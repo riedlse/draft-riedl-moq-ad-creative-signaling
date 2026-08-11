@@ -526,13 +526,65 @@ Table of Contents
    (This section follows [RFC7942] and is to be removed before
    publication as an RFC.)
 
-   The author operates a working server-side ad insertion deployment
-   over MOQT: fixed-timeline linear channels with a stitcher publishing
-   SCTE-35-conditioned placement opportunities alongside creative and
-   tracking metadata on companion tracks, with client-requested tracking
-   resolved through a distributor tracking endpoint of the kind
-   described in Section 7.  The timing rules in Section 5 derive from
-   that running code rather than from speculation.
+   The author operates a continuously running server-side ad insertion
+   deployment over MoQ.  This section states what that deployment does
+   and does not implement, because the two are easy to conflate: the
+   mechanism this document specifies is NOT yet what the deployment
+   publishes.
+
+   Running today:
+
+   *  Fixed-timeline linear channels, publisher to relay to browser,
+      with ad creatives spliced server-side into one shared broadcast --
+      so every subscriber receives the same media objects, which is the
+      condition that motivates this document (Section 1).
+
+   *  Placement opportunities detected from *inbound* in-band SCTE-35
+      (emsg), parsed to a break window and duration.  The deployment
+      consumes SCTE-35; it does not publish SCTE-35 records, and it does
+      not publish a splice signaling track.
+
+   *  Creative identity and per-creative tracking published *in band*,
+      ahead of the splice, on a control track the subscriber reads
+      before the first event renders.  That validates the delivery model
+      in Section 5.3.  The track's schema is the deployment's own and is
+      NOT the event class defined here.
+
+   *  Tracking indirection exactly as described in Section 7: a proxy
+      holds vendor beacon URLs and returns compact per-event capability
+      URLs, which devices fire with their own client identifier, with
+      per-{uuid, event, client} deduplication so a shared broadcast
+      yields per-device counts.  This is the part of the document with
+      the most operational experience behind it.
+
+   *  An MSF catalog, published automatically by the MoQ implementation
+      in use and verified against an interop profile by a tool in the
+      same codebase.  A capture from the live deployment validates
+      clean, so the transport and catalog layers this document builds on
+      are exercised, not assumed.
+
+   NOT yet implemented:
+
+   *  The event class this document defines.  No track advertises
+      eventType urn:svta:advertising-wg:ad-creative-signaling, and no
+      record carries an SVTA 2053-1 Version 2 carriage envelope
+      (Section 4.3).  Migrating the control track to the envelope form
+      is in progress.
+
+   *  The IANA registration in Section 12, which this document requests.
+
+   *  Correlation with a co-published splice signaling track
+      (Section 5.2), since no such track is published.
+
+   Consequently the timing and lead-time rules in Section 5 and
+   Section 5.3 derive from running code, while the record format in
+   Section 4 and the payload constraint in Section 4.3 are specified but
+   unexercised.  The JSON Schema and test vectors in Appendix "JSON
+   Schema and Test Vectors" are conformance examples written against
+   this specification, not captured output; the rules they express are
+   executed in the implementation's own test suite, so they are
+   internally consistent, but they have not yet been produced by a
+   publisher.
 
 
 11.  Security Considerations
