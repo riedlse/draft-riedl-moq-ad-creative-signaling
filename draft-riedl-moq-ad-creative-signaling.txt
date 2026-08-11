@@ -235,11 +235,16 @@ Table of Contents
    (MOQT Location) index MAY be used for records bound to a delivery
    position rather than a media time.
 
-   When a splice signaling track accompanies this track, index selection
-   SHOULD follow the same selection and precedence rules that track
-   applies (Section 4.2 of [SCTE35-MOQ]), so that co-timed records on
-   the two tracks carry comparable index values (Section 5.2).
-
+   When a splice signaling track accompanies this track, records on the
+   two tracks that describe the same point on the media timeline SHOULD
+   carry index values of the same kind, chosen by the same precedence,
+   so that a consumer can correlate them without converting between
+   index types (Section 5.2).  The requirement is on the observable
+   result -- comparable indices for co-timed records -- not on adopting
+   any particular document's selection algorithm.  A deployment carrying
+   SCTE-35 records per [SCTE35-MOQ] satisfies it by applying that
+   specification's index selection rules (its Section 4.2) to both
+   tracks.
 
 4.3.  Payload: Version 2 Carriage Envelope
 

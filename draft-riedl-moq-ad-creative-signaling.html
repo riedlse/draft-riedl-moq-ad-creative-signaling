@@ -1437,11 +1437,15 @@ the <code>m</code> (media time) index, expressed in the coordinate space of the
 defined in wallclock terms and no media time is available. The <code>l</code>
 (MOQT Location) index <span class="bcp14">MAY</span> be used for records bound to a delivery
 position rather than a media time.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
-<p id="section-4.2-2">When a splice signaling track accompanies this track, index selection
-<span class="bcp14">SHOULD</span> follow the same selection and precedence rules that track
-applies (Section 4.2 of <span>[<a href="#SCTE35-MOQ" class="cite xref">SCTE35-MOQ</a>]</span>), so that co-timed records on
-the two tracks carry comparable index values (<a href="#correlation" class="auto internal xref">Section 5.2</a>).<a href="#section-4.2-2" class="pilcrow">¶</a></p>
-<p id="section-4.2-3"></p>
+<p id="section-4.2-2">When a splice signaling track accompanies this track, records on the two
+tracks that describe the same point on the media timeline <span class="bcp14">SHOULD</span> carry
+index values of the same kind, chosen by the same precedence, so that a
+consumer can correlate them without converting between index types
+(<a href="#correlation" class="auto internal xref">Section 5.2</a>). The requirement is on the observable result --
+comparable indices for co-timed records -- not on adopting any particular
+document's selection algorithm. A deployment carrying SCTE-35 records per
+<span>[<a href="#SCTE35-MOQ" class="cite xref">SCTE35-MOQ</a>]</span> satisfies it by applying that specification's index
+selection rules (its Section 4.2) to both tracks.<a href="#section-4.2-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="payload">
