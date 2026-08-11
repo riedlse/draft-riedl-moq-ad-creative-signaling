@@ -246,15 +246,15 @@ defined in wallclock terms and no media time is available. The `l`
 (MOQT Location) index MAY be used for records bound to a delivery
 position rather than a media time.
 
-When a splice signaling track accompanies this track, index selection
-SHOULD follow the same selection and precedence rules that track
-applies (Section 4.2 of {{SCTE35-MOQ}}), so that co-timed records on
-the two tracks carry comparable index values ({{correlation}}).
-
-{::comment} TODO: decide whether to restate the full wilaw 4.2
-precedence rules normatively here (self-contained) or keep this
-alignment-by-reference. Restating is safer while SCTE35-MOQ is
-informative. {:/comment}
+When a splice signaling track accompanies this track, records on the two
+tracks that describe the same point on the media timeline SHOULD carry
+index values of the same kind, chosen by the same precedence, so that a
+consumer can correlate them without converting between index types
+({{correlation}}). The requirement is on the observable result --
+comparable indices for co-timed records -- not on adopting any particular
+document's selection algorithm. A deployment carrying SCTE-35 records per
+{{SCTE35-MOQ}} satisfies it by applying that specification's index
+selection rules (its Section 4.2) to both tracks.
 
 ## Payload: Version 2 Carriage Envelope {#payload}
 
