@@ -1,0 +1,14 @@
+{
+  "m": 60000,
+  "data": {
+    "version": 2,
+    "type": "slot",
+    "payload": [
+      { "id": "ad-c843aa0d", "index": 0, "startTime": 60000, "duration": 30030,
+        "trackingEvents": [
+          { "event": "start",    "startTime": 0,     "urls": ["https://aip.example/v2/impression/3a8f6d21-9e40-4b7c-85f1-2c7b9e04a6d8/start"] },
+          { "event": "complete", "startTime": 30030, "urls": ["https://aip.example/v2/impression/3a8f6d21-9e40-4b7c-85f1-2c7b9e04a6d8/complete"] }
+        ] }
+    ]
+  }
+}

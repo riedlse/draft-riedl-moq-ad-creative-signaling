@@ -1,0 +1,11 @@
+{
+  "m": 67507,
+  "data": {
+    "version": 2,
+    "type": "trackingEvent",
+    "payload": [
+      { "event": "firstQuartile", "adId": "ad-32600921", "startTime": 7507,
+        "urls": ["https://aip.example/v2/impression/9f2c1e84-3b7a-4d21-9c05-6ea8b1d47f3e/firstQuartile"] }
+    ]
+  }
+}

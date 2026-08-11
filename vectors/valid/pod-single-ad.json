@@ -1,0 +1,30 @@
+{
+  "m": 60000,
+  "data": {
+    "version": 2,
+    "type": "pod",
+    "payload": [
+      {
+        "id": "brk-947",
+        "startTime": 60000,
+        "duration": 30030,
+        "slots": [
+          {
+            "id": "ad-32600921",
+            "index": 0,
+            "startTime": 60000,
+            "duration": 30030,
+            "trackingEvents": [
+              { "event": "start",         "startTime": 0,     "urls": ["https://aip.example/v2/impression/9f2c1e84-3b7a-4d21-9c05-6ea8b1d47f3e/start"] },
+              { "event": "firstQuartile", "startTime": 7507,  "urls": ["https://aip.example/v2/impression/9f2c1e84-3b7a-4d21-9c05-6ea8b1d47f3e/firstQuartile"] },
+              { "event": "midpoint",      "startTime": 15015, "urls": ["https://aip.example/v2/impression/9f2c1e84-3b7a-4d21-9c05-6ea8b1d47f3e/midpoint"] },
+              { "event": "thirdQuartile", "startTime": 22522, "urls": ["https://aip.example/v2/impression/9f2c1e84-3b7a-4d21-9c05-6ea8b1d47f3e/thirdQuartile"] },
+              { "event": "complete",      "startTime": 30030, "urls": ["https://aip.example/v2/impression/9f2c1e84-3b7a-4d21-9c05-6ea8b1d47f3e/complete"] }
+            ]
+          }
+        ]
+      }
+    ],
+    "features": { "capabilityUrls": true, "perDeviceDedup": true }
+  }
+}

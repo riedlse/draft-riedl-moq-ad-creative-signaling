@@ -1,0 +1,21 @@
+{
+  "m": 150000,
+  "data": {
+    "version": 2,
+    "type": "pod",
+    "payload": [
+      {
+        "id": "brk-948",
+        "startTime": 150000,
+        "duration": 30000,
+        "slots": [
+          { "id": "ad-addams-family-15", "index": 0, "startTime": 150000, "duration": 15015,
+            "trackingEvents": [ { "event": "start", "startTime": 0, "urls": ["https://aip.example/v2/impression/1d0b7a55-2c9e-4f13-8a67-0b3d5e9c2a41/start"] } ] },
+          { "id": "ad-aeb322e0", "index": 1, "startTime": 165015, "duration": 15015,
+            "trackingEvents": [ { "event": "start", "startTime": 0, "urls": ["https://aip.example/v2/impression/7c4e2f90-8b16-4a53-9d20-5f8a1c6b3e07/start"] } ] }
+        ]
+      }
+    ],
+    "features": { "capabilityUrls": true, "perDeviceDedup": true }
+  }
+}

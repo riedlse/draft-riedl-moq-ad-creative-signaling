@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://riedlse.github.io/draft-riedl-moq-ad-creative-signaling/schema/ad-creative-record.schema.json",
+  "title": "Ad creative signaling Event Timeline record",
+  "description": "One record on an MSF Event Timeline track whose eventType is urn:svta:advertising-wg:ad-creative-signaling. Encodes the two MUST requirements of draft-riedl-moq-ad-creative-signaling section 4: exactly one index reference field, and a data member holding exactly one SVTA 2053-1 Version 2 carriage envelope. Note the DASH and HLS bindings also accept bare Version 1 payload objects; this binding does not.",
+  "type": "object",
+  "properties": {
+    "m": {
+      "description": "Media time index, in the coordinate space of the depends media track. RECOMMENDED for records describing creatives spliced into the media timeline.",
+      "type": "number"
+    },
+    "t": {
+      "description": "Wallclock index. For placement opportunities defined in wallclock terms where no media time is available.",
+      "type": ["number", "string"]
+    },
+    "l": {
+      "description": "MOQT Location index, for records bound to a delivery position rather than a media time.",
+      "type": ["number", "string", "object"]
+    },
+    "data": { "$ref": "#/$defs/envelope" }
+  },
+  "required": ["data"],
+  "oneOf": [
+    { "required": ["m"], "not": { "anyOf": [{ "required": ["t"] }, { "required": ["l"] }] } },
+    { "required": ["t"], "not": { "anyOf": [{ "required": ["m"] }, { "required": ["l"] }] } },
+    { "required": ["l"], "not": { "anyOf": [{ "required": ["m"] }, { "required": ["t"] }] } }
+  ],
+  "$defs": {
+    "envelope": {
+      "title": "SVTA 2053-1 Version 2 carriage envelope",
+      "type": "object",
+      "properties": {
+        "version": { "const": 2 },
+        "type": { "enum": ["pod", "slot", "trackingEvent"] },
+        "payload": { "type": "array" },
+        "features": { "type": "object" }
+      },
+      "required": ["version", "type", "payload"]
+    }
+  }
+}
