@@ -1,0 +1,670 @@
+
+
+
+
+Media Over QUIC                                                 S. Riedl
+Internet-Draft                                                 Paramount
+Intended status: Informational                            11 August 2026
+Expires: 12 February 2027
+
+
+           Ad Creative Signaling over the MSF Event Timeline
+              draft-riedl-moq-ad-creative-signaling-latest
+
+Abstract
+
+   This document defines the carriage of ad creative signaling --
+   creative identity, tracking events, and measurement verification
+   metadata as specified by SVTA 2053-1 -- in records on a Media over
+   QUIC (MOQT) Streaming Format (MSF) Event Timeline track.  It
+   complements the carriage of SCTE-35 splice signaling over the same
+   mechanism: splice events describe where placement opportunities occur
+   on a media timeline, while the event class defined here describes the
+   creatives that fill them and how their playback is to be measured.
+   This binding is the MSF counterpart of the DASH and HLS carriage
+   bindings defined by SVTA 2053-1, which defines none for MOQT.
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   The latest revision of this draft can be found at
+   https://riedlse.github.io/draft-riedl-moq-ad-creative-signaling/.
+   Status information for this document may be found at
+   https://datatracker.ietf.org/doc/draft-riedl-moq-ad-creative-
+   signaling/.
+
+   Discussion of this document takes place on the Media Over QUIC
+   Working Group mailing list (mailto:moq@ietf.org), which is archived
+   at https://mailarchive.ietf.org/arch/browse/moq/.  Subscribe at
+   https://www.ietf.org/mailman/listinfo/moq/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/riedlse/draft-riedl-moq-ad-creative-signaling.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 12 February 2027.
+
+Copyright Notice
+
+   Copyright (c) 2026 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+   2.  Conventions and Definitions
+   3.  Track Properties
+   4.  Record Format
+     4.1.  Structure
+     4.2.  Index Reference Selection
+     4.3.  Payload: Version 2 Carriage Envelope
+   5.  Timing and Correlation
+     5.1.  Shared Index Space
+     5.2.  Correlation with Splice Signaling
+     5.3.  Publication Lead
+     5.4.  Container-Relative Interior Timing
+   6.  Worked Example
+   7.  Tracking Indirection and Capability URLs
+     7.1.  Client Identity and Per-Device Accounting
+     7.2.  Load Shaping
+   8.  Per-Session Insertion Plans
+   9.  Open Issues
+   10. Implementation Status
+   11. Security Considerations
+     11.1.  Integrity of Tracking Records
+     11.2.  Amplification and Load
+     11.3.  Payload Validation
+     11.4.  Privacy
+   12. IANA Considerations
+   13. References
+     13.1.  Normative References
+     13.2.  Informative References
+   Acknowledgments
+   JSON Schema and Test Vectors
+   Author's Address
+
+1.  Introduction
+
+   SCTE-35 messages [SCTE35] carried on an MSF Event Timeline track
+   [SCTE35-MOQ] give Media over QUIC deployments the function SCTE-35
+   was built for: signaling placement opportunities -- break windows and
+   splice conditioning -- on a shared media timeline, using the Event
+   Timeline mechanism of the MOQT Streaming Format (Section 8.1 of
+   [MSF]).  What that layer deliberately does not carry is a description
+   of what plays inside those windows.
+
+   On HLS and DASH, that gap is filled at the manifest: a packager or
+   stitcher decorates each session's playlist with creative identity and
+   tracking metadata.  On a one-to-many publish/subscribe transport
+   [MOQT] there is no per-session manifest to decorate -- every
+   subscriber receives the same cached objects -- so anything a client
+   needs at render time (which creative is playing, which tracking
+   resources to request at which quartiles, which verification script to
+   load) must be delivered in band, on the shared timeline, ahead of the
+   splice point.
+
+   This need is not incidental.  Accurate measurement of server-side ad
+   insertion increasingly means client-requested tracking -- per-device
+   accounting at render time rather than server-side firing at publish
+   time, which measures the wrong clock -- and verification means
+   initializing a measurement script [OMSDK] before the slot renders.
+   SVTA 2053-1 [SVTA2053] already standardizes exactly this payload: a
+   Pod/Slot/TrackingEvent/Verification data model (Section 4 of
+   [SVTA2053]), explicitly agnostic to client-side, server-side, and
+   server-guided insertion, with carriage bindings defined per stream
+   format -- DASH EventStream, HLS EXT-X-DATERANGE, HLS Interstitials --
+   and none for MOQT.
+
+   This document fills that gap using the structures [MSF] and
+   [SCTE35-MOQ] already put in place: it defines an Event Timeline event
+   class whose records carry SVTA 2053-1 Version 2 carriage envelopes,
+   specifies how those records are timed and correlated with splice
+   signaling, and gives operational guidance for tracking on one-to-many
+   delivery.  It changes nothing in the SVTA 2053-1 data model; payload
+   normativity remains with [SVTA2053], and this binding could
+   additionally be published as a carriage section in a future revision
+   of that specification.
+
+
+2.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+   This document uses the terms Track, Group, Object, Event Timeline,
+   and the index reference fields t, l, and m as defined in [MSF], and
+   the terms Pod, Slot, Tracking Event, Verification, and carriage
+   envelope as defined in Sections 4 and 5 of [SVTA2053].
+
+   Additionally:
+
+   Distributor:  The party operating the publisher that emits the media
+      and signaling tracks (typically the party performing ad
+      insertion).
+
+   Placement opportunity:  A window on the media timeline, typically
+      signaled by SCTE-35, in which advertising content plays.
+
+   Splice signaling track:  An Event Timeline track carrying SCTE-35
+      records per [SCTE35-MOQ].
+
+   Capability URL:  A URL whose knowledge alone grants the ability to
+      perform a narrow action, used here as a short-lived, opaque
+      reference to a distributor-operated tracking endpoint [CAP-URLS].
+
+3.  Track Properties
+
+   An MSF track carrying ad creative signaling:
+
+   *  MUST declare a packaging value of "eventtimeline";
+
+   *  MUST declare an eventType value of "urn:svta:advertising-wg:ad-
+      creative-signaling".  This is the data scheme URI defined in
+      Section 5 of [SVTA2053], used unversioned: as in the DASH binding,
+      the payload version is carried inside the payload itself
+      (Section 4.3);
+
+   *  MUST declare a depends attribute naming the media track or tracks
+      whose timeline its records index.  When the track accompanies a
+      splice signaling track, it SHOULD name the same media track(s) as
+      that track.
+
+   Because eventType is uniform for a track, and because implementations
+   do not mix payload flavors within one Event Timeline track (see
+   Section 4.3 of [SCTE35-MOQ] for the same rule applied to SCTE-35), ad
+   creative signaling is carried on a _sibling_ Event Timeline track
+   alongside any splice signaling track, not interleaved within it.
+
+4.  Record Format
+
+4.1.  Structure
+
+   Each record is a JSON object [RFC8259] following the Event Timeline
+   data format of Section 8.1 of [MSF].  A record MUST contain:
+
+   *  exactly one index reference field -- t (wallclock), l (MOQT
+      Location), or m (media time) -- selected per Section 4.2; and
+
+   *  a data field whose value is exactly one Version 2 carriage
+      envelope as defined in Section 4.3.
+
+4.2.  Index Reference Selection
+
+   Records describing creatives spliced into the media timeline SHOULD
+   use the m (media time) index, expressed in the coordinate space of
+   the depends media track and sharing that track's timeline zero point.
+   The t (wallclock) index MAY be used where a placement opportunity is
+   defined in wallclock terms and no media time is available.  The l
+   (MOQT Location) index MAY be used for records bound to a delivery
+   position rather than a media time.
+
+   When a splice signaling track accompanies this track, index selection
+   SHOULD follow the same selection and precedence rules that track
+   applies (Section 4.2 of [SCTE35-MOQ]), so that co-timed records on
+   the two tracks carry comparable index values (Section 5.2).
+
+
+4.3.  Payload: Version 2 Carriage Envelope
+
+   The data field carries one SVTA 2053-1 Version 2 carriage envelope
+   (Section 5.2.2.1 of [SVTA2053]) directly:
+
+   { "version": 2, "type": "...", "payload": [ ... ],
+     "features": { ... } }
+
+   The envelope is self-describing -- version and payload type are
+   fields -- so no additional wrapper member is defined.
+
+   Unlike the DASH and HLS bindings, where bare Version 1 payload
+   objects are also legal, records in this binding MUST carry Version 2
+   envelopes only.  On a fan-out transport the envelope's features flags
+   are the only capability-signaling mechanism available, and the
+   envelope type field is what allows a uniform track to carry pod,
+   slot, and trackingEvent payloads interchangeably.
+
+   It is RECOMMENDED that a publisher emit one pod envelope per
+   placement opportunity. slot and trackingEvent envelopes MAY be used
+   (mirroring the granularity options of the DASH binding), but
+   deduplication under redelivery is simplest at pod granularity (see
+   Section 9).
+
+5.  Timing and Correlation
+
+5.1.  Shared Index Space
+
+   A creative signaling record's index values are interpreted in the
+   same coordinate space, with the same timeline zero point, as the
+   depends media track -- and therefore the same space as an
+   accompanying splice signaling track that names the same media track.
+
+5.2.  Correlation with Splice Signaling
+
+   The record or records describing a placement opportunity SHOULD carry
+   the same index value as the SCTE-35 record whose splice point opens
+   that opportunity (the same m, or the same l Location when the splice
+   is immediate).  A pod whose start differs from the splice point MUST
+   carry an index within the window the splice defines.
+
+5.3.  Publication Lead
+
+   The publisher SHOULD publish a placement opportunity's creative
+   signaling record(s) at least one full Group ahead of the media Group
+   containing the splice point.  Clients render seconds behind delivery,
+   while render-time tracking and verification fire windows are sub-
+   second: the tracking table must already be resident on the device
+   when the first ad frame displays, with no time for a lookup round
+   trip.
+
+
+5.4.  Container-Relative Interior Timing
+
+   Within the envelope, timing is container-relative, per Sections 4.4.2
+   and 4.4.5 of [SVTA2053]: a Slot's start is relative to its Pod, and a
+   Tracking Event's offset is relative to its container.  Only the
+   record's index reference is absolute.  Consequently, redelivery,
+   looped schedules, and regional timeline shifts never require payload
+   rewrites -- which matters where relays cache and re-serve objects.
+
+6.  Worked Example
+
+   An SCTE-35 record on the splice signaling track (reproduced from
+   Section 5.1 of [SCTE35-MOQ]) announces a splice at media time 480500
+   ms:
+
+   {
+     "m": 480500,
+     "data": {
+       "scte35_payload":
+         "/DAhAAAAAAAAAP/wFAUAAArXf+/+AAAAAH4AARSyAAAAAA=="
+     }
+   }
+
+   The companion record on the ad creative signaling track, published at
+   least one Group earlier (Section 5.3), carries the same index.  It
+   describes a 45.045-second pod with two slots: explicit quartile
+   tracking and a verification resource on slot 1 (no offset on the
+   quartile events, so timing is driven by event-type semantics per
+   Section 4.4.5 of [SVTA2053]), and lazily resolved tracking on slot 2
+   via $remote (Section 7):
+
+   {
+     "m": 480500,
+     "data": {
+       "version": 2,
+       "type": "pod",
+       "payload": [{
+         "duration": 45.045,
+         "slots": [
+           {
+             "type": "linear",
+             "start": 0.0,
+             "duration": 30.03,
+             "identifiers": [{
+               "scheme":
+         "urn:smpte:ul:060E2B34.01040101.01200900.00000000",
+               "value": "ABCD1234567H"
+             }],
+             "tracking": [
+               { "type": "impression", "urls": [
+                 "https://beacons.example.net/c/7f3a92/imp"
+               ] },
+               { "type": "firstQuartile", "urls": [
+                 "https://beacons.example.net/c/7f3a92/q1"
+               ] },
+               { "type": "midpoint", "urls": [
+                 "https://beacons.example.net/c/7f3a92/q2"
+               ] },
+               { "type": "thirdQuartile", "urls": [
+                 "https://beacons.example.net/c/7f3a92/q3"
+               ] },
+               { "type": "complete", "urls": [
+                 "https://beacons.example.net/c/7f3a92/done"
+               ] }
+             ],
+             "verifications": [{
+               "vendor": "vendor.example-omid",
+               "parameters": "key=value",
+               "resource":
+                 "https://cdn.vendor.example/omid-verify.js"
+             }]
+           },
+           {
+             "type": "linear",
+             "start": 30.03,
+             "duration": 15.015,
+             "identifiers": [{
+               "scheme": "urn:com:example:ads:id",
+               "value":
+                 "972c79e1-2363-403e-9287-a0fa4323c389"
+             }],
+             "$remote": {
+               "tracking":
+                 "https://beacons.example.net/c/9d41c7/trk"
+             }
+           }
+         ],
+         "tracking": [
+           { "type": "podStart", "urls": [
+             "https://beacons.example.net/c/p8842/start"
+           ] },
+           { "type": "podEnd", "urls": [
+             "https://beacons.example.net/c/p8842/end"
+           ] }
+         ]
+       }],
+       "features": { "remoteFields": true }
+     }
+   }
+
+7.  Tracking Indirection and Capability URLs
+
+   Section 5.2.2.2 of [SVTA2053] already says interpreters SHOULD defer
+   $remote resolution until the containing object is about to become
+   active.  That deferral maps naturally onto broadcast fan-out, with
+   one addition: on a shared timeline, the URLs in tracking and $remote
+   fields SHOULD be short-lived capability URLs [CAP-URLS] referencing a
+   distributor-operated tracking endpoint (a "beacon proxy"), rather
+   than raw measurement-vendor URLs.
+
+   At activation, the client requests the capability URL (or resolves
+   $remote from it), appending a client identifier (Section 7.1).  The
+   endpoint performs macro substitution per Section 6 of [VAST] (as
+   Section 5.2.3 of [SVTA2053] provides) and requests the corresponding
+   vendor resources with the calling device's context.  Two properties
+   fall out for free on one-to-many delivery:
+
+   *  *Payload size*: shared-timeline records stay small even for heavy
+      vendor tracking lists, with late binding after the pod record
+      ships.
+
+   *  *Privacy and cache-safety*: no per-user macro values and no vendor
+      endpoint inventory appear in bytes that every subscriber and relay
+      cache can read.
+
+7.1.  Client Identity and Per-Device Accounting
+
+   Because every subscriber receives identical records, per-device
+   measurement requires the device to identify itself at request time,
+   not in the payload.  A client SHOULD append a pseudonymous, session-
+   scoped client identifier (issued and signed out of band, for example
+   with the playback session) as a query parameter when requesting
+   capability URLs.  The tracking endpoint can then deduplicate on
+   (resource, event, client identifier), count unique reach, and forward
+   at most one request per device per event to vendor resources with
+   that device's context -- preserving per-device measurement semantics
+   without per-device payloads.  Raw device identifiers MUST NOT appear
+   in requested URLs.
+
+7.2.  Load Shaping
+
+   On a shared fixed timeline, every subscriber reaches the same
+   tracking instant at the same wallclock moment; naive activation-time
+   behavior synchronizes both the $remote resolution fetches and the
+   tracking requests of the entire audience.  Clients SHOULD resolve
+   $remote fields within a randomized window ahead of activation (the
+   publication lead of Section 5.3 provides the margin), and SHOULD
+   apply bounded random jitter to tracking requests whose measurement
+   semantics tolerate it, carrying the original event time as data where
+   the measurement moment must be preserved.  Verification-critical
+   requests with sub-second fire windows are the exception and are
+   expected to be provisioned for.
+
+8.  Per-Session Insertion Plans
+
+   Everything above is deliberately identical bytes for every subscriber
+   -- that is what makes it relay-cacheable.  Server-guided insertion,
+   per-session capability URLs, and entitlement-scoped fields are per-
+   session by definition and cannot ride the shared timeline.  The
+   authors believe the standardization target for that layer is a
+   separate per-session insertion plan mechanism: a unicast-scoped
+   metadata track (or equivalent side channel) carrying distributor
+   session metadata -- the session's pod assignment for each shared-
+   timeline placement opportunity, its capability URLs, and policy
+   fields -- which composes with the shared events defined here (the
+   shared timeline announces placement geometry and the broadcast/
+   default pod; the insertion plan overlays the per-session decision).
+
+   That mechanism is out of scope for this document and deserves its
+   own.  It is named here only as a design constraint: the event class
+   defined in this document is intended to be overridden or
+   parameterized by such a layer without being redefined by it.
+
+9.  Open Issues
+
+   This section lists issues to be resolved through working group
+   discussion; it is to be removed before publication.
+
+   1.  *Granularity*: one pod envelope per placement opportunity (the
+       RECOMMENDED default), or slot/trackingEvent envelopes per
+       creative?  Redelivery deduplication is simpler at pod
+       granularity.
+
+   2.  *Update semantics for live*: pods change close to air.  Is a
+       later record at the same index a full supersede (last-writer-
+       wins), or is a patch rule needed?  [SVTA2053] has no cancel/
+       supersede concept; SCTE-35 inherits cancellation from its payload
+       semantics.
+
+   3.  *Deduplication and late joiners*: the DASH/HLS bindings give each
+       event a manifest-unique id for dedup on re-encounter; MSF records
+       carry no id.  Is (eventType, index, payload) a sufficient dedup
+       key under relay redelivery and FETCH catch-up -- and which past
+       records MUST a mid-break joiner fetch?
+
+   4.  *Switching sets*: when ladder rungs are separate tracks, does one
+       creative signaling track depends on all of them?  Splice
+       conditioning can land at slightly different media times per rung;
+       container-relative interior offsets survive that, but a single m
+       may not.  Sender-side track switching under discussion in the MOQ
+       Working Group sharpens this: if relays select the delivered rung
+       per subscriber and switch at Group boundaries, (a) these records
+       must remain valid for every rung of a switching set, (b) splice
+       conditioning must keep switching sets coherent at placement
+       boundaries, and (c) the delivered rendition is known only at the
+       client, so rendition-level measurement is necessarily client-
+       observed.
+
+   5.  *Common-format scope*: is the Event Timeline binding the whole
+       story, or is a container-level mapping (the envelope in CMAF
+       emsg) also wanted so one payload survives packager transit across
+       HLS/DASH/MOQT boundaries?
+
+   6.  *Feature negotiation on one-to-many*: [SVTA2053] interpreters
+       SHOULD error on unsupported flagged features -- sensible unicast
+       behavior, but a broadcast publisher cannot negotiate per
+       subscriber.  Should the catalog advertise which features a track
+       uses so clients subscribe eyes-open?
+
+   7.  *Record integrity*: do these records need payload signing (JWS or
+       COSE over the envelope, or a catalog-pinned key) beyond transport
+       authentication?  See Section 11.
+
+10.  Implementation Status
+
+   (This section follows [RFC7942] and is to be removed before
+   publication as an RFC.)
+
+   The author operates a working server-side ad insertion deployment
+   over MOQT: fixed-timeline linear channels with a stitcher publishing
+   SCTE-35-conditioned placement opportunities alongside creative and
+   tracking metadata on companion tracks, with client-requested tracking
+   resolved through a distributor tracking endpoint of the kind
+   described in Section 7.  The timing rules in Section 5 derive from
+   that running code rather than from speculation.
+
+
+11.  Security Considerations
+
+11.1.  Integrity of Tracking Records
+
+   Tracking URLs move money.  A relay path is not end-to-end
+   confidential or authentic by default, and a tampered creative
+   signaling record turns a large synchronized audience into a request
+   cannon aimed at an arbitrary URL -- amplifying the denial-of-service
+   concerns already noted for splice records (Section 6.3 of
+   [SCTE35-MOQ]) with an attacker-chosen target.  Deployments MUST
+   authenticate the publication path for this track, and receivers
+   SHOULD restrict tracking requests to URL authorities the distributor
+   has designated (capability URLs at a distributor endpoint make this
+   restriction natural).  Whether records additionally need payload
+   signing is tracked in Section 9.
+
+11.2.  Amplification and Load
+
+   Even absent an attacker, activation-synchronized behavior across a
+   broadcast audience is a self-inflicted denial of service; the
+   mitigations in Section 7.2 are accordingly stated as client SHOULDs.
+   Capability URLs bound the blast radius of both cases: devices address
+   the distributor's endpoint, which applies its own policy before any
+   vendor is contacted.
+
+11.3.  Payload Validation
+
+   Receivers MUST treat record payloads as untrusted input: enforce size
+   and nesting limits on the JSON envelope, and accept only https URLs
+   in tracking, $remote, and verification fields.  Verification
+   resources are executable code; clients MUST apply their platform's
+   script-loading policy and SHOULD load them only for slots that will
+   actually render.
+
+11.4.  Privacy
+
+   By construction, the shared timeline carries no per-user data:
+   records are identical for every subscriber, per-device identity is
+   appended by the client at request time (Section 7.1), and identifiers
+   are pseudonymous and session-scoped.  Indirection through capability
+   URLs additionally keeps vendor endpoint inventories and macro-
+   expanded values out of relay caches.  Distributor tracking endpoints
+   handle real device context (addresses, user agents) and MUST apply
+   applicable consent and data-protection policy before forwarding it to
+   vendors.
+
+12.  IANA Considerations
+
+   This document requests registration of the following entry in the
+   "MSF Event Timeline Types" registry established by Section 14.2 of
+   [MSF].  [SCTE35-MOQ] registers entries in that same registry; this
+   document follows the same pattern.
+
+    +==========================+=========================+============+
+    | Event Type               | Description             | Reference  |
+    +==========================+=========================+============+
+    | urn:svta:advertising-    | SVTA 2053-1 ad creative | This       |
+    | wg:ad-creative-signaling | signaling, Version 2    | document;  |
+    |                          | carriage envelope       | [SVTA2053] |
+    +--------------------------+-------------------------+------------+
+
+         Table 1: Addition to the MSF Event Timeline Types registry
+
+   Editor's note (to be resolved before publication): the URN is defined
+   and owned by the SVTA Advertising Working Group; this registration is
+   made in coordination with that group.
+
+13.  References
+
+13.1.  Normative References
+
+   [MSF]      Law, W. and S. Nandakumar, "MOQT Streaming Format", Work
+              in Progress, Internet-Draft, draft-ietf-moq-msf-01, 2 June
+              2026, <https://datatracker.ietf.org/doc/html/draft-ietf-
+              moq-msf-01>.
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [RFC8259]  Bray, T., Ed., "The JavaScript Object Notation (JSON) Data
+              Interchange Format", STD 90, RFC 8259,
+              DOI 10.17487/RFC8259, December 2017,
+              <https://www.rfc-editor.org/rfc/rfc8259>.
+
+   [SVTA2053] Streaming Video Technology Alliance (SVTA), Advertising
+              Working Group, "SVTA 2053-1: Ad Creative Signaling in DASH
+              and HLS, Revision 1.0", 19 May 2025,
+              <https://www.svta.org/>.
+
+13.2.  Informative References
+
+   [CAP-URLS] Tennison, J., "Good Practices for Capability URLs",
+              W3C First Public Working Draft, February 2014,
+              <https://www.w3.org/TR/capability-urls/>.
+
+   [MOQT]     Nandakumar, S., Vasiliev, V., Swett, I., and A. Frindell,
+              "Media over QUIC Transport", Work in Progress, Internet-
+              Draft, draft-ietf-moq-transport-19, 6 July 2026,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-moq-
+              transport-19>.
+
+   [OMSDK]    IAB Technology Laboratory, "Open Measurement SDK",
+              <https://iabtechlab.com/standards/open-measurement-sdk/>.
+
+   [RFC7942]  Sheffer, Y. and A. Farrel, "Improving Awareness of Running
+              Code: The Implementation Status Section", BCP 205,
+              RFC 7942, DOI 10.17487/RFC7942, July 2016,
+              <https://www.rfc-editor.org/rfc/rfc7942>.
+
+   [SCTE35]   Society of Cable Telecommunications Engineers, "Digital
+              Program Insertion Cueing Message", ANSI/SCTE 35 2022,
+              2022.
+
+   [SCTE35-MOQ]
+              Law, W. and S. Nandakumar, "SCTE35 transmission over MSF
+              Event Timeline", Work in Progress, Internet-Draft, draft-
+              wilaw-moq-scte35-event-timeline-00, 6 July 2026,
+              <https://datatracker.ietf.org/doc/html/draft-wilaw-moq-
+              scte35-event-timeline-00>.
+
+   [VAST]     IAB Technology Laboratory, "Digital Video Ad Serving
+              Template (VAST), Version 4.2", June 2019,
+              <https://iabtechlab.com/standards/vast/>.
+
+Acknowledgments
+
+   This document deliberately reuses the carriage pattern established by
+   Will Law and Suhas Nandakumar in [SCTE35-MOQ], and is designed to
+   compose with it.  The payload data model is the work of the SVTA
+   Advertising Working Group [SVTA2053].
+
+
+JSON Schema and Test Vectors
+
+
+   (To be provided in a future revision.)
+
+Author's Address
+
+   Steven Riedl
+   Paramount
+   Email: steven.riedl@pluto.tv

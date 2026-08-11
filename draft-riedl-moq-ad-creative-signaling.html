@@ -1,0 +1,2010 @@
+<!DOCTYPE html>
+<html lang="en" class="Internet-Draft">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>Ad Creative Signaling over the MSF Event Timeline</title>
+<meta content="Steven Riedl" name="author">
+<meta content="
+       This document defines the carriage of ad creative signaling -- creative
+identity, tracking events, and measurement verification metadata as
+specified by SVTA 2053-1 -- in records on a Media over QUIC (MOQT)
+Streaming Format (MSF) Event Timeline track. It complements the carriage
+of SCTE-35 splice signaling over the same mechanism: splice events
+describe where placement opportunities occur on a media timeline, while
+the event class defined here describes the creatives that fill them and
+how their playback is to be measured. This binding is the MSF
+counterpart of the DASH and HLS carriage bindings defined by SVTA
+2053-1, which defines none for MOQT. 
+    " name="description">
+<meta content="xml2rfc 3.34.0" name="generator">
+<meta content="media over quic" name="keyword">
+<meta content="moq" name="keyword">
+<meta content="msf" name="keyword">
+<meta content="event timeline" name="keyword">
+<meta content="advertising" name="keyword">
+<meta content="ad signaling" name="keyword">
+<meta content="ssai" name="keyword">
+<meta content="beacon" name="keyword">
+<meta content="draft-riedl-moq-ad-creative-signaling-latest" name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.34.0
+    Python 3.14.5
+    ConfigArgParse 1.7.5
+    google-i18n-address 3.1.1
+    intervaltree 3.2.1
+    Jinja2 3.1.6
+    lxml 6.1.1
+    natsort 8.4.0
+    platformdirs 4.11.0
+    pycountry 24.6.1
+    PyYAML 6.0.3
+    requests 2.33.1
+    wcwidth 0.8.2
+-->
+<link href="draft-riedl-moq-ad-creative-signaling.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Italic'), local('Lora-Italic'), url('https://martinthomson.github.io/rfc-css/fonts/lora-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Lora Regular'), local('Lora-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/lora-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-cyrillic.woff2') format('woff2');
+  unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-vietnamese.woff2') format('woff2');
+  unicode-range: U+0102-0103, U+0110-0111, U+1EA0-1EF9, U+20AB;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Lora Bold'), local('Lora-Bold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-bold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: local('Lora SemiBold'), local('Lora-SemiBold'), url('https://martinthomson.github.io/rfc-css/fonts/lora-semibold-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Oxygen Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Oxygen Mono'), local('OxygenMono-Regular'), url('https://martinthomson.github.io/rfc-css/fonts/oxygenmono-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: italic;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-italic-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-greek.woff2') format('woff2');
+  unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1, U+03A3-03FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Sofia Sans Semi Condensed';
+  font-style: normal;
+  font-weight: 1 1000;
+  src: url('https://martinthomson.github.io/rfc-css/fonts/sofiasanssemicondensed-regular-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light dark;
+  --background-color: #fff;
+  --text-color: #222;
+  --title-color: #191919;
+  --link-color: #2a6496;
+  --highlight-color: #f9f9f9;
+  --line-color: #eee;
+  --pilcrow-weak: #ddd;
+  --pilcrow-strong: #bbb;
+  --small-font-size: 14.5px;
+  --font-mono: 'Oxygen Mono', monospace;
+  --font-title: "Sofia Sans Semi Condensed", sans-serif;
+  scrollbar-color: #bbb #eee;
+}
+body {
+  max-width: 600px;
+  margin: 75px auto;
+  padding: 0 5px;
+  color: var(--text-color);
+  background-color: var(--background-color);
+  font: 16px/22px "Lora", serif;
+  scroll-behavior: smooth;
+}
+
+.ears {
+  display: none;
+}
+
+/* headings */
+section {
+  clear: both;
+}
+.section-number {
+  padding-right: 0.5em;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-title);
+  font-weight: 680;
+  margin: 0.8em 0 0.3em;
+  font-size-adjust: 0.5;
+  color: var(--title-color);
+}
+h1 {
+  &#title {
+    font-size: 32px;
+    line-height: 40px;
+    clear: both;
+    margin: 1.5em 0 0.2em;
+  }
+  &#rfcnum {
+    margin: 1.5em 0 0.2em;
+    & + h1#title {
+      margin: 0.2em 0;
+    }
+  }
+}
+
+h1, h2, h3 {
+  font-size: 22px;
+  line-height: 27px;
+}
+h4, h5, h6 {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+/* general structure */
+.author {
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+#abstract+p {
+  font-size: 18px;
+  line-height: 24px;
+  & code, & samp, & tt {
+    font-size: 16px;
+    line-height: 0;
+  }
+}
+
+p {
+  padding: 0;
+  margin: 0.5em 0;
+  text-align: left;
+}
+div {
+  margin: 0;
+}
+.alignRight {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    margin: 0;
+    float: right;
+    clear: both;
+  }
+  & > *:nth-child(2) {
+    clear: both;
+    display: block;
+    border: none;
+  }
+}
+svg {
+  display: block;
+  /* font-family isn't space-separated, but =~ will have to do */
+  &[font-family~="monospace" i], & [font-family~="monospace" i] {
+    font-family: var(--font-mono);
+  }
+}
+.alignCenter {
+  margin: 1em 0;
+  &.art-text {
+    background-color: var(--highlight-color);
+    border: 1px solid var(--line-color);
+    border-radius: 3px;
+    padding: 0.5em 1em 0;
+    margin-bottom: 0.5em;
+    & pre {
+      padding: 0;
+      width: auto;
+    }
+  }
+  & > *:first-child {
+    border: none;
+    /* this isn't optimal, but it's an existence proof.  PrinceXML doesn't
+       support flexbox yet.
+    */
+    display: table;
+    margin: 0 auto;
+  }
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 0.5em 2em;
+  & :is(ol, ul) {
+    margin-left: 1em;
+  }
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+  & li {
+    margin-top: 0.5em;
+  }
+}
+:is(ul, ol).compact, .ulCompact, .olCompact {
+  margin: 0 0 0 2em;
+  & li {
+    margin: 0;
+    & :first-child { margin-top: 0; }
+    & :last-child { margin-bottom: 0; }
+  }
+}
+
+/* definition lists */
+dl {
+  clear: left;
+  --indent: 3ch;
+  /* --indent: attr(indent ch); not supported in any browser, but we can dream */
+  &.olPercent {
+    --indent: 5ch;
+    & > dt {
+      min-width: calc(var(--indent) - 2ch);
+      float: none;
+    }
+  }
+
+  dl > dd > & {
+    margin-top: 0.5em;
+    margin-bottom: 0;
+  }
+
+  &:not(.dlNewline) > dt {
+    float: left;
+    margin-right: 2ch;
+    min-width: 8ch;
+  }
+  & > dd {
+    margin-bottom: .8em;
+    margin-left: var(--indent) !important; /* stupid element overrides */
+    min-height: 2ex;
+  }
+}
+:is(dl.compact, .dlCompact) > dd {
+  margin-bottom: 0;
+  & > :is(:first-child, .break:first-child + *) {
+    margin-top: 0;
+  }
+  & > :is(:last-child) {
+    margin-bottom: 0;
+  }
+}
+:is(dd, span).break {
+  display: none;
+}
+
+/* links */
+a {
+  text-decoration: none;
+  &[href] {
+    color: var(--link-color);
+    &:hover { text-decoration: underline; }
+    &.selfRef {
+      color: var(--text-color);
+      &:hover {
+        text-decoration: none;
+        background-color: var(--highlight-color);
+      }
+    }
+  }
+}
+.iref + a[href].internal {
+  color: var(--text-color);
+}
+a.xref:is(.cite, .auto), :is(#status-of-memo, #copyright) a {
+  white-space: nowrap;
+}
+
+/* Figures */
+tt, code, pre {
+  background-color: var(--highlight-color);
+  font: 14px/22px var(--font-mono);
+}
+tt, code {
+  /* changing the font for inline elements leads to different ascender
+     and descender heights; as we want to retain baseline alignment,
+     remove leading to avoid altering the final height of lines
+     note: this fails if these blocks take an entire line,
+     a different solution would be great */
+  line-height: 0;
+}
+:is(h1, h2, h3, h4, h5, h6) :is(tt, code) {
+  font-size: 84%;
+}
+pre {
+  border: 1px solid var(--line-color);
+  font-size: 13.5px;
+  line-height: 16px;
+  letter-spacing: -0.2px;
+  margin: 5px;
+  padding: 5px;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0.5em 0;
+  padding: 0;
+  & blockquote {
+    margin: 0.8em 0.4em 0.4em;
+  }
+}
+figcaption, caption {
+  font-style: italic;
+  margin: 0.5em 1.5em;
+  text-align: left;
+  caption-side: bottom;
+}
+@media screen {
+  /* Auto-collapse boilerplate. */
+  :is(#status-of-memo, #copyright) {
+    & p {
+      margin: -2px 0;
+      max-height: 0;
+      transition: max-height 2s ease, margin 0.5s ease 0.5s;
+      overflow: hidden;
+    }
+    &:hover p,
+    & h2:target ~ p {
+      margin: 0.5em 0;
+      max-height: 500px;
+      overflow: auto;
+    }
+  }
+  pre, svg {
+    display: inline-block;
+    /* In the horizontal direction, sometimes people make over-sized figures.
+       Scrollbars for those is therefore necessary: auto adds them as necessary..
+       In the vertical direction, the line-height can combine with the font
+       asender/descender height to produce scrollbars: hidden avoids that. */
+    overflow: auto hidden;
+  }
+  pre {
+    max-width: 100%;
+    width: calc(100% - 22px - 1em);
+  }
+  svg {
+    max-width: calc(100% - 22px - 1em);
+  }
+  figure pre {
+    display: block;
+    width: calc(100% - 25px);
+  }
+  :is(pre, svg) + .pilcrow {
+    display: inline-block;
+    vertical-align: text-bottom;
+    padding-bottom: 8px;
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 0 2em;
+  font-style: italic;
+}
+blockquote {
+  margin: 1em 0;
+  border-left: 2px var(--pilcrow-strong) solid;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  width: auto;
+  max-width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+  &.right { margin-left: auto; }
+  &.center { margin-left: auto; margin-right: auto; }
+  &.left { margin-right: auto; }
+  & .text-left { text-align: left; }
+  & .text-center { text-align: center; }
+  & .text-right { text-align: right; }
+  & caption {
+    margin: 0;
+    padding: 3px 0 3px 1em;
+  }
+  & p { margin: 0; }
+}
+
+thead, tbody {
+  border: 1px solid var(--line-color);
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 5px 10px;
+}
+th {
+  background-color: var(--line-color);
+}
+:is(tr:nth-child(2n), thead+tbody > tr:nth-child(2n+1)) > td {
+  background-color: var(--background-color);
+}
+:is(tr:nth-child(2n+1), thead+tbody > tr:nth-child(2n)) > td {
+  background-color: var(--highlight-color);
+}
+
+/* pilcrow */
+a.pilcrow {
+  margin-left: 3px;
+  opacity: 0.2;
+  user-select: none;
+  &[href] {
+    color: var(--pilcrow-weak);
+    &:hover { text-decoration: none; }
+  }
+  @media not print {
+    :hover > &, &:focus {
+      opacity: 1;
+    }
+    &[href]:hover {
+      color: var(--pilcrow-strong);
+      background-color: transparent;
+    }
+  }
+  @media print {
+    display: none;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid var(--line-color);
+}
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: 600;
+  font-size: var(--small-font-size);
+}
+.role {
+  font-variant: all-small-caps;
+}
+sub, sup {
+  line-height: 1;
+  font-size: 80%;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: var(--small-font-size);
+  line-height: 18px;
+  --identifier-width: 15ch;
+  & dt {
+    width: var(--identifier-width);
+    min-width: var(--identifier-width);
+    clear: left;
+    float: left;
+    text-align: right;
+    margin-right: 1ch;
+  }
+  & dd {
+    margin: 0;
+    margin-left: calc(1em + var(--identifier-width)) !important;
+    min-width: 5em;
+  }
+  & .authors {
+    & .author {
+      display: inline-block;
+      margin-right: 1.5em;
+    }
+    & .org {
+      font-style: italic;
+    }
+  }
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #999;
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+  & .prepared {
+    float: right;
+  }
+}
+
+/* table of contents */
+#toc {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+
+  & nav {
+    & ul {
+      margin: 0 0.5em 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    & li {
+      line-height: 1.3em;
+      margin: 2px 0;
+      padding-left: 1.2em;
+      text-indent: -1.2em;
+    }
+  }
+  & a.xref {
+    white-space: normal;
+  }
+}
+
+.references {
+  & > dt {
+    text-align: right;
+    font-weight: bold;
+    min-width: 10ch;
+    margin-right: 1.5ch;
+    &:target::before {
+      content: "⇒";
+      margin: 0 10px 0 -25px;
+    }
+  }
+  & > dd {
+    margin-left: 12ch !important;
+    overflow: visible;
+    & .refInstance {
+      margin-bottom: 0.8em;
+    }
+    & .ascii {
+      margin-bottom: 0.25em;
+    }
+  }
+}
+
+#rfc\.index\.index + ul {
+  margin-left: 0;
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  max-width: 20em;
+  margin: 1em auto 1em 0;
+
+  & .nameRole {
+    font-weight: 700;
+    margin-left: 0;
+  }
+  & .label {
+    margin: 0.5em 0;
+  }
+  & .type {
+    display: none;
+  }
+  & .alternative-contact {
+    margin: 0.5em 0 0.25em 0;
+  }
+  & .non-ascii {
+    margin: 0 0 0 2em;
+  }
+  & div.left {
+    text-align: left;
+  }
+  & div.right {
+    text-align: right;
+  }
+}
+
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+@media (min-width: 500px) {
+  #authors-addresses {
+    & > section {
+      column-count: 2;
+      column-gap: 20px;
+    }
+    & > section > h2 {
+      column-span: all;
+    }
+    /* hack for break-inside: avoid-column */
+    & address {
+      display: inline-block;
+      break-inside: avoid-column;
+    }
+  }
+}
+
+/* Comments */
+.rfcEditorRemove {
+  & p:first-of-type {
+    font-style: italic;
+  }
+}
+.cref {
+  background-color: rgba(249, 232, 105, 0.3);
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+
+@media screen {
+  #toc {
+    & nav {
+      font-family: var(--font-title);
+      font-weight: 360;
+      & > ul { margin-bottom: 2em; }
+      & ul {
+        margin: 0 0 0 4px;
+        & :is(p, li) {
+          margin: 2px 0;
+        }
+      }
+    }
+    & a.toplink {
+      float: right;
+    }
+  }
+}
+@media not screen {
+  #toc a.toplink {
+    display: none;
+  }
+}
+
+
+/* TOC layout for smaller screens */
+@media screen and (max-width: 929px) {
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 1px 0 0 0;
+    margin: 0;
+    border-bottom: 1px solid #ccc;
+    opacity: 0.6;
+    & h2 {
+      margin: 0;
+      padding: 2px 0 2px 6px;
+      padding-right: 1em;
+      font-size: 18px;
+      line-height: 24px;
+      min-width: 190px;
+      text-align: right;
+      background-color: #444;
+      color: white;
+      cursor: pointer;
+      &::before { /* css hamburger */
+        float: right;
+        position: relative;
+        width: 1em;
+        height: 1px;
+        left: -164px;
+        margin: 8px 0 0 0;
+        background: white none repeat scroll 0 0;
+        box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+        content: "";
+      }
+    }
+    & nav {
+      display: none;
+      background-color: var(--background-color);
+      padding: 0.5em 1em 1em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      height: calc(100vh - 48px);
+      border-left: 1px solid #ddd;
+    }
+    &.active {
+      opacity: 1;
+      & nav { display: block; }
+    }
+    /* Make the collapsed ToC header render white on gray also when it's a link */
+    & h2 a,
+    & h2 a:is(:link, :focus, :hover),
+    & a.toplink,
+    & a.toplink:hover {
+      color: white;
+      background-color: #444;
+      text-decoration: none;
+    }
+    & a.toplink {
+      margin: 2px 0.5em 0;
+    }
+  }
+}
+
+/* TOC layout for wide screens */
+@media screen and (min-width: 930px) {
+  body {
+    padding-right: 360px;
+    padding-right: calc(min(180px + 20%, 500px));
+  }
+  #toc {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    right: calc(50vw - 480px);
+    width: 312px;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+    & h2 {
+      margin: 0;
+      padding: 0.25em 1em 1em 0;
+    }
+    & nav {
+      display: block;
+      height: calc(90vh - 84px);
+      bottom: 0;
+      padding: 0.5em 0 2em;
+      overflow: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+    }
+    & a.toplink {
+      margin: 8px 0.5em 0;
+    }
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc {
+    page-break-before: always;
+    border-top: none;
+    padding-top: 0;
+  }
+  #n-introduction {
+    page-break-before: always;
+  }
+  figure, pre, .vcard {
+    page-break-inside: avoid;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  :is(h2, h3, h4, h5, h6)+*, dd {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+}
+
+/* Dark mode. */
+@media (prefers-color-scheme: dark) {
+:root {
+  --background-color: #121212;
+  --text-color: #f0f0f0;
+  --title-color: #fff;
+  --link-color: #4da4f0;
+  --highlight-color: #282828;
+  --line-color: #444;
+  --pilcrow-weak: #444;
+  --pilcrow-strong: #666;
+  scrollbar-color: #777 #333;
+}
+}
+
+/* SVG Trick: a prefix match works because only black and white are allowed */
+svg {
+  & :is([stroke="black"], [stroke^="#000"]) {
+    stroke: var(--text-color);
+  }
+  & :is([stroke="white"], [stroke^="#fff"]) {
+    stroke: var(--background-color);
+  }
+  & :is([fill="black"], [fill^="#000"], :not([fill])) {
+    fill: var(--text-color);
+  }
+  & :is([fill="white"], [fill^="#fff"]) {
+    fill: var(--background-color);
+  }
+}
+</style>
+
+</head>
+<body class="xml2rfc">
+<table class="ears">
+<thead><tr>
+<td class="left">Internet-Draft</td>
+<td class="center">MSF Ad Creative Signaling</td>
+<td class="right">August 2026</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Riedl</td>
+<td class="center">Expires 12 February 2027</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-workgroup">Workgroup:</dt>
+<dd class="workgroup">Media Over QUIC</dd>
+<dt class="label-internet-draft">Internet-Draft:</dt>
+<dd class="internet-draft">draft-riedl-moq-ad-creative-signaling-latest</dd>
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2026-08-11" class="published">11 August 2026</time>
+    </dd>
+<dt class="label-intended-status">Intended Status:</dt>
+<dd class="intended-status">Informational</dd>
+<dt class="label-expires">Expires:</dt>
+<dd class="expires"><time datetime="2027-02-12">12 February 2027</time></dd>
+<dt class="label-authors">Author:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">S. Riedl</div>
+<div class="org">Paramount</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">Ad Creative Signaling over the MSF Event Timeline</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">This document defines the carriage of ad creative signaling -- creative
+identity, tracking events, and measurement verification metadata as
+specified by SVTA 2053-1 -- in records on a Media over QUIC (MOQT)
+Streaming Format (MSF) Event Timeline track. It complements the carriage
+of SCTE-35 splice signaling over the same mechanism: splice events
+describe where placement opportunities occur on a media timeline, while
+the event class defined here describes the creatives that fill them and
+how their playback is to be measured. This binding is the MSF
+counterpart of the DASH and HLS carriage bindings defined by SVTA
+2053-1, which defines none for MOQT.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+</section>
+<section class="note rfcEditorRemove" id="section-note.1">
+      <h2 id="name-about-this-document">
+<a href="#name-about-this-document" class="section-name selfRef">About This Document</a>
+      </h2>
+<p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
+<p id="section-note.1-2">
+        The latest revision of this draft can be found at <span><a href="https://riedlse.github.io/draft-riedl-moq-ad-creative-signaling/">https://riedlse.github.io/draft-riedl-moq-ad-creative-signaling/</a></span>.
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-riedl-moq-ad-creative-signaling/">https://datatracker.ietf.org/doc/draft-riedl-moq-ad-creative-signaling/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">
+        Discussion of this document takes place on the
+        Media Over QUIC Working Group mailing list (<span><a href="mailto:moq@ietf.org">mailto:moq@ietf.org</a></span>),
+        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/moq/">https://mailarchive.ietf.org/arch/browse/moq/</a></span>.
+        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/moq/">https://www.ietf.org/mailman/listinfo/moq/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+<p id="section-note.1-4">Source for this draft and an issue tracker can be found at
+        <span><a href="https://github.com/riedlse/draft-riedl-moq-ad-creative-signaling">https://github.com/riedlse/draft-riedl-moq-ad-creative-signaling</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
+</section>
+<div id="status-of-memo">
+<section id="section-boilerplate.1">
+        <h2 id="name-status-of-this-memo">
+<a href="#name-status-of-this-memo" class="section-name selfRef">Status of This Memo</a>
+        </h2>
+<p id="section-boilerplate.1-1">
+        This Internet-Draft is submitted in full conformance with the
+        provisions of BCP 78 and BCP 79.<a href="#section-boilerplate.1-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-2">
+        Internet-Drafts are working documents of the Internet Engineering Task
+        Force (IETF). Note that other groups may also distribute working
+        documents as Internet-Drafts. The list of current Internet-Drafts is
+        at <span><a href="https://datatracker.ietf.org/drafts/current/">https://datatracker.ietf.org/drafts/current/</a></span>.<a href="#section-boilerplate.1-2" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-3">
+        Internet-Drafts are draft documents valid for a maximum of six months
+        and may be updated, replaced, or obsoleted by other documents at any
+        time. It is inappropriate to use Internet-Drafts as reference
+        material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.1-4">
+        This Internet-Draft will expire on 12 February 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="copyright">
+<section id="section-boilerplate.2">
+        <h2 id="name-copyright-notice">
+<a href="#name-copyright-notice" class="section-name selfRef">Copyright Notice</a>
+        </h2>
+<p id="section-boilerplate.2-1">
+            Copyright (c) 2026 IETF Trust and the persons identified as the
+            document authors. All rights reserved.<a href="#section-boilerplate.2-1" class="pilcrow">¶</a></p>
+<p id="section-boilerplate.2-2">
+            This document is subject to BCP 78 and the IETF Trust's Legal
+            Provisions Relating to IETF Documents
+            (<span><a href="https://trustee.ietf.org/license-info">https://trustee.ietf.org/license-info</a></span>) in effect on the date of
+            publication of this document. Please review these documents
+            carefully, as they describe your rights and restrictions with
+            respect to this document. Code Components extracted from this
+            document must include Revised BSD License text as described in
+            Section 4.e of the Trust Legal Provisions and are provided without
+            warranty as described in the Revised BSD License.<a href="#section-boilerplate.2-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1" class="keepWithNext"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-track-properties" class="internal xref">Track Properties</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-record-format" class="internal xref">Record Format</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-structure" class="internal xref">Structure</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-index-reference-selection" class="internal xref">Index Reference Selection</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-payload-version-2-carriage-" class="internal xref">Payload: Version 2 Carriage Envelope</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-timing-and-correlation" class="internal xref">Timing and Correlation</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
+                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-shared-index-space" class="internal xref">Shared Index Space</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
+                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-correlation-with-splice-sig" class="internal xref">Correlation with Splice Signaling</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
+                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-publication-lead" class="internal xref">Publication Lead</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.4">
+                <p id="section-toc.1-1.5.2.4.1"><a href="#section-5.4" class="auto internal xref">5.4</a>.  <a href="#name-container-relative-interior" class="internal xref">Container-Relative Interior Timing</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-worked-example" class="internal xref">Worked Example</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-tracking-indirection-and-ca" class="internal xref">Tracking Indirection and Capability URLs</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-client-identity-and-per-dev" class="internal xref">Client Identity and Per-Device Accounting</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-load-shaping" class="internal xref">Load Shaping</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-per-session-insertion-plans" class="internal xref">Per-Session Insertion Plans</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-open-issues" class="internal xref">Open Issues</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-implementation-status" class="internal xref">Implementation Status</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
+                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="auto internal xref">11.1</a>.  <a href="#name-integrity-of-tracking-recor" class="internal xref">Integrity of Tracking Records</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
+                <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="auto internal xref">11.2</a>.  <a href="#name-amplification-and-load" class="internal xref">Amplification and Load</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.3">
+                <p id="section-toc.1-1.11.2.3.1"><a href="#section-11.3" class="auto internal xref">11.3</a>.  <a href="#name-payload-validation" class="internal xref">Payload Validation</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.4">
+                <p id="section-toc.1-1.11.2.4.1"><a href="#section-11.4" class="auto internal xref">11.4</a>.  <a href="#name-privacy" class="internal xref">Privacy</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
+            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#section-13" class="auto internal xref">13</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1">
+                <p id="section-toc.1-1.13.2.1.1"><a href="#section-13.1" class="auto internal xref">13.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.2">
+                <p id="section-toc.1-1.13.2.2.1"><a href="#section-13.2" class="auto internal xref">13.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
+            <p id="section-toc.1-1.14.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
+            <p id="section-toc.1-1.15.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-json-schema-and-test-vector" class="internal xref">JSON Schema and Test Vectors</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16">
+            <p id="section-toc.1-1.16.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<div id="introduction">
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">SCTE-35 messages <span>[<a href="#SCTE35" class="cite xref">SCTE35</a>]</span> carried on an MSF Event Timeline track
+<span>[<a href="#SCTE35-MOQ" class="cite xref">SCTE35-MOQ</a>]</span> give Media over QUIC deployments the function SCTE-35 was
+built for: signaling placement opportunities -- break windows and splice
+conditioning -- on a shared media timeline, using the Event Timeline
+mechanism of the MOQT Streaming Format (<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-01#section-8.1" class="relref">Section 8.1</a> of [<a href="#MSF" class="cite xref">MSF</a>]</span>). What
+that layer deliberately does not carry is a description of what plays
+inside those windows.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">On HLS and DASH, that gap is filled at the manifest: a packager or
+stitcher decorates each session's playlist with creative identity and
+tracking metadata. On a one-to-many publish/subscribe transport
+<span>[<a href="#MOQT" class="cite xref">MOQT</a>]</span> there is no per-session manifest to decorate -- every
+subscriber receives the same cached objects -- so anything a client
+needs at render time (which creative is playing, which tracking
+resources to request at which quartiles, which verification script to
+load) must be delivered in band, on the shared timeline, ahead of the
+splice point.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">This need is not incidental. Accurate measurement of server-side ad
+insertion increasingly means client-requested tracking -- per-device
+accounting at render time rather than server-side firing at publish
+time, which measures the wrong clock -- and verification means
+initializing a measurement script <span>[<a href="#OMSDK" class="cite xref">OMSDK</a>]</span> before the slot renders.
+SVTA 2053-1 <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> already standardizes exactly this payload: a
+Pod/Slot/TrackingEvent/Verification data model (Section 4 of
+<span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>), explicitly agnostic to client-side, server-side, and
+server-guided insertion, with carriage bindings defined per stream
+format -- DASH EventStream, HLS EXT-X-DATERANGE, HLS Interstitials --
+and none for MOQT.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-4">This document fills that gap using the structures <span>[<a href="#MSF" class="cite xref">MSF</a>]</span> and
+<span>[<a href="#SCTE35-MOQ" class="cite xref">SCTE35-MOQ</a>]</span> already put in place: it defines an Event Timeline event
+class whose records carry SVTA 2053-1 Version 2 carriage envelopes,
+specifies how those records are timed and correlated with splice
+signaling, and gives operational guidance for tracking on one-to-many
+delivery. It changes nothing in the SVTA 2053-1 data model; payload
+normativity remains with <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>, and this binding could
+additionally be published as a carriage section in a future revision of
+that specification.<a href="#section-1-4" class="pilcrow">¶</a></p>
+<p id="section-1-5"></p>
+</section>
+</div>
+<div id="conventions">
+<section id="section-2">
+      <h2 id="name-conventions-and-definitions">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
+      </h2>
+<p id="section-2-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
+"<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
+described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
+appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<p id="section-2-2">This document uses the terms Track, Group, Object, Event Timeline, and
+the index reference fields <code>t</code>, <code>l</code>, and <code>m</code> as defined in <span>[<a href="#MSF" class="cite xref">MSF</a>]</span>, and
+the terms Pod, Slot, Tracking Event, Verification, and carriage envelope
+as defined in Sections 4 and 5 of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>.<a href="#section-2-2" class="pilcrow">¶</a></p>
+<p id="section-2-3">Additionally:<a href="#section-2-3" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2-4">
+        <dt id="section-2-4.1">Distributor:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-4.2">
+          <p id="section-2-4.2.1">The party operating the publisher that emits the media and signaling
+tracks (typically the party performing ad insertion).<a href="#section-2-4.2.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-4.3">Placement opportunity:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-4.4">
+          <p id="section-2-4.4.1">A window on the media timeline, typically signaled by SCTE-35, in
+which advertising content plays.<a href="#section-2-4.4.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-4.5">Splice signaling track:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-4.6">
+          <p id="section-2-4.6.1">An Event Timeline track carrying SCTE-35 records per <span>[<a href="#SCTE35-MOQ" class="cite xref">SCTE35-MOQ</a>]</span>.<a href="#section-2-4.6.1" class="pilcrow">¶</a></p>
+</dd>
+        <dd class="break"></dd>
+<dt id="section-2-4.7">Capability URL:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-4.8">
+          <p id="section-2-4.8.1">A URL whose knowledge alone grants the ability to perform a narrow
+action, used here as a short-lived, opaque reference to a
+distributor-operated tracking endpoint <span>[<a href="#CAP-URLS" class="cite xref">CAP-URLS</a>]</span>.<a href="#section-2-4.8.1" class="pilcrow">¶</a></p>
+</dd>
+      <dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="track-properties">
+<section id="section-3">
+      <h2 id="name-track-properties">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-track-properties" class="section-name selfRef">Track Properties</a>
+      </h2>
+<p id="section-3-1">An MSF track carrying ad creative signaling:<a href="#section-3-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-3-2.1">
+          <p id="section-3-2.1.1"><span class="bcp14">MUST</span> declare a packaging value of <code>"eventtimeline"</code>;<a href="#section-3-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-2.2">
+          <p id="section-3-2.2.1"><span class="bcp14">MUST</span> declare an <code>eventType</code> value of
+<code>"urn:svta:advertising-wg:ad-creative-signaling"</code>. This is the data
+scheme URI defined in Section 5 of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>, used unversioned: as
+in the DASH binding, the payload version is carried inside the
+payload itself (<a href="#payload" class="auto internal xref">Section 4.3</a>);<a href="#section-3-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-3-2.3">
+          <p id="section-3-2.3.1"><span class="bcp14">MUST</span> declare a <code>depends</code> attribute naming the media track or tracks
+whose timeline its records index. When the track accompanies a splice
+signaling track, it <span class="bcp14">SHOULD</span> name the same media track(s) as that
+track.<a href="#section-3-2.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-3-3">Because <code>eventType</code> is uniform for a track, and because implementations
+do not mix payload flavors within one Event Timeline track (see Section
+4.3 of <span>[<a href="#SCTE35-MOQ" class="cite xref">SCTE35-MOQ</a>]</span> for the same rule applied to SCTE-35), ad
+creative signaling is carried on a <em>sibling</em> Event Timeline track
+alongside any splice signaling track, not interleaved within it.<a href="#section-3-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="record-format">
+<section id="section-4">
+      <h2 id="name-record-format">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-record-format" class="section-name selfRef">Record Format</a>
+      </h2>
+<div id="record-structure">
+<section id="section-4.1">
+        <h3 id="name-structure">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-structure" class="section-name selfRef">Structure</a>
+        </h3>
+<p id="section-4.1-1">Each record is a JSON object <span>[<a href="#RFC8259" class="cite xref">RFC8259</a>]</span> following the Event Timeline
+data format of <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-01#section-8.1" class="relref">Section 8.1</a> of [<a href="#MSF" class="cite xref">MSF</a>]</span>. A record <span class="bcp14">MUST</span> contain:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.1-2.1">
+            <p id="section-4.1-2.1.1">exactly one index reference field -- <code>t</code> (wallclock), <code>l</code> (MOQT
+Location), or <code>m</code> (media time) -- selected per <a href="#index-selection" class="auto internal xref">Section 4.2</a>;
+and<a href="#section-4.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.1-2.2">
+            <p id="section-4.1-2.2.1">a <code>data</code> field whose value is exactly one Version 2 carriage
+envelope as defined in <a href="#payload" class="auto internal xref">Section 4.3</a>.<a href="#section-4.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+</section>
+</div>
+<div id="index-selection">
+<section id="section-4.2">
+        <h3 id="name-index-reference-selection">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-index-reference-selection" class="section-name selfRef">Index Reference Selection</a>
+        </h3>
+<p id="section-4.2-1">Records describing creatives spliced into the media timeline <span class="bcp14">SHOULD</span> use
+the <code>m</code> (media time) index, expressed in the coordinate space of the
+<code>depends</code> media track and sharing that track's timeline zero point. The
+<code>t</code> (wallclock) index <span class="bcp14">MAY</span> be used where a placement opportunity is
+defined in wallclock terms and no media time is available. The <code>l</code>
+(MOQT Location) index <span class="bcp14">MAY</span> be used for records bound to a delivery
+position rather than a media time.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2-2">When a splice signaling track accompanies this track, index selection
+<span class="bcp14">SHOULD</span> follow the same selection and precedence rules that track
+applies (Section 4.2 of <span>[<a href="#SCTE35-MOQ" class="cite xref">SCTE35-MOQ</a>]</span>), so that co-timed records on
+the two tracks carry comparable index values (<a href="#correlation" class="auto internal xref">Section 5.2</a>).<a href="#section-4.2-2" class="pilcrow">¶</a></p>
+<p id="section-4.2-3"></p>
+</section>
+</div>
+<div id="payload">
+<section id="section-4.3">
+        <h3 id="name-payload-version-2-carriage-">
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-payload-version-2-carriage-" class="section-name selfRef">Payload: Version 2 Carriage Envelope</a>
+        </h3>
+<p id="section-4.3-1">The <code>data</code> field carries one SVTA 2053-1 Version 2 carriage envelope
+(Section 5.2.2.1 of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>) directly:<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-4.3-2">
+<pre>
+{ "version": 2, "type": "...", "payload": [ ... ],
+  "features": { ... } }
+</pre><a href="#section-4.3-2" class="pilcrow">¶</a>
+</div>
+<p id="section-4.3-3">The envelope is self-describing -- version and payload type are fields
+-- so no additional wrapper member is defined.<a href="#section-4.3-3" class="pilcrow">¶</a></p>
+<p id="section-4.3-4">Unlike the DASH and HLS bindings, where bare Version 1 payload objects
+are also legal, records in this binding <span class="bcp14">MUST</span> carry Version 2 envelopes
+only. On a fan-out transport the envelope's <code>features</code> flags are the
+only capability-signaling mechanism available, and the envelope <code>type</code>
+field is what allows a uniform track to carry <code>pod</code>, <code>slot</code>, and
+<code>trackingEvent</code> payloads interchangeably.<a href="#section-4.3-4" class="pilcrow">¶</a></p>
+<p id="section-4.3-5">It is <span class="bcp14">RECOMMENDED</span> that a publisher emit one <code>pod</code> envelope per
+placement opportunity. <code>slot</code> and <code>trackingEvent</code> envelopes <span class="bcp14">MAY</span> be used
+(mirroring the granularity options of the DASH binding), but
+deduplication under redelivery is simplest at pod granularity (see
+<a href="#open-issues" class="auto internal xref">Section 9</a>).<a href="#section-4.3-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="timing">
+<section id="section-5">
+      <h2 id="name-timing-and-correlation">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-timing-and-correlation" class="section-name selfRef">Timing and Correlation</a>
+      </h2>
+<div id="index-space">
+<section id="section-5.1">
+        <h3 id="name-shared-index-space">
+<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-shared-index-space" class="section-name selfRef">Shared Index Space</a>
+        </h3>
+<p id="section-5.1-1">A creative signaling record's index values are interpreted in the same
+coordinate space, with the same timeline zero point, as the <code>depends</code>
+media track -- and therefore the same space as an accompanying splice
+signaling track that names the same media track.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="correlation">
+<section id="section-5.2">
+        <h3 id="name-correlation-with-splice-sig">
+<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-correlation-with-splice-sig" class="section-name selfRef">Correlation with Splice Signaling</a>
+        </h3>
+<p id="section-5.2-1">The record or records describing a placement opportunity <span class="bcp14">SHOULD</span> carry
+the same index value as the SCTE-35 record whose splice point opens
+that opportunity (the same <code>m</code>, or the same <code>l</code> Location when the
+splice is immediate). A pod whose start differs from the splice point
+<span class="bcp14">MUST</span> carry an index within the window the splice defines.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="publication-lead">
+<section id="section-5.3">
+        <h3 id="name-publication-lead">
+<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-publication-lead" class="section-name selfRef">Publication Lead</a>
+        </h3>
+<p id="section-5.3-1">The publisher <span class="bcp14">SHOULD</span> publish a placement opportunity's creative
+signaling record(s) at least one full Group ahead of the media Group
+containing the splice point. Clients render seconds behind delivery,
+while render-time tracking and verification fire windows are
+sub-second: the tracking table must already be resident on the device
+when the first ad frame displays, with no time for a lookup round
+trip.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
+<p id="section-5.3-2"></p>
+</section>
+</div>
+<div id="interior-timing">
+<section id="section-5.4">
+        <h3 id="name-container-relative-interior">
+<a href="#section-5.4" class="section-number selfRef">5.4. </a><a href="#name-container-relative-interior" class="section-name selfRef">Container-Relative Interior Timing</a>
+        </h3>
+<p id="section-5.4-1">Within the envelope, timing is container-relative, per Sections 4.4.2
+and 4.4.5 of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>: a Slot's <code>start</code> is relative to its Pod, and
+a Tracking Event's <code>offset</code> is relative to its container. Only the
+record's index reference is absolute. Consequently, redelivery, looped
+schedules, and regional timeline shifts never require payload rewrites
+-- which matters where relays cache and re-serve objects.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="example">
+<section id="section-6">
+      <h2 id="name-worked-example">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-worked-example" class="section-name selfRef">Worked Example</a>
+      </h2>
+<p id="section-6-1">An SCTE-35 record on the splice signaling track (reproduced from
+Section 5.1 of <span>[<a href="#SCTE35-MOQ" class="cite xref">SCTE35-MOQ</a>]</span>) announces a splice at media time
+480500 ms:<a href="#section-6-1" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-6-2">
+<pre>
+{
+  "m": 480500,
+  "data": {
+    "scte35_payload":
+      "/DAhAAAAAAAAAP/wFAUAAArXf+/+AAAAAH4AARSyAAAAAA=="
+  }
+}
+</pre><a href="#section-6-2" class="pilcrow">¶</a>
+</div>
+<p id="section-6-3">The companion record on the ad creative signaling track, published at
+least one Group earlier (<a href="#publication-lead" class="auto internal xref">Section 5.3</a>), carries the same index.
+It describes a 45.045-second pod with two slots: explicit quartile
+tracking and a verification resource on slot 1 (no <code>offset</code> on the
+quartile events, so timing is driven by event-type semantics per
+Section 4.4.5 of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>), and lazily resolved tracking on slot 2
+via <code>$remote</code> (<a href="#capability-urls" class="auto internal xref">Section 7</a>):<a href="#section-6-3" class="pilcrow">¶</a></p>
+<div class="breakable lang-json sourcecode" id="section-6-4">
+<pre>
+{
+  "m": 480500,
+  "data": {
+    "version": 2,
+    "type": "pod",
+    "payload": [{
+      "duration": 45.045,
+      "slots": [
+        {
+          "type": "linear",
+          "start": 0.0,
+          "duration": 30.03,
+          "identifiers": [{
+            "scheme":
+      "urn:smpte:ul:060E2B34.01040101.01200900.00000000",
+            "value": "ABCD1234567H"
+          }],
+          "tracking": [
+            { "type": "impression", "urls": [
+              "https://beacons.example.net/c/7f3a92/imp"
+            ] },
+            { "type": "firstQuartile", "urls": [
+              "https://beacons.example.net/c/7f3a92/q1"
+            ] },
+            { "type": "midpoint", "urls": [
+              "https://beacons.example.net/c/7f3a92/q2"
+            ] },
+            { "type": "thirdQuartile", "urls": [
+              "https://beacons.example.net/c/7f3a92/q3"
+            ] },
+            { "type": "complete", "urls": [
+              "https://beacons.example.net/c/7f3a92/done"
+            ] }
+          ],
+          "verifications": [{
+            "vendor": "vendor.example-omid",
+            "parameters": "key=value",
+            "resource":
+              "https://cdn.vendor.example/omid-verify.js"
+          }]
+        },
+        {
+          "type": "linear",
+          "start": 30.03,
+          "duration": 15.015,
+          "identifiers": [{
+            "scheme": "urn:com:example:ads:id",
+            "value":
+              "972c79e1-2363-403e-9287-a0fa4323c389"
+          }],
+          "$remote": {
+            "tracking":
+              "https://beacons.example.net/c/9d41c7/trk"
+          }
+        }
+      ],
+      "tracking": [
+        { "type": "podStart", "urls": [
+          "https://beacons.example.net/c/p8842/start"
+        ] },
+        { "type": "podEnd", "urls": [
+          "https://beacons.example.net/c/p8842/end"
+        ] }
+      ]
+    }],
+    "features": { "remoteFields": true }
+  }
+}
+</pre><a href="#section-6-4" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="capability-urls">
+<section id="section-7">
+      <h2 id="name-tracking-indirection-and-ca">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-tracking-indirection-and-ca" class="section-name selfRef">Tracking Indirection and Capability URLs</a>
+      </h2>
+<p id="section-7-1">Section 5.2.2.2 of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> already says interpreters <span class="bcp14">SHOULD</span> defer
+<code>$remote</code> resolution until the containing object is about to become
+active. That deferral maps naturally onto broadcast fan-out, with one
+addition: on a shared timeline, the URLs in tracking and <code>$remote</code>
+fields <span class="bcp14">SHOULD</span> be short-lived capability URLs <span>[<a href="#CAP-URLS" class="cite xref">CAP-URLS</a>]</span> referencing a
+distributor-operated tracking endpoint (a "beacon proxy"), rather than
+raw measurement-vendor URLs.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">At activation, the client requests the capability URL (or resolves
+<code>$remote</code> from it), appending a client identifier (<a href="#client-identity" class="auto internal xref">Section 7.1</a>).
+The endpoint performs macro substitution per Section 6 of <span>[<a href="#VAST" class="cite xref">VAST</a>]</span> (as
+Section 5.2.3 of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> provides) and requests the corresponding
+vendor resources with the calling device's context. Two properties fall
+out for free on one-to-many delivery:<a href="#section-7-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-7-3.1">
+          <p id="section-7-3.1.1"><strong>Payload size</strong>: shared-timeline records stay small even for heavy
+vendor tracking lists, with late binding after the pod record ships.<a href="#section-7-3.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-7-3.2">
+          <p id="section-7-3.2.1"><strong>Privacy and cache-safety</strong>: no per-user macro values and no vendor
+endpoint inventory appear in bytes that every subscriber and relay
+cache can read.<a href="#section-7-3.2.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<div id="client-identity">
+<section id="section-7.1">
+        <h3 id="name-client-identity-and-per-dev">
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-client-identity-and-per-dev" class="section-name selfRef">Client Identity and Per-Device Accounting</a>
+        </h3>
+<p id="section-7.1-1">Because every subscriber receives identical records, per-device
+measurement requires the device to identify itself at request time, not
+in the payload. A client <span class="bcp14">SHOULD</span> append a pseudonymous, session-scoped
+client identifier (issued and signed out of band, for example with the
+playback session) as a query parameter when requesting capability URLs.
+The tracking endpoint can then deduplicate on (resource, event, client
+identifier), count unique reach, and forward at most one request per
+device per event to vendor resources with that device's context --
+preserving per-device measurement semantics without per-device
+payloads. Raw device identifiers <span class="bcp14">MUST NOT</span> appear in requested URLs.<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="load-shaping">
+<section id="section-7.2">
+        <h3 id="name-load-shaping">
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-load-shaping" class="section-name selfRef">Load Shaping</a>
+        </h3>
+<p id="section-7.2-1">On a shared fixed timeline, every subscriber reaches the same tracking
+instant at the same wallclock moment; naive activation-time behavior
+synchronizes both the <code>$remote</code> resolution fetches and the tracking
+requests of the entire audience. Clients <span class="bcp14">SHOULD</span> resolve <code>$remote</code>
+fields within a randomized window ahead of activation (the publication
+lead of <a href="#publication-lead" class="auto internal xref">Section 5.3</a> provides the margin), and <span class="bcp14">SHOULD</span> apply
+bounded random jitter to tracking requests whose measurement semantics
+tolerate it, carrying the original event time as data where the
+measurement moment must be preserved. Verification-critical requests
+with sub-second fire windows are the exception and are expected to be
+provisioned for.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="insertion-plans">
+<section id="section-8">
+      <h2 id="name-per-session-insertion-plans">
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-per-session-insertion-plans" class="section-name selfRef">Per-Session Insertion Plans</a>
+      </h2>
+<p id="section-8-1">Everything above is deliberately identical bytes for every subscriber
+-- that is what makes it relay-cacheable. Server-guided insertion,
+per-session capability URLs, and entitlement-scoped fields are
+per-session by definition and cannot ride the shared timeline. The
+authors believe the standardization target for that layer is a separate
+per-session insertion plan mechanism: a unicast-scoped metadata track
+(or equivalent side channel) carrying distributor session metadata --
+the session's pod assignment for each shared-timeline placement
+opportunity, its capability URLs, and policy fields -- which composes
+with the shared events defined here (the shared timeline announces
+placement geometry and the broadcast/default pod; the insertion plan
+overlays the per-session decision).<a href="#section-8-1" class="pilcrow">¶</a></p>
+<p id="section-8-2">That mechanism is out of scope for this document and deserves its own.
+It is named here only as a design constraint: the event class defined
+in this document is intended to be overridden or parameterized by such
+a layer without being redefined by it.<a href="#section-8-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="open-issues">
+<section id="section-9">
+      <h2 id="name-open-issues">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-open-issues" class="section-name selfRef">Open Issues</a>
+      </h2>
+<p id="section-9-1">This section lists issues to be resolved through working group
+discussion; it is to be removed before publication.<a href="#section-9-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-9-2">
+<li id="section-9-2.1">
+          <p id="section-9-2.1.1"><strong>Granularity</strong>: one <code>pod</code> envelope per placement opportunity (the
+<span class="bcp14">RECOMMENDED</span> default), or <code>slot</code>/<code>trackingEvent</code> envelopes per
+creative? Redelivery deduplication is simpler at pod granularity.<a href="#section-9-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-9-2.2">
+          <p id="section-9-2.2.1"><strong>Update semantics for live</strong>: pods change close to air. Is a later
+record at the same index a full supersede (last-writer-wins), or is
+a patch rule needed? <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> has no cancel/supersede concept;
+SCTE-35 inherits cancellation from its payload semantics.<a href="#section-9-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-9-2.3">
+          <p id="section-9-2.3.1"><strong>Deduplication and late joiners</strong>: the DASH/HLS bindings give each
+event a manifest-unique id for dedup on re-encounter; MSF records
+carry no id. Is (eventType, index, payload) a sufficient dedup key
+under relay redelivery and FETCH catch-up -- and which past records
+<span class="bcp14">MUST</span> a mid-break joiner fetch?<a href="#section-9-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-9-2.4">
+          <p id="section-9-2.4.1"><strong>Switching sets</strong>: when ladder rungs are separate tracks, does one
+creative signaling track <code>depends</code> on all of them? Splice
+conditioning can land at slightly different media times per rung;
+container-relative interior offsets survive that, but a single <code>m</code>
+may not. Sender-side track switching under discussion in the MOQ
+Working Group sharpens this: if relays select the delivered rung per
+subscriber and switch at Group boundaries, (a) these records must
+remain valid for every rung of a switching set, (b) splice
+conditioning must keep switching sets coherent at placement
+boundaries, and (c) the delivered rendition is known only at the
+client, so rendition-level measurement is necessarily
+client-observed.<a href="#section-9-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-9-2.5">
+          <p id="section-9-2.5.1"><strong>Common-format scope</strong>: is the Event Timeline binding the whole
+story, or is a container-level mapping (the envelope in CMAF <code>emsg</code>)
+also wanted so one payload survives packager transit across
+HLS/DASH/MOQT boundaries?<a href="#section-9-2.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-9-2.6">
+          <p id="section-9-2.6.1"><strong>Feature negotiation on one-to-many</strong>: <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> interpreters
+<span class="bcp14">SHOULD</span> error on unsupported flagged features -- sensible unicast
+behavior, but a broadcast publisher cannot negotiate per subscriber.
+Should the catalog advertise which features a track uses so clients
+subscribe eyes-open?<a href="#section-9-2.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-9-2.7">
+          <p id="section-9-2.7.1"><strong>Record integrity</strong>: do these records need payload signing (JWS or
+COSE over the envelope, or a catalog-pinned key) beyond transport
+authentication? See <a href="#security" class="auto internal xref">Section 11</a>.<a href="#section-9-2.7.1" class="pilcrow">¶</a></p>
+</li>
+      </ol>
+</section>
+</div>
+<div id="impl-status">
+<section id="section-10">
+      <h2 id="name-implementation-status">
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-implementation-status" class="section-name selfRef">Implementation Status</a>
+      </h2>
+<p id="section-10-1">(This section follows <span>[<a href="#RFC7942" class="cite xref">RFC7942</a>]</span> and is to be removed before
+publication as an RFC.)<a href="#section-10-1" class="pilcrow">¶</a></p>
+<p id="section-10-2">The author operates a working server-side ad insertion deployment over
+MOQT: fixed-timeline linear channels with a stitcher publishing
+SCTE-35-conditioned placement opportunities alongside creative and
+tracking metadata on companion tracks, with client-requested tracking
+resolved through a distributor tracking endpoint of the kind described
+in <a href="#capability-urls" class="auto internal xref">Section 7</a>. The timing rules in <a href="#timing" class="auto internal xref">Section 5</a> derive from that
+running code rather than from speculation.<a href="#section-10-2" class="pilcrow">¶</a></p>
+<p id="section-10-3"></p>
+</section>
+</div>
+<div id="security">
+<section id="section-11">
+      <h2 id="name-security-considerations">
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+      </h2>
+<div id="integrity">
+<section id="section-11.1">
+        <h3 id="name-integrity-of-tracking-recor">
+<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-integrity-of-tracking-recor" class="section-name selfRef">Integrity of Tracking Records</a>
+        </h3>
+<p id="section-11.1-1">Tracking URLs move money. A relay path is not end-to-end confidential
+or authentic by default, and a tampered creative signaling record turns
+a large synchronized audience into a request cannon aimed at an
+arbitrary URL -- amplifying the denial-of-service concerns already
+noted for splice records (Section 6.3 of <span>[<a href="#SCTE35-MOQ" class="cite xref">SCTE35-MOQ</a>]</span>) with an
+attacker-chosen target. Deployments <span class="bcp14">MUST</span> authenticate the publication
+path for this track, and receivers <span class="bcp14">SHOULD</span> restrict tracking requests to
+URL authorities the distributor has designated (capability URLs at a
+distributor endpoint make this restriction natural). Whether records
+additionally need payload signing is tracked in <a href="#open-issues" class="auto internal xref">Section 9</a>.<a href="#section-11.1-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="amplification">
+<section id="section-11.2">
+        <h3 id="name-amplification-and-load">
+<a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-amplification-and-load" class="section-name selfRef">Amplification and Load</a>
+        </h3>
+<p id="section-11.2-1">Even absent an attacker, activation-synchronized behavior across a
+broadcast audience is a self-inflicted denial of service; the
+mitigations in <a href="#load-shaping" class="auto internal xref">Section 7.2</a> are accordingly stated as client
+SHOULDs. Capability URLs bound the blast radius of both cases: devices
+address the distributor's endpoint, which applies its own policy before
+any vendor is contacted.<a href="#section-11.2-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="validation">
+<section id="section-11.3">
+        <h3 id="name-payload-validation">
+<a href="#section-11.3" class="section-number selfRef">11.3. </a><a href="#name-payload-validation" class="section-name selfRef">Payload Validation</a>
+        </h3>
+<p id="section-11.3-1">Receivers <span class="bcp14">MUST</span> treat record payloads as untrusted input: enforce size
+and nesting limits on the JSON envelope, and accept only <code>https</code> URLs
+in tracking, <code>$remote</code>, and verification fields. Verification resources
+are executable code; clients <span class="bcp14">MUST</span> apply their platform's script-loading
+policy and <span class="bcp14">SHOULD</span> load them only for slots that will actually render.<a href="#section-11.3-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="privacy">
+<section id="section-11.4">
+        <h3 id="name-privacy">
+<a href="#section-11.4" class="section-number selfRef">11.4. </a><a href="#name-privacy" class="section-name selfRef">Privacy</a>
+        </h3>
+<p id="section-11.4-1">By construction, the shared timeline carries no per-user data: records
+are identical for every subscriber, per-device identity is appended by
+the client at request time (<a href="#client-identity" class="auto internal xref">Section 7.1</a>), and identifiers are
+pseudonymous and session-scoped. Indirection through capability URLs
+additionally keeps vendor endpoint inventories and macro-expanded
+values out of relay caches. Distributor tracking endpoints handle real
+device context (addresses, user agents) and <span class="bcp14">MUST</span> apply applicable
+consent and data-protection policy before forwarding it to vendors.<a href="#section-11.4-1" class="pilcrow">¶</a></p>
+</section>
+</div>
+</section>
+</div>
+<div id="iana">
+<section id="section-12">
+      <h2 id="name-iana-considerations">
+<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+      </h2>
+<p id="section-12-1">This document requests registration of the following entry in the "MSF
+Event Timeline Types" registry established by <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-01#section-14.2" class="relref">Section 14.2</a> of [<a href="#MSF" class="cite xref">MSF</a>]</span>.
+<span>[<a href="#SCTE35-MOQ" class="cite xref">SCTE35-MOQ</a>]</span> registers entries in that same registry; this document
+follows the same pattern.<a href="#section-12-1" class="pilcrow">¶</a></p>
+<span id="name-addition-to-the-msf-event-t"></span><table class="center" id="table-1">
+        <caption>
+<a href="#table-1" class="selfRef">Table 1</a>:
+<a href="#name-addition-to-the-msf-event-t" class="selfRef">Addition to the MSF Event Timeline Types registry</a>
+        </caption>
+<thead>
+          <tr>
+            <th class="text-left" rowspan="1" colspan="1">Event Type</th>
+            <th class="text-left" rowspan="1" colspan="1">Description</th>
+            <th class="text-left" rowspan="1" colspan="1">Reference</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">urn:svta:advertising-wg:ad-creative-signaling</td>
+            <td class="text-left" rowspan="1" colspan="1">SVTA 2053-1 ad creative signaling, Version 2 carriage envelope</td>
+            <td class="text-left" rowspan="1" colspan="1">This document; <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>
+</td>
+          </tr>
+        </tbody>
+      </table>
+<p id="section-12-3">Editor's note (to be resolved before publication): the URN is defined and
+owned by the SVTA Advertising Working Group; this registration is made in
+coordination with that group.<a href="#section-12-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="sec-combined-references">
+<section id="section-13">
+      <h2 id="name-references">
+<a href="#section-13" class="section-number selfRef">13. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<div id="sec-normative-references">
+<section id="section-13.1">
+        <h3 id="name-normative-references">
+<a href="#section-13.1" class="section-number selfRef">13.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="MSF">[MSF]</dt>
+        <dd>
+<span class="refAuthor">Law, W.</span> and <span class="refAuthor">S. Nandakumar</span>, <span class="refTitle">"MOQT Streaming Format"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-msf-01</span>, <time datetime="2026-06-02" class="refDate">2 June 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-01">https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-01</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC2119">[RFC2119]</dt>
+        <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8174">[RFC8174]</dt>
+        <dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8259">[RFC8259]</dt>
+        <dd>
+<span class="refAuthor">Bray, T., Ed.</span>, <span class="refTitle">"The JavaScript Object Notation (JSON) Data Interchange Format"</span>, <span class="seriesInfo">STD 90</span>, <span class="seriesInfo">RFC 8259</span>, <span class="seriesInfo">DOI 10.17487/RFC8259</span>, <time datetime="2017-12" class="refDate">December 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8259">https://www.rfc-editor.org/rfc/rfc8259</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="SVTA2053">[SVTA2053]</dt>
+      <dd>
+<span class="refAuthor">Streaming Video Technology Alliance (SVTA), Advertising Working Group</span>, <span class="refTitle">"SVTA 2053-1: Ad Creative Signaling in DASH and HLS, Revision 1.0"</span>, <time datetime="2025-05-19" class="refDate">19 May 2025</time>, <span>&lt;<a href="https://www.svta.org/">https://www.svta.org/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+<div id="sec-informative-references">
+<section id="section-13.2">
+        <h3 id="name-informative-references">
+<a href="#section-13.2" class="section-number selfRef">13.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="CAP-URLS">[CAP-URLS]</dt>
+        <dd>
+<span class="refAuthor">Tennison, J.</span>, <span class="refTitle">"Good Practices for Capability URLs"</span>, <span class="seriesInfo">W3C First Public Working Draft</span>, <time datetime="2014-02" class="refDate">February 2014</time>, <span>&lt;<a href="https://www.w3.org/TR/capability-urls/">https://www.w3.org/TR/capability-urls/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="MOQT">[MOQT]</dt>
+        <dd>
+<span class="refAuthor">Nandakumar, S.</span>, <span class="refAuthor">Vasiliev, V.</span>, <span class="refAuthor">Swett, I.</span>, and <span class="refAuthor">A. Frindell</span>, <span class="refTitle">"Media over QUIC Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-transport-19</span>, <time datetime="2026-07-06" class="refDate">6 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-19">https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-19</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="OMSDK">[OMSDK]</dt>
+        <dd>
+<span class="refAuthor">IAB Technology Laboratory</span>, <span class="refTitle">"Open Measurement SDK"</span>, <span>&lt;<a href="https://iabtechlab.com/standards/open-measurement-sdk/">https://iabtechlab.com/standards/open-measurement-sdk/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7942">[RFC7942]</dt>
+        <dd>
+<span class="refAuthor">Sheffer, Y.</span> and <span class="refAuthor">A. Farrel</span>, <span class="refTitle">"Improving Awareness of Running Code: The Implementation Status Section"</span>, <span class="seriesInfo">BCP 205</span>, <span class="seriesInfo">RFC 7942</span>, <span class="seriesInfo">DOI 10.17487/RFC7942</span>, <time datetime="2016-07" class="refDate">July 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7942">https://www.rfc-editor.org/rfc/rfc7942</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="SCTE35">[SCTE35]</dt>
+        <dd>
+<span class="refAuthor">Society of Cable Telecommunications Engineers</span>, <span class="refTitle">"Digital Program Insertion Cueing Message"</span>, <span class="seriesInfo">ANSI/SCTE 35 2022</span>, <time datetime="2022" class="refDate">2022</time>. </dd>
+<dd class="break"></dd>
+<dt id="SCTE35-MOQ">[SCTE35-MOQ]</dt>
+        <dd>
+<span class="refAuthor">Law, W.</span> and <span class="refAuthor">S. Nandakumar</span>, <span class="refTitle">"SCTE35 transmission over MSF Event Timeline"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-wilaw-moq-scte35-event-timeline-00</span>, <time datetime="2026-07-06" class="refDate">6 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-wilaw-moq-scte35-event-timeline-00">https://datatracker.ietf.org/doc/html/draft-wilaw-moq-scte35-event-timeline-00</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="VAST">[VAST]</dt>
+      <dd>
+<span class="refAuthor">IAB Technology Laboratory</span>, <span class="refTitle">"Digital Video Ad Serving Template (VAST), Version 4.2"</span>, <time datetime="2019-06" class="refDate">June 2019</time>, <span>&lt;<a href="https://iabtechlab.com/standards/vast/">https://iabtechlab.com/standards/vast/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</div>
+</section>
+</div>
+<div id="acknowledgments">
+<section id="appendix-A">
+      <h2 id="name-acknowledgments">
+<a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+      </h2>
+<p id="appendix-A-1">This document deliberately reuses the carriage pattern established by
+Will Law and Suhas Nandakumar in <span>[<a href="#SCTE35-MOQ" class="cite xref">SCTE35-MOQ</a>]</span>, and is designed to
+compose with it. The payload data model is the work of the SVTA
+Advertising Working Group <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-2"></p>
+</section>
+</div>
+<div id="schema">
+<section id="appendix-B">
+      <h2 id="name-json-schema-and-test-vector">
+<a href="#name-json-schema-and-test-vector" class="section-name selfRef">JSON Schema and Test Vectors</a>
+      </h2>
+<p id="appendix-B-1"></p>
+<p id="appendix-B-2">(To be provided in a future revision.)<a href="#appendix-B-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="authors-addresses">
+<section id="appendix-C">
+      <h2 id="name-authors-address">
+<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Steven Riedl</span></div>
+<div dir="auto" class="left"><span class="org">Paramount</span></div>
+<div class="email">
+<span>Email:</span>
+<a href="mailto:steven.riedl@pluto.tv" class="email">steven.riedl@pluto.tv</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>
