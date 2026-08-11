@@ -48,8 +48,10 @@ normative:
       - org: Streaming Video Technology Alliance (SVTA), Advertising Working Group
     date: 2025-05-19
     target: https://www.svta.org/
-{::comment} TODO: confirm the stable public URL for SVTA 2053-1 with the SVTA
-Advertising WG before submission. {:/comment}
+    # TODO before submission: confirm the stable public URL for SVTA 2053-1 with the SVTA
+    # Advertising WG. (This was a kramdown {::comment} block inside the YAML front matter,
+    # which is not valid YAML and made the draft fail to build at all — the first compile
+    # ever attempted, 2026-08-11, caught it.)
 
 informative:
   # If this fails to resolve at build time, Will's draft is not on the datatracker yet.
