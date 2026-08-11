@@ -40,6 +40,16 @@ author:
     email: steven.riedl@pluto.tv
 
 normative:
+  # NORMATIVE on purpose (Steven, 2026-08-11): this document registers into a registry that
+  # {{SCTE35-MOQ}} also registers into, and its event records are timed and correlated against
+  # that draft's splice signaling -- you cannot implement this one correctly without reading it.
+  #
+  # Consequence to accept knowingly: a normative reference to an individual (non-WG-adopted)
+  # draft puts us in MISSREF at the RFC Editor -- our document cannot be published until the
+  # referenced one is. For an informational companion whose whole premise is following that
+  # draft's pattern, that coupling is honest rather than costly. Verified resolving 2026-08-11:
+  # draft-wilaw-moq-scte35-event-timeline-00 submitted 6 July 2026, live on the datatracker.
+  SCTE35-MOQ: I-D.draft-wilaw-moq-scte35-event-timeline
   MSF: I-D.ietf-moq-msf
   RFC8259:
   SVTA2053:
@@ -54,12 +64,6 @@ normative:
     # ever attempted, 2026-08-11, caught it.)
 
 informative:
-  # Verified 2026-08-11: this resolves. draft-wilaw-moq-scte35-event-timeline-00 was
-  # submitted 6 July 2026 and is on the datatracker; the build renders the reference with
-  # its datatracker URL. (The differing casing in his repo README --
-  # scte35-MSF-event-timeline -- 404s, so that link is simply wrong; the lowercase
-  # datatracker name used here is the real one. No `target:` fallback needed.)
-  SCTE35-MOQ: I-D.draft-wilaw-moq-scte35-event-timeline
   MOQT: I-D.ietf-moq-transport
   SCTE35:
     title: "Digital Program Insertion Cueing Message"
