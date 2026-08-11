@@ -1389,6 +1389,15 @@ do not mix payload flavors within one Event Timeline track (see Section
 4.3 of <span>[<a href="#SCTE35-MOQ" class="cite xref">SCTE35-MOQ</a>]</span> for the same rule applied to SCTE-35), ad
 creative signaling is carried on a <em>sibling</em> Event Timeline track
 alongside any splice signaling track, not interleaved within it.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-4">A splice signaling track is not required. Ad creative signaling describes
+what plays inside a placement opportunity; it does not depend on how the
+boundaries of that opportunity were signaled. A deployment <span class="bcp14">MAY</span> carry ad
+creative signaling with no SCTE-35 records present, leaving break
+detection to another mechanism entirely -- in-band timed metadata such as
+ID3, an <code>emsg</code> box, or the timing carried by the creative records
+themselves. Where a splice signaling track <em>is</em> present, the alignment
+rules in <a href="#correlation" class="auto internal xref">Section 5.2</a> let the two be correlated; where it is absent,
+those rules simply do not apply.<a href="#section-3-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="record-format">
@@ -1916,10 +1925,6 @@ coordination with that group.<a href="#section-12-3" class="pilcrow">¶</a></p>
         <dd>
 <span class="refAuthor">Bray, T., Ed.</span>, <span class="refTitle">"The JavaScript Object Notation (JSON) Data Interchange Format"</span>, <span class="seriesInfo">STD 90</span>, <span class="seriesInfo">RFC 8259</span>, <span class="seriesInfo">DOI 10.17487/RFC8259</span>, <time datetime="2017-12" class="refDate">December 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8259">https://www.rfc-editor.org/rfc/rfc8259</a>&gt;</span>. </dd>
 <dd class="break"></dd>
-<dt id="SCTE35-MOQ">[SCTE35-MOQ]</dt>
-        <dd>
-<span class="refAuthor">Law, W.</span> and <span class="refAuthor">S. Nandakumar</span>, <span class="refTitle">"SCTE35 transmission over MSF Event Timeline"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-wilaw-moq-scte35-event-timeline-00</span>, <time datetime="2026-07-06" class="refDate">6 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-wilaw-moq-scte35-event-timeline-00">https://datatracker.ietf.org/doc/html/draft-wilaw-moq-scte35-event-timeline-00</a>&gt;</span>. </dd>
-<dd class="break"></dd>
 <dt id="SVTA2053">[SVTA2053]</dt>
       <dd>
 <span class="refAuthor">Streaming Video Technology Alliance (SVTA), Advertising Working Group</span>, <span class="refTitle">"SVTA 2053-1: Ad Creative Signaling in DASH and HLS, Revision 1.0"</span>, <time datetime="2025-05-19" class="refDate">19 May 2025</time>, <span>&lt;<a href="https://www.svta.org/">https://www.svta.org/</a>&gt;</span>. </dd>
@@ -1952,6 +1957,10 @@ coordination with that group.<a href="#section-12-3" class="pilcrow">¶</a></p>
 <dt id="SCTE35">[SCTE35]</dt>
         <dd>
 <span class="refAuthor">Society of Cable Telecommunications Engineers</span>, <span class="refTitle">"Digital Program Insertion Cueing Message"</span>, <span class="seriesInfo">ANSI/SCTE 35 2022</span>, <time datetime="2022" class="refDate">2022</time>. </dd>
+<dd class="break"></dd>
+<dt id="SCTE35-MOQ">[SCTE35-MOQ]</dt>
+        <dd>
+<span class="refAuthor">Law, W.</span> and <span class="refAuthor">S. Nandakumar</span>, <span class="refTitle">"SCTE35 transmission over MSF Event Timeline"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-wilaw-moq-scte35-event-timeline-00</span>, <time datetime="2026-07-06" class="refDate">6 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-wilaw-moq-scte35-event-timeline-00">https://datatracker.ietf.org/doc/html/draft-wilaw-moq-scte35-event-timeline-00</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="VAST">[VAST]</dt>
       <dd>
