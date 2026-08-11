@@ -1992,8 +1992,122 @@ Advertising Working Group <span>[<a href="#SVTA2053" class="cite xref">SVTA2053<
       <h2 id="name-json-schema-and-test-vector">
 <a href="#name-json-schema-and-test-vector" class="section-name selfRef">JSON Schema and Test Vectors</a>
       </h2>
-<p id="appendix-B-1"></p>
-<p id="appendix-B-2">(To be provided in a future revision.)<a href="#appendix-B-2" class="pilcrow">¶</a></p>
+<p id="appendix-B-1">A JSON Schema for the record shape and a set of test vectors are published
+alongside this document at
+<a href="https://riedlse.github.io/draft-riedl-moq-ad-creative-signaling/">https://riedlse.github.io/draft-riedl-moq-ad-creative-signaling/</a>.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<p id="appendix-B-2">The schema encodes exactly the two requirements of <a href="#record-structure" class="auto internal xref">Section 4.1</a> — one
+index reference field, and a <code>data</code> member holding one Version 2 envelope — and
+nothing further; the envelope's own contents are governed by <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>, not
+by this document.<a href="#appendix-B-2" class="pilcrow">¶</a></p>
+<p id="appendix-B-3">The vectors come in two sets, and both matter: six that <span class="bcp14">MUST</span> validate, and six
+that <span class="bcp14">MUST NOT</span>. A validator that accepts everything passes the first set alone.
+The rejecting cases pin the constraints most likely to be implemented loosely:<a href="#appendix-B-3" class="pilcrow">¶</a></p>
+<table class="center" id="table-2">
+        <caption><a href="#table-2" class="selfRef">Table 2</a></caption>
+<thead>
+          <tr>
+            <th class="text-left" rowspan="1" colspan="1">Vector</th>
+            <th class="text-left" rowspan="1" colspan="1">Rejected because</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>two-index-fields</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">carries both <code>m</code> and <code>t</code>; exactly one is allowed</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>no-index-field</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">carries none</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>missing-data</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">index only, no envelope</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>v1-bare-payload</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">a bare Version 1 payload object, which the DASH and HLS bindings accept and this one does not (<a href="#payload" class="auto internal xref">Section 4.3</a>)</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>wrong-envelope-version</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>"version": 1</code> inside <code>data</code>
+</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>unknown-envelope-type</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">a <code>type</code> outside <code>pod</code>, <code>slot</code>, <code>trackingEvent</code>
+</td>
+          </tr>
+        </tbody>
+      </table>
+<p id="appendix-B-5">A minimal conforming record, one <code>pod</code> envelope describing a single 30 s
+creative with its quartile chain (timings taken from a running deployment, so
+the values are the real ones a 30 s transcode produces -- note <code>30030</code>, not
+<code>30000</code>):<a href="#appendix-B-5" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="appendix-B-6">
+<pre>
+{
+  "m": 60000,
+  "data": {
+    "version": 2,
+    "type": "pod",
+    "payload": [
+      {
+        "id": "brk-947",
+        "startTime": 60000,
+        "duration": 30030,
+        "slots": [
+          {
+            "id": "ad-32600921",
+            "index": 0,
+            "startTime": 60000,
+            "duration": 30030,
+            "trackingEvents": [
+              { "event": "start",         "startTime": 0,
+                "urls": ["https://aip.example/v2/impression/9f2c1e84-.../start"] },
+              { "event": "firstQuartile", "startTime": 7507,
+                "urls": ["https://aip.example/v2/impression/9f2c1e84-.../firstQuartile"] },
+              { "event": "midpoint",      "startTime": 15015,
+                "urls": ["https://aip.example/v2/impression/9f2c1e84-.../midpoint"] },
+              { "event": "thirdQuartile", "startTime": 22522,
+                "urls": ["https://aip.example/v2/impression/9f2c1e84-.../thirdQuartile"] },
+              { "event": "complete",      "startTime": 30030,
+                "urls": ["https://aip.example/v2/impression/9f2c1e84-.../complete"] }
+            ]
+          }
+        ]
+      }
+    ],
+    "features": { "capabilityUrls": true, "perDeviceDedup": true }
+  }
+}
+</pre><a href="#appendix-B-6" class="pilcrow">¶</a>
+</div>
+<p id="appendix-B-7">The <code>urls</code> values are capability URLs (<a href="#capability-urls" class="auto internal xref">Section 7</a>), abbreviated here.<a href="#appendix-B-7" class="pilcrow">¶</a></p>
+<p id="appendix-B-8">Two notes on provenance, so implementers know what these are and are not.<a href="#appendix-B-8" class="pilcrow">¶</a></p>
+<p id="appendix-B-9">The vectors are <strong>conformance examples authored against this specification</strong>,
+not captured output. The reference implementation publishes its break timeline
+on a non-standard control track today; migrating it to the envelope form
+described here is in progress, and vectors captured from it will replace these
+once that lands. Their timings, identifiers and quartile offsets are taken from
+a live deployment, so they are realistic, but the record framing is this
+document's.<a href="#appendix-B-9" class="pilcrow">¶</a></p>
+<p id="appendix-B-10">The rules the schema expresses are executable and run in that implementation's
+CI, so the published vectors cannot silently drift from the prose: the valid set
+is asserted to pass and the invalid set to fail, each for the specific reason its
+name claims.<a href="#appendix-B-10" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">

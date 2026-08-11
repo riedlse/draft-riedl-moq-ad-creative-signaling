@@ -675,8 +675,102 @@ Acknowledgments
 
 JSON Schema and Test Vectors
 
+   A JSON Schema for the record shape and a set of test vectors are
+   published alongside this document at https://riedlse.github.io/draft-
+   riedl-moq-ad-creative-signaling/ (https://riedlse.github.io/draft-
+   riedl-moq-ad-creative-signaling/).
 
-   (To be provided in a future revision.)
+   The schema encodes exactly the two requirements of Section 4.1 — one
+   index reference field, and a data member holding one Version 2
+   envelope — and nothing further; the envelope's own contents are
+   governed by [SVTA2053], not by this document.
+
+   The vectors come in two sets, and both matter: six that MUST
+   validate, and six that MUST NOT.  A validator that accepts everything
+   passes the first set alone.  The rejecting cases pin the constraints
+   most likely to be implemented loosely:
+
+    +========================+========================================+
+    | Vector                 | Rejected because                       |
+    +========================+========================================+
+    | two-index-fields       | carries both m and t; exactly one is   |
+    |                        | allowed                                |
+    +------------------------+----------------------------------------+
+    | no-index-field         | carries none                           |
+    +------------------------+----------------------------------------+
+    | missing-data           | index only, no envelope                |
+    +------------------------+----------------------------------------+
+    | v1-bare-payload        | a bare Version 1 payload object, which |
+    |                        | the DASH and HLS bindings accept and   |
+    |                        | this one does not (Section 4.3)        |
+    +------------------------+----------------------------------------+
+    | wrong-envelope-version | "version": 1 inside data               |
+    +------------------------+----------------------------------------+
+    | unknown-envelope-type  | a type outside pod, slot,              |
+    |                        | trackingEvent                          |
+    +------------------------+----------------------------------------+
+
+                                  Table 2
+
+   A minimal conforming record, one pod envelope describing a single 30
+   s creative with its quartile chain (timings taken from a running
+   deployment, so the values are the real ones a 30 s transcode produces
+   -- note 30030, not 30000):
+
+   {
+     "m": 60000,
+     "data": {
+       "version": 2,
+       "type": "pod",
+       "payload": [
+         {
+           "id": "brk-947",
+           "startTime": 60000,
+           "duration": 30030,
+           "slots": [
+             {
+               "id": "ad-32600921",
+               "index": 0,
+               "startTime": 60000,
+               "duration": 30030,
+               "trackingEvents": [
+                 { "event": "start",         "startTime": 0,
+                   "urls": ["https://aip.example/v2/impression/9f2c1e84-.../start"] },
+                 { "event": "firstQuartile", "startTime": 7507,
+                   "urls": ["https://aip.example/v2/impression/9f2c1e84-.../firstQuartile"] },
+                 { "event": "midpoint",      "startTime": 15015,
+                   "urls": ["https://aip.example/v2/impression/9f2c1e84-.../midpoint"] },
+                 { "event": "thirdQuartile", "startTime": 22522,
+                   "urls": ["https://aip.example/v2/impression/9f2c1e84-.../thirdQuartile"] },
+                 { "event": "complete",      "startTime": 30030,
+                   "urls": ["https://aip.example/v2/impression/9f2c1e84-.../complete"] }
+               ]
+             }
+           ]
+         }
+       ],
+       "features": { "capabilityUrls": true, "perDeviceDedup": true }
+     }
+   }
+
+   The urls values are capability URLs (Section 7), abbreviated here.
+
+   Two notes on provenance, so implementers know what these are and are
+   not.
+
+   The vectors are *conformance examples authored against this
+   specification*, not captured output.  The reference implementation
+   publishes its break timeline on a non-standard control track today;
+   migrating it to the envelope form described here is in progress, and
+   vectors captured from it will replace these once that lands.  Their
+   timings, identifiers and quartile offsets are taken from a live
+   deployment, so they are realistic, but the record framing is this
+   document's.
+
+   The rules the schema expresses are executable and run in that
+   implementation's CI, so the published vectors cannot silently drift
+   from the prose: the valid set is asserted to pass and the invalid set
+   to fail, each for the specific reason its name claims.
 
 Author's Address
 
