@@ -54,11 +54,11 @@ normative:
     # ever attempted, 2026-08-11, caught it.)
 
 informative:
-  # If this fails to resolve at build time, Will's draft is not on the datatracker yet.
-  # His repo README links a name with different casing (scte35-MSF-event-timeline) than
-  # his docname, which suggests it is still pre-submission. Fallback: expand this into a
-  # full reference block with an explicit `target:` pointing at his GitHub Pages render
-  # until the datatracker entry exists. Do NOT ship an unresolvable normative reference.
+  # Verified 2026-08-11: this resolves. draft-wilaw-moq-scte35-event-timeline-00 was
+  # submitted 6 July 2026 and is on the datatracker; the build renders the reference with
+  # its datatracker URL. (The differing casing in his repo README --
+  # scte35-MSF-event-timeline -- 404s, so that link is simply wrong; the lowercase
+  # datatracker name used here is the real one. No `target:` fallback needed.)
   SCTE35-MOQ: I-D.draft-wilaw-moq-scte35-event-timeline
   MOQT: I-D.ietf-moq-transport
   SCTE35:
