@@ -694,7 +694,7 @@ the values are the real ones a 30 s transcode produces -- note `30030`, not
 }
 ~~~
 
-The `urls` values are capability URLs ({{beacons}}), abbreviated here.
+The `urls` values are capability URLs ({{capability-urls}}), abbreviated here.
 
 Two notes on provenance, so implementers know what these are and are not.
 
