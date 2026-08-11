@@ -30,7 +30,7 @@ venue:
   mail: "moq@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/moq/"
   github: "riedlse/draft-riedl-moq-ad-creative-signaling"
-  latest: "https://riedlse.github.io/draft-riedl-moq-ad-creative-signaling/"
+  latest: "https://riedlse.github.io/draft-riedl-moq-ad-creative-signaling/draft-riedl-moq-ad-creative-signaling.html"
 
 author:
  -
