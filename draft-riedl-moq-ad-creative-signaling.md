@@ -40,16 +40,6 @@ author:
     email: steven.riedl@pluto.tv
 
 normative:
-  # NORMATIVE on purpose (Steven, 2026-08-11): this document registers into a registry that
-  # {{SCTE35-MOQ}} also registers into, and its event records are timed and correlated against
-  # that draft's splice signaling -- you cannot implement this one correctly without reading it.
-  #
-  # Consequence to accept knowingly: a normative reference to an individual (non-WG-adopted)
-  # draft puts us in MISSREF at the RFC Editor -- our document cannot be published until the
-  # referenced one is. For an informational companion whose whole premise is following that
-  # draft's pattern, that coupling is honest rather than costly. Verified resolving 2026-08-11:
-  # draft-wilaw-moq-scte35-event-timeline-00 submitted 6 July 2026, live on the datatracker.
-  SCTE35-MOQ: I-D.draft-wilaw-moq-scte35-event-timeline
   MSF: I-D.ietf-moq-msf
   RFC8259:
   SVTA2053:
@@ -64,6 +54,14 @@ normative:
     # ever attempted, 2026-08-11, caught it.)
 
 informative:
+  # INFORMATIVE, deliberately (Steven, 2026-08-11). Ad-creative signaling is independent of
+  # ad-LOCATION signaling: a client can detect a break from embedded ID3, an emsg, or the
+  # creative records' own timing, with no SCTE-35 track present at all. Every reference to this
+  # draft in the body is conditional ("when a splice signaling track accompanies this track")
+  # or an explicit analogy -- there is no MUST that requires reading it, so it is not normative.
+  # Practical upside: no MISSREF, so this document's publication is not gated on an individual
+  # draft advancing.
+  SCTE35-MOQ: I-D.draft-wilaw-moq-scte35-event-timeline
   MOQT: I-D.ietf-moq-transport
   SCTE35:
     title: "Digital Program Insertion Cueing Message"
@@ -213,6 +211,16 @@ do not mix payload flavors within one Event Timeline track (see Section
 4.3 of {{SCTE35-MOQ}} for the same rule applied to SCTE-35), ad
 creative signaling is carried on a *sibling* Event Timeline track
 alongside any splice signaling track, not interleaved within it.
+
+A splice signaling track is not required. Ad creative signaling describes
+what plays inside a placement opportunity; it does not depend on how the
+boundaries of that opportunity were signaled. A deployment MAY carry ad
+creative signaling with no SCTE-35 records present, leaving break
+detection to another mechanism entirely -- in-band timed metadata such as
+ID3, an `emsg` box, or the timing carried by the creative records
+themselves. Where a splice signaling track *is* present, the alignment
+rules in {{correlation}} let the two be correlated; where it is absent,
+those rules simply do not apply.
 
 # Record Format {#record-format}
 
