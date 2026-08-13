@@ -159,8 +159,12 @@ normativity remains with {{SVTA2053}}, and this binding could
 additionally be published as a carriage section in a future revision of
 that specification.
 
-{::comment} TODO: one sentence positioning vs. WG adoption status of
-MSF at submission time. {:/comment}
+On status: {{MSF}} is an adopted work item of the MoQ Working Group,
+and its Event Timeline mechanism is the substrate here; this document
+and {{SCTE35-MOQ}} are individual submissions layered on that substrate,
+and this one is written to track {{MSF}} as it evolves under WG change
+control -- including following its registry, wherever that registry
+ultimately lands.
 
 # Conventions and Definitions {#conventions}
 
