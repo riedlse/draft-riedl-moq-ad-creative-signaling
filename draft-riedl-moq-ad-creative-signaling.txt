@@ -4,8 +4,8 @@
 
 Media Over QUIC                                                 S. Riedl
 Internet-Draft                                                 Paramount
-Intended status: Informational                            11 August 2026
-Expires: 12 February 2027
+Intended status: Informational                            13 August 2026
+Expires: 14 February 2027
 
 
            Ad Creative Signaling over the MSF Event Timeline
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 12 February 2027.
+   This Internet-Draft will expire on 14 February 2027.
 
 Copyright Notice
 
@@ -149,6 +149,12 @@ Table of Contents
    additionally be published as a carriage section in a future revision
    of that specification.
 
+   On status: [MSF] is an adopted work item of the MoQ Working Group,
+   and its Event Timeline mechanism is the substrate here; this document
+   and [SCTE35-MOQ] are individual submissions layered on that
+   substrate, and this one is written to track [MSF] as it evolves under
+   WG change control -- including following its registry, wherever that
+   registry ultimately lands.
 
 2.  Conventions and Definitions
 
