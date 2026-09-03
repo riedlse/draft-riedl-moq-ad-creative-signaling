@@ -6,6 +6,10 @@ anything in the Markdown source:
 
   * kramdown-rfc emits `<?line N?>` processing instructions for error mapping.
     idnits reports these as LINE_PI.
+  * xml2rfc writes the XML declaration as <?xml version='1.0'
+    encoding='utf-8'?>. That is valid, but encoding sniffers that match
+    encoding="UTF-8" literally report INVALID_ENCODING / "detected null" on
+    a file this close to pure ASCII, so normalize the quoting and case.
   * kramdown-rfc wraps both reference sections in an outer
     `<references><name>References</name>`. idnits reports the wrapper's name as
     INVALID_REFERENCES_NAME, expecting Normative/Informative at that level.
@@ -24,6 +28,13 @@ WRAPPER = re.compile(
 def main(path):
     s = io.open(path, encoding="utf-8").read()
     original = s
+
+    s = re.sub(
+        r"^<\?xml[^>]*\?>",
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        s,
+        count=1,
+    )
 
     line_pis = len(re.findall(r"<\?line[^>]*\?>", s))
     s = re.sub(r"[ \t]*<\?line[^>]*\?>\n?", "", s)
