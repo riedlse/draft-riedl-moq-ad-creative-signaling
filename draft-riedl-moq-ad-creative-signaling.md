@@ -1,7 +1,7 @@
 ---
 title: "Ad Creative Signaling over the MSF Event Timeline"
 abbrev: "MSF Ad Creative Signaling"
-docname: draft-riedl-moq-ad-creative-signaling-latest
+docname: draft-riedl-moq-ad-creative-signaling-00
 category: info
 submissiontype: IETF
 consensus: true
@@ -47,7 +47,7 @@ normative:
     author:
       - org: Streaming Video Technology Alliance (SVTA), Advertising Working Group
     date: 2025-05-19
-    target: https://www.svta.org/
+    target: https://www.svta.org/product/svta2053/
     # TODO before submission: confirm the stable public URL for SVTA 2053-1 with the SVTA
     # Advertising WG. (This was a kramdown {::comment} block inside the YAML front matter,
     # which is not valid YAML and made the draft fail to build at all — the first compile
@@ -286,6 +286,23 @@ placement opportunity. `slot` and `trackingEvent` envelopes MAY be used
 deduplication under redelivery is simplest at pod granularity (see
 {{open-issues}}).
 
+## Subscriber Invariance {#invariance}
+
+Records on this track MUST be subscriber-invariant: no field value may
+vary between subscribers. Per-session values enter only after delivery,
+either by client-side macro substitution (Section 6 of {{VAST}}) against
+broadcast templates, or by request-time indirection through capability
+URLs ({{capability-urls}}). A macro template is conformant precisely
+because the template is identical for every subscriber; substitution is
+a post-delivery operation.
+
+The DASH and HLS bindings of {{SVTA2053}} assume a per-session manifest,
+so payload fields carrying session-scoped tracking values are
+well-formed in those bindings. That assumption does not hold here:
+records on a shared Event Timeline track are delivered identically to
+every subscriber and are relay-cacheable, so a session-scoped field
+would both leak across sessions and defeat caching.
+
 # Timing and Correlation {#timing}
 
 ## Shared Index Space {#index-space}
@@ -423,6 +440,16 @@ via `$remote` ({{capability-urls}}):
 
 # Tracking Indirection and Capability URLs {#capability-urls}
 
+Two patterns satisfy {{invariance}}. In the first, the record carries
+broadcast tracking templates and the client performs macro substitution
+locally at activation; SVTA 2053-1 payloads carry over from the DASH and
+HLS bindings unchanged and no distributor infrastructure is required, at
+the cost of exposing vendor endpoint inventory in shared bytes,
+inflating every record by the full tracking list, and leaving per-device
+accounting to the macros alone. The second, described in the remainder
+of this section, defers resolution to a distributor-operated endpoint.
+Both are conformant; a publisher chooses per deployment.
+
 Section 5.2.2.2 of {{SVTA2053}} already says interpreters SHOULD defer
 `$remote` resolution until the containing object is about to become
 active. That deferral maps naturally onto broadcast fan-out, with one
@@ -452,6 +479,8 @@ measurement requires the device to identify itself at request time, not
 in the payload. A client SHOULD append a pseudonymous, session-scoped
 client identifier (issued and signed out of band, for example with the
 playback session) as a query parameter when requesting capability URLs.
+This mechanism applies to the indirection pattern; under client-side
+substitution, per-device accounting rests on the macro values alone.
 The tracking endpoint can then deduplicate on (resource, event, client
 identifier), count unique reach, and forward at most one request per
 device per event to vendor resources with that device's context --
@@ -463,7 +492,9 @@ payloads. Raw device identifiers MUST NOT appear in requested URLs.
 On a shared fixed timeline, every subscriber reaches the same tracking
 instant at the same wallclock moment; naive activation-time behavior
 synchronizes both the `$remote` resolution fetches and the tracking
-requests of the entire audience. Clients SHOULD resolve `$remote`
+requests of the entire audience. This applies with particular force
+under client-side substitution, where no distributor endpoint sits in
+the path to absorb the burst. Clients SHOULD resolve `$remote`
 fields within a randomized window ahead of activation (the publication
 lead of {{publication-lead}} provides the margin), and SHOULD apply
 bounded random jitter to tracking requests whose measurement semantics
@@ -681,8 +712,8 @@ A JSON Schema for the record shape and a set of test vectors are published
 alongside this document at
 <https://riedlse.github.io/draft-riedl-moq-ad-creative-signaling/>.
 
-The schema encodes exactly the two requirements of {{record-structure}} — one
-index reference field, and a `data` member holding one Version 2 envelope — and
+The schema encodes exactly the two requirements of {{record-structure}} -- one
+index reference field, and a `data` member holding one Version 2 envelope -- and
 nothing further; the envelope's own contents are governed by {{SVTA2053}}, not
 by this document.
 
@@ -723,15 +754,15 @@ the values are the real ones a 30 s transcode produces -- note `30030`, not
             "duration": 30030,
             "trackingEvents": [
               { "event": "start",         "startTime": 0,
-                "urls": ["https://aip.example/v2/impression/9f2c1e84-.../start"] },
+                "urls": ["https://aip.example/9f2c/start"] },
               { "event": "firstQuartile", "startTime": 7507,
-                "urls": ["https://aip.example/v2/impression/9f2c1e84-.../firstQuartile"] },
+                "urls": ["https://aip.example/9f2c/firstQuartile"] },
               { "event": "midpoint",      "startTime": 15015,
-                "urls": ["https://aip.example/v2/impression/9f2c1e84-.../midpoint"] },
+                "urls": ["https://aip.example/9f2c/midpoint"] },
               { "event": "thirdQuartile", "startTime": 22522,
-                "urls": ["https://aip.example/v2/impression/9f2c1e84-.../thirdQuartile"] },
+                "urls": ["https://aip.example/9f2c/thirdQuartile"] },
               { "event": "complete",      "startTime": 30030,
-                "urls": ["https://aip.example/v2/impression/9f2c1e84-.../complete"] }
+                "urls": ["https://aip.example/9f2c/complete"] }
             ]
           }
         ]
