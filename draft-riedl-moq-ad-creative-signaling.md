@@ -616,6 +616,41 @@ discussion; it is to be removed before publication.
    COSE over the envelope, or a catalog-pinned key) beyond transport
    authentication? See {{security}}.
 
+8. **No stable placement identifier**: {{SVTA2053}} gives neither the Pod
+   nor the Slot object an identifier. A Pod carries `start`, `duration`,
+   `slots` and `tracking`; a Slot carries `type`, `start`, `duration`,
+   `media`, `identifiers`, `tracking`, `verifications`, `skipOffset` and
+   `clickThrough`. `MediaReference` does have an `id`, but the
+   specification states that uniqueness of that value "is desired, but
+   not required", so it cannot be relied on as a key. The Slot
+   `identifiers` array identifies the **creative**, not the
+   **placement**: the same creative may legitimately appear twice in one
+   pod, and each appearance is measured separately.
+
+   While an envelope carries a whole pod, correlation is structural and
+   the absence costs nothing. It only bites once records are decomposed
+   — which {{SVTA2053}} itself already does in two places, the `$remote`
+   fields that resolve `slots`, `tracking` and `verifications`
+   separately, and the HLS Interstitial ASSET-LIST mapping, whose own
+   note observes that it "separates the Slot objects from the Pod
+   objects without explicit reference". This document decomposes further
+   still if the event class is split by function across sibling tracks
+   (see issue 1), because then a tracking record and the creative record
+   it belongs to arrive on different tracks: a shared index identifies
+   the placement opportunity, not which slot within it.
+
+   Three ways out. Derive a composite key from what already exists —
+   creative `identifiers` plus the slot's ordinal position within the
+   pod, anchored by the shared index — which needs no change to
+   {{SVTA2053}} but is positional and therefore fragile under pod
+   rewriting. Or request stable `id` fields on Pod and Slot from the
+   SVTA Advertising Working Group, which is the clean fix and the one
+   their ASSET-LIST note already argues for. Or define identifiers in
+   this document, which is the wrong layer: payload normativity belongs
+   with {{SVTA2053}} and this binding should not fork the data model.
+   The first is what an implementation can do today; the second is what
+   the ecosystem should have.
+
 # Implementation Status {#impl-status}
 
 (This section follows {{RFC7942}} and is to be removed before
