@@ -519,10 +519,28 @@ with the shared events defined here (the shared timeline announces
 placement geometry and the broadcast/default pod; the insertion plan
 overlays the per-session decision).
 
-That mechanism is out of scope for this document and deserves its own.
-It is named here only as a design constraint: the event class defined
-in this document is intended to be overridden or parameterized by such
-a layer without being redefined by it.
+Between those two extremes there is a third scope worth naming,
+because the choice is not binary. Records can be published per
+**cohort**: one track per distinct ad decision, shared by every device
+that resolves to it. Per-device plans are by definition uncacheable --
+one subscriber per track -- which forfeits the fan-out that motivates
+one-to-many delivery in the first place and reduces to per-session
+manifest stitching with extra steps. Cohort scope keeps relay fan-out
+within each cohort and bounds the number of distinct tracks by the
+number of decisions rather than the number of viewers. Server-guided
+insertion can therefore be served at whichever of the three scopes the
+deployment's decisioning actually requires.
+
+The event class defined here is unchanged across all three: shared,
+per-cohort, and per-session differ in the scope of the track carrying
+the records, not in the records themselves. That is deliberate --
+scope is a deployment decision, and this binding should not have to be
+redefined to follow it.
+
+That per-session mechanism is out of scope for this document and
+deserves its own. It is named here only as a design constraint: the
+event class defined in this document is intended to be overridden or
+parameterized by such a layer without being redefined by it.
 
 # Open Issues {#open-issues}
 
@@ -626,7 +644,14 @@ Running today:
   capability URLs, which devices fire with their own client identifier,
   with per-`{uuid, event, client}` deduplication so a shared broadcast
   yields per-device counts. This is the part of the document with the
-  most operational experience behind it.
+  most operational experience behind it. The deployment converged on it
+  for a concrete reason: a single impression in this inventory carries
+  roughly 5 to 15 vendor tracking URLs, so firing them from the client
+  directly means 5 to 15 device requests per impression, multiplied by
+  every subscriber to a shared broadcast. A capability URL is one device
+  request that the proxy fans out server-side, which is what makes the
+  device-side cost independent of how many vendors a creative carries
+  ({{amplification}}).
 * An MSF catalog, published automatically by the MoQ implementation in
   use and verified against an interop profile by a tool in the same
   codebase. A capture from the live deployment validates clean, so the
