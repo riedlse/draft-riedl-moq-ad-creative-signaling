@@ -48,7 +48,7 @@ normative:
     # served "Revision 1.0" for what this document calls Version 2. Targeting the SVTA root
     # avoids pinning a URL that renames or redirects; the body always says "Version 2
     # carriage envelope", so the model version stays unambiguous in prose.
-    title: "Ad Signaling in DASH and HLS — Version 2 object model"
+    title: "SVTA2053-2: Ad Creative Signaling in DASH and HLS — Version 2 object model"
     author:
       - org: Streaming Video Technology Alliance (SVTA), Advertising Working Group
     date: 2025
@@ -599,16 +599,18 @@ discussion; it is to be removed before publication.
    SHOULD error on unsupported flagged features -- sensible unicast
    behavior, but a broadcast publisher cannot negotiate per subscriber.
    Should the catalog advertise which features a track uses so clients
-   subscribe eyes-open? Two dependencies to settle first. (a) This
-   document assumes the Version 2 envelope carries a `features` member
-   for capability signaling; that member is not visible in SVTA's public
-   material, so it needs confirming with the SVTA Advertising WG, and if
-   it is not normative there, the minimal capability-flag mechanism has
-   to be defined here or requested from that group. (b) If the per-
-   function tracks of a split are published as separate broadcasts
-   rather than sibling tracks, a subscriber selects the functions it
-   supports by subscribing to them, which answers much of this question
-   for the split case but not for flagged features within one track.
+   subscribe eyes-open? The `features` member this rests on is
+   confirmed: the Version 2 base carriage envelope defines it as an
+   object of boolean flags, with `features.remoteFields` as the first,
+   and requires that an interpreter encountering a flag it does not
+   support SHOULD raise an error and ignore the payload. That rule is
+   written for unicast, where the publisher learns of the failure; on
+   one-to-many the publisher never hears, so the burden has to move to
+   subscribe time. Note also that if the per-function tracks of a split
+   are published as separate broadcasts rather than sibling tracks, a
+   subscriber selects the functions it supports by subscribing to them,
+   which answers much of this for the split case but not for flagged
+   features within a single track.
 
 7. **Record integrity**: do these records need payload signing (JWS or
    COSE over the envelope, or a catalog-pinned key) beyond transport
