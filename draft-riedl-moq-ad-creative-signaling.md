@@ -557,6 +557,21 @@ discussion; it is to be removed before publication.
    client, so rendition-level measurement is necessarily
    client-observed.
 
+   That mechanism now has a concrete shape to test against. The
+   `SWITCH_FROM` proposal distinguishes an *aligned* switch, where Group
+   IDs from the two tracks are compared, from an *unaligned* switch,
+   where they are not. The distinction decides this issue directly: a
+   single `m` on one signaling track can only address a switching set if
+   switches are aligned, since an unaligned switch leaves no common
+   Group-ID frame in which one index means the same instant on every
+   rung. Under unaligned switching the interior offsets survive but `m`
+   does not, which would push the binding toward either a per-rung
+   signaling track or an index defined against something other than the
+   media track's Group IDs. The proposal was not resolved at the
+   2026-09-08 interim and is held for the following one; at least one
+   implementation (MOQtail) reports partial draft-18 support, so
+   experience should be available before this document has to choose.
+
 5. **Common-format scope**: is the Event Timeline binding the whole
    story, or is a container-level mapping (the envelope in CMAF `emsg`)
    also wanted so one payload survives packager transit across
