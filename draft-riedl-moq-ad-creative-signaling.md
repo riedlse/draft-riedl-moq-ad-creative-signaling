@@ -43,15 +43,16 @@ normative:
   MSF: I-D.ietf-moq-msf
   RFC8259:
   SVTA2053:
-    title: "SVTA 2053-1: Ad Creative Signaling in DASH and HLS, Revision 1.0"
+    # Cited by document title + the Version 2 object model, NOT by SVTA's product slug.
+    # SVTA's slugs are unstable and inconsistently versioned: the svta2053-1 product page
+    # served "Revision 1.0" for what this document calls Version 2. Targeting the SVTA root
+    # avoids pinning a URL that renames or redirects; the body always says "Version 2
+    # carriage envelope", so the model version stays unambiguous in prose.
+    title: "Ad Signaling in DASH and HLS — Version 2 object model"
     author:
       - org: Streaming Video Technology Alliance (SVTA), Advertising Working Group
-    date: 2025-05-19
-    target: https://www.svta.org/product/svta2053/
-    # TODO before submission: confirm the stable public URL for SVTA 2053-1 with the SVTA
-    # Advertising WG. (This was a kramdown {::comment} block inside the YAML front matter,
-    # which is not valid YAML and made the draft fail to build at all — the first compile
-    # ever attempted, 2026-08-11, caught it.)
+    date: 2025
+    target: https://www.svta.org/
 
 informative:
   # INFORMATIVE, deliberately (Steven, 2026-08-11). Ad-creative signaling is independent of
@@ -565,7 +566,16 @@ discussion; it is to be removed before publication.
    SHOULD error on unsupported flagged features -- sensible unicast
    behavior, but a broadcast publisher cannot negotiate per subscriber.
    Should the catalog advertise which features a track uses so clients
-   subscribe eyes-open?
+   subscribe eyes-open? Two dependencies to settle first. (a) This
+   document assumes the Version 2 envelope carries a `features` member
+   for capability signaling; that member is not visible in SVTA's public
+   material, so it needs confirming with the SVTA Advertising WG, and if
+   it is not normative there, the minimal capability-flag mechanism has
+   to be defined here or requested from that group. (b) If the per-
+   function tracks of a split are published as separate broadcasts
+   rather than sibling tracks, a subscriber selects the functions it
+   supports by subscribing to them, which answers much of this question
+   for the split case but not for flagged features within one track.
 
 7. **Record integrity**: do these records need payload signing (JWS or
    COSE over the envelope, or a catalog-pinned key) beyond transport
