@@ -1,7 +1,9 @@
 ---
 title: "Ad Creative Signaling over the MSF Event Timeline"
 abbrev: "MSF Ad Creative Signaling"
-docname: draft-riedl-moq-ad-creative-signaling-00
+docname: draft-riedl-moq-ad-creative-signaling-latest
+# The revision number lives in the Makefile (SUB_REV), which substitutes it for
+# "-latest" when building the submission file: `make submission`.
 category: info
 submissiontype: IETF
 consensus: true
