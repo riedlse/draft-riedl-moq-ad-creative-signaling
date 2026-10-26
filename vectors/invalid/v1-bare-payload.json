@@ -1,2 +1,7 @@
-{ "m": 60000,
-  "data": { "id": "brk-947", "startTime": 60000, "duration": 30030, "slots": [] } }
+{
+  "m": 60000,
+  "data": {
+    "version": 1,
+    "identifiers": [{"scheme": "urn:smpte:ul:060E2B34.01040101.01200900.00000000", "value": "ABCD1234567H"}]
+  }
+}

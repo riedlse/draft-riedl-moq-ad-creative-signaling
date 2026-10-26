@@ -1,8 +1,58 @@
 [
-  { "m": 60000,  "data": { "version": 2, "type": "pod", "payload": [
-      { "id": "brk-950", "startTime": 60000, "duration": 30030, "slots": [
-        { "id": "ad-e5ad228d", "index": 0, "startTime": 60000, "duration": 30030, "trackingEvents": [] } ] } ] } },
-  { "m": 90030,  "data": { "version": 2, "type": "pod", "payload": [
-      { "id": "brk-951", "startTime": 90030, "duration": 30030, "slots": [
-        { "id": "ad-5bdf3691", "index": 0, "startTime": 90030, "duration": 30030, "trackingEvents": [] } ] } ] } }
+  {
+    "m": 60000,
+    "data": {
+      "version": 2,
+      "type": "pod",
+      "payload": [
+        {
+          "duration": 30.03,
+          "slots": [
+            {
+              "type": "linear",
+              "start": 0.0,
+              "duration": 30.03,
+              "identifiers": [{"scheme": "urn:com:example:ads:id", "value": "example-30s-a"}],
+              "tracking": [
+                {"type": "start", "urls": ["https://beacons.example.com/c/f7769a7e/start"]},
+                {"type": "complete", "urls": ["https://beacons.example.com/c/f7769a7e/done"]}
+              ]
+            }
+          ],
+          "tracking": [
+            {"type": "podStart", "urls": ["https://beacons.example.com/c/b50727d5/start"]},
+            {"type": "podEnd", "urls": ["https://beacons.example.com/c/b50727d5/end"]}
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "m": 90030,
+    "data": {
+      "version": 2,
+      "type": "pod",
+      "payload": [
+        {
+          "duration": 30.03,
+          "slots": [
+            {
+              "type": "linear",
+              "start": 0.0,
+              "duration": 30.03,
+              "identifiers": [{"scheme": "urn:com:example:ads:id", "value": "example-30s-b"}],
+              "tracking": [
+                {"type": "start", "urls": ["https://beacons.example.com/c/bc31db4f/start"]},
+                {"type": "complete", "urls": ["https://beacons.example.com/c/bc31db4f/done"]}
+              ]
+            }
+          ],
+          "tracking": [
+            {"type": "podStart", "urls": ["https://beacons.example.com/c/7dcbb18e/start"]},
+            {"type": "podEnd", "urls": ["https://beacons.example.com/c/7dcbb18e/end"]}
+          ]
+        }
+      ]
+    }
+  }
 ]

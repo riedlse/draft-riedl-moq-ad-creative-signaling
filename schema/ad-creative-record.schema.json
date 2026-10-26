@@ -2,20 +2,28 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://riedlse.github.io/draft-riedl-moq-ad-creative-signaling/schema/ad-creative-record.schema.json",
   "title": "Ad creative signaling Event Timeline record",
-  "description": "One record on an MSF Event Timeline track whose eventType is urn:svta:advertising-wg:ad-creative-signaling. Encodes the two MUST requirements of draft-riedl-moq-ad-creative-signaling section 4: exactly one index reference field, and a data member holding exactly one SVTA 2053-1 Version 2 carriage envelope. Note the DASH and HLS bindings also accept bare Version 1 payload objects; this binding does not.",
+  "description": "One record on an MSF Event Timeline track whose eventType is urn:svta:advertising-wg:ad-creative-signaling. Encodes the record requirements of draft-riedl-moq-ad-creative-signaling Section 4: exactly one index reference field, typed as MSF-01 Section 8.1 requires, and a data member holding exactly one SVTA 2053-1 Version 2 carriage envelope, with the envelope-level rules of SVTA 2053-1 Section 5.2.2.1 (Table 15). The payload objects (Pod, Slot, TrackingEvent, Verification) are governed by SVTA 2053-1 and are not checked here. Note the DASH and HLS bindings also accept bare Version 1 payload objects; this binding does not.",
   "type": "object",
   "properties": {
     "m": {
-      "description": "Media time index, in the coordinate space of the depends media track. RECOMMENDED for records describing creatives spliced into the media timeline.",
-      "type": "number"
+      "description": "Media PTS index (MSF-01 Section 8.1): a JSON Number of milliseconds on the timeline of the depends media track. RECOMMENDED for records describing creatives spliced into the media timeline.",
+      "type": "number",
+      "minimum": 0
     },
     "t": {
-      "description": "Wallclock index. For placement opportunities defined in wallclock terms where no media time is available.",
-      "type": ["number", "string"]
+      "description": "Wallclock index (MSF-01 Section 8.1): a JSON Number of milliseconds since the Unix epoch, not a date string. For placement opportunities defined in wallclock terms where no media time is available.",
+      "type": "number",
+      "minimum": 0
     },
     "l": {
-      "description": "MOQT Location index, for records bound to a delivery position rather than a media time.",
-      "type": ["number", "string", "object"]
+      "description": "MOQT Location index (MSF-01 Section 8.1): [Group ID, Object ID]. For records bound to a delivery position rather than a media time.",
+      "type": "array",
+      "prefixItems": [
+        { "type": "integer", "minimum": 0 },
+        { "type": "integer", "minimum": 0 }
+      ],
+      "minItems": 2,
+      "maxItems": 2
     },
     "data": { "$ref": "#/$defs/envelope" }
   },
@@ -27,13 +35,25 @@
   ],
   "$defs": {
     "envelope": {
-      "title": "SVTA 2053-1 Version 2 carriage envelope",
+      "title": "SVTA 2053-1 Version 2 carriage envelope (Section 5.2.2.1, Table 15)",
       "type": "object",
       "properties": {
         "version": { "const": 2 },
-        "type": { "enum": ["pod", "slot", "trackingEvent"] },
-        "payload": { "type": "array" },
-        "features": { "type": "object" }
+        "type": { "enum": ["pod", "slot", "trackingEvent", "verification"] },
+        "payload": {
+          "description": "At least one payload object, of the kind named by type.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "object" }
+        },
+        "features": {
+          "description": "Boolean feature flags. SVTA 2053-1 defines only remoteFields; an interpreter that does not support a flag set to true SHOULD ignore the payload, so no other flag may be true.",
+          "type": "object",
+          "properties": {
+            "remoteFields": { "type": "boolean" }
+          },
+          "additionalProperties": { "const": false }
+        }
       },
       "required": ["version", "type", "payload"]
     }

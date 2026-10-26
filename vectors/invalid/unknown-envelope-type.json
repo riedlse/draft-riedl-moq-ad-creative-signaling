@@ -1,1 +1,20 @@
-{ "m": 60000, "data": { "version": 2, "type": "podd", "payload": [] } }
+{
+  "m": 60000,
+  "data": {
+    "version": 2,
+    "type": "podd",
+    "payload": [
+      {
+        "duration": 30.03,
+        "slots": [
+          {
+            "type": "linear",
+            "start": 0.0,
+            "duration": 30.03,
+            "identifiers": [{"scheme": "urn:com:example:ads:id", "value": "example-30s-a"}]
+          }
+        ]
+      }
+    ]
+  }
+}

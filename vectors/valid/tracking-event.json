@@ -1,11 +1,13 @@
 {
-  "m": 67507,
+  "m": 60000,
   "data": {
     "version": 2,
     "type": "trackingEvent",
     "payload": [
-      { "event": "firstQuartile", "adId": "ad-32600921", "startTime": 7507,
-        "urls": ["https://aip.example/v2/impression/9f2c1e84-3b7a-4d21-9c05-6ea8b1d47f3e/firstQuartile"] }
+      {"type": "progress", "offset": 0.0, "urls": ["https://beacons.example.com/c/1aa1d7e5/progress-0"]},
+      {"type": "progress", "offset": 7.5075, "urls": ["https://beacons.example.com/c/1aa1d7e5/progress-1"]},
+      {"type": "progress", "offset": 15.015, "urls": ["https://beacons.example.com/c/1aa1d7e5/progress-2"]},
+      {"type": "progress", "offset": 22.5225, "urls": ["https://beacons.example.com/c/1aa1d7e5/progress-3"]}
     ]
   }
 }

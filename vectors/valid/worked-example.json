@@ -1,0 +1,44 @@
+{
+  "m": 480500,
+  "data": {
+    "version": 2,
+    "type": "pod",
+    "payload": [
+      {
+        "duration": 45.045,
+        "slots": [
+          {
+            "type": "linear",
+            "start": 0.0,
+            "duration": 30.03,
+            "identifiers": [
+              {"scheme": "urn:smpte:ul:060E2B34.01040101.01200900.00000000", "value": "ABCD1234567H"}
+            ],
+            "tracking": [
+              {"type": "impression", "urls": ["https://beacons.example.net/c/7f3a92/imp"]},
+              {"type": "firstQuartile", "urls": ["https://beacons.example.net/c/7f3a92/q1"]},
+              {"type": "midpoint", "urls": ["https://beacons.example.net/c/7f3a92/q2"]},
+              {"type": "thirdQuartile", "urls": ["https://beacons.example.net/c/7f3a92/q3"]},
+              {"type": "complete", "urls": ["https://beacons.example.net/c/7f3a92/done"]}
+            ],
+            "verifications": [
+              {"vendor": "vendor.example-omid", "parameters": "key=value", "resource": "https://cdn.vendor.example/omid-verify.js"}
+            ]
+          },
+          {
+            "type": "linear",
+            "start": 30.03,
+            "duration": 15.015,
+            "identifiers": [{"scheme": "urn:com:example:ads:id", "value": "972c79e1-2363-403e-9287-a0fa4323c389"}],
+            "$remote": {"tracking": "https://beacons.example.net/c/9d41c7/trk"}
+          }
+        ],
+        "tracking": [
+          {"type": "podStart", "urls": ["https://beacons.example.net/c/p8842/start"]},
+          {"type": "podEnd", "urls": ["https://beacons.example.net/c/p8842/end"]}
+        ]
+      }
+    ],
+    "features": {"remoteFields": true}
+  }
+}

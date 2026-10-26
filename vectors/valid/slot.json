@@ -4,11 +4,17 @@
     "version": 2,
     "type": "slot",
     "payload": [
-      { "id": "ad-c843aa0d", "index": 0, "startTime": 60000, "duration": 30030,
-        "trackingEvents": [
-          { "event": "start",    "startTime": 0,     "urls": ["https://aip.example/v2/impression/3a8f6d21-9e40-4b7c-85f1-2c7b9e04a6d8/start"] },
-          { "event": "complete", "startTime": 30030, "urls": ["https://aip.example/v2/impression/3a8f6d21-9e40-4b7c-85f1-2c7b9e04a6d8/complete"] }
-        ] }
+      {
+        "type": "linear",
+        "start": 0.0,
+        "duration": 30.03,
+        "identifiers": [{"scheme": "urn:com:example:ads:id", "value": "example-30s-a"}],
+        "tracking": [
+          {"type": "impression", "urls": ["https://beacons.example.com/c/6f6e6bf3/imp"]},
+          {"type": "start", "urls": ["https://beacons.example.com/c/6f6e6bf3/start"]},
+          {"type": "complete", "urls": ["https://beacons.example.com/c/6f6e6bf3/done"]}
+        ]
+      }
     ]
   }
 }

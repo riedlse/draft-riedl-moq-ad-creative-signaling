@@ -1,0 +1,122 @@
+[
+  {
+    "m": 82005596,
+    "data": {
+      "version": 2,
+      "type": "pod",
+      "payload": [
+        {
+          "duration": 60.117,
+          "slots": [
+            {
+              "type": "linear",
+              "start": 0.0,
+              "duration": 30.058,
+              "identifiers": [{"scheme": "urn:com:example:ads:id", "value": "example-30s-a"}],
+              "tracking": [
+                {"type": "impression", "urls": ["https://beacons.example.com/c/d916217e/imp"]},
+                {"type": "start", "urls": ["https://beacons.example.com/c/d916217e/start"]},
+                {"type": "firstQuartile", "urls": ["https://beacons.example.com/c/d916217e/q1"]},
+                {"type": "midpoint", "urls": ["https://beacons.example.com/c/d916217e/q2"]},
+                {"type": "thirdQuartile", "urls": ["https://beacons.example.com/c/d916217e/q3"]},
+                {"type": "complete", "urls": ["https://beacons.example.com/c/d916217e/done"]}
+              ]
+            },
+            {
+              "type": "linear",
+              "start": 30.058,
+              "duration": 30.059,
+              "identifiers": [{"scheme": "urn:com:example:ads:id", "value": "example-30s-b"}],
+              "tracking": [
+                {"type": "impression", "urls": ["https://beacons.example.com/c/2ea7e414/imp"]},
+                {"type": "start", "urls": ["https://beacons.example.com/c/2ea7e414/start"]},
+                {"type": "firstQuartile", "urls": ["https://beacons.example.com/c/2ea7e414/q1"]},
+                {"type": "midpoint", "urls": ["https://beacons.example.com/c/2ea7e414/q2"]},
+                {"type": "thirdQuartile", "urls": ["https://beacons.example.com/c/2ea7e414/q3"]},
+                {"type": "complete", "urls": ["https://beacons.example.com/c/2ea7e414/done"]}
+              ]
+            }
+          ],
+          "tracking": [
+            {"type": "podStart", "urls": ["https://beacons.example.com/c/bf847920/start"]},
+            {"type": "podEnd", "urls": ["https://beacons.example.com/c/bf847920/end"]}
+          ]
+        }
+      ]
+    }
+  },
+  {
+    "m": 82105756,
+    "data": {
+      "version": 2,
+      "type": "pod",
+      "payload": [
+        {
+          "duration": 60.149,
+          "slots": [
+            {
+              "type": "linear",
+              "start": 0.0,
+              "duration": 15.036,
+              "identifiers": [{"scheme": "urn:com:example:ads:id", "value": "example-15s-a"}],
+              "tracking": [
+                {"type": "impression", "urls": ["https://beacons.example.com/c/d7a913cd/imp"]},
+                {"type": "start", "urls": ["https://beacons.example.com/c/d7a913cd/start"]},
+                {"type": "firstQuartile", "urls": ["https://beacons.example.com/c/d7a913cd/q1"]},
+                {"type": "midpoint", "urls": ["https://beacons.example.com/c/d7a913cd/q2"]},
+                {"type": "thirdQuartile", "urls": ["https://beacons.example.com/c/d7a913cd/q3"]},
+                {"type": "complete", "urls": ["https://beacons.example.com/c/d7a913cd/done"]}
+              ]
+            },
+            {
+              "type": "linear",
+              "start": 15.036,
+              "duration": 15.036,
+              "identifiers": [{"scheme": "urn:com:example:ads:id", "value": "example-15s-b"}],
+              "tracking": [
+                {"type": "impression", "urls": ["https://beacons.example.com/c/4e03b9f1/imp"]},
+                {"type": "start", "urls": ["https://beacons.example.com/c/4e03b9f1/start"]},
+                {"type": "firstQuartile", "urls": ["https://beacons.example.com/c/4e03b9f1/q1"]},
+                {"type": "midpoint", "urls": ["https://beacons.example.com/c/4e03b9f1/q2"]},
+                {"type": "thirdQuartile", "urls": ["https://beacons.example.com/c/4e03b9f1/q3"]},
+                {"type": "complete", "urls": ["https://beacons.example.com/c/4e03b9f1/done"]}
+              ]
+            },
+            {
+              "type": "linear",
+              "start": 30.072,
+              "duration": 15.04,
+              "identifiers": [{"scheme": "urn:com:example:ads:id", "value": "example-15s-c"}],
+              "tracking": [
+                {"type": "impression", "urls": ["https://beacons.example.com/c/4e608d15/imp"]},
+                {"type": "start", "urls": ["https://beacons.example.com/c/4e608d15/start"]},
+                {"type": "firstQuartile", "urls": ["https://beacons.example.com/c/4e608d15/q1"]},
+                {"type": "midpoint", "urls": ["https://beacons.example.com/c/4e608d15/q2"]},
+                {"type": "thirdQuartile", "urls": ["https://beacons.example.com/c/4e608d15/q3"]},
+                {"type": "complete", "urls": ["https://beacons.example.com/c/4e608d15/done"]}
+              ]
+            },
+            {
+              "type": "linear",
+              "start": 45.112,
+              "duration": 15.037,
+              "identifiers": [{"scheme": "urn:com:example:ads:id", "value": "example-15s-d"}],
+              "tracking": [
+                {"type": "impression", "urls": ["https://beacons.example.com/c/3016a1b2/imp"]},
+                {"type": "start", "urls": ["https://beacons.example.com/c/3016a1b2/start"]},
+                {"type": "firstQuartile", "urls": ["https://beacons.example.com/c/3016a1b2/q1"]},
+                {"type": "midpoint", "urls": ["https://beacons.example.com/c/3016a1b2/q2"]},
+                {"type": "thirdQuartile", "urls": ["https://beacons.example.com/c/3016a1b2/q3"]},
+                {"type": "complete", "urls": ["https://beacons.example.com/c/3016a1b2/done"]}
+              ]
+            }
+          ],
+          "tracking": [
+            {"type": "podStart", "urls": ["https://beacons.example.com/c/b8d5b02a/start"]},
+            {"type": "podEnd", "urls": ["https://beacons.example.com/c/b8d5b02a/end"]}
+          ]
+        }
+      ]
+    }
+  }
+]

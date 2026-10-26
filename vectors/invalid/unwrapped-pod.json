@@ -1,0 +1,14 @@
+{
+  "m": 60000,
+  "data": {
+    "duration": 30.03,
+    "slots": [
+      {
+        "type": "linear",
+        "start": 0.0,
+        "duration": 30.03,
+        "identifiers": [{"scheme": "urn:com:example:ads:id", "value": "example-30s-a"}]
+      }
+    ]
+  }
+}

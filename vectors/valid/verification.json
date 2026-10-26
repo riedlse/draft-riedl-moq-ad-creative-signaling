@@ -1,0 +1,10 @@
+{
+  "m": 60000,
+  "data": {
+    "version": 2,
+    "type": "verification",
+    "payload": [
+      {"vendor": "vendor.example-omid", "resource": "https://verify.example.com/omid-verify.js", "parameters": "key=value"}
+    ]
+  }
+}
