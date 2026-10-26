@@ -77,6 +77,13 @@ informative:
         name: Steven Riedl
     date: false
     target: https://github.com/riedlse/draft-riedl-moq-ad-creative-signaling
+  SVTA2053-2:
+    title: "SVTA2053-2: Ad Creative Signaling in DASH and HLS, 3rd Edition, with Reference Implementations (Non-Linear (Concurrent) Ad and Media Experiences)"
+    author:
+      - org: Streaming Video Technology Alliance (SVTA)
+    date: false
+    target: https://www.svta.org/project/non-linear-concurrent-ad-and-media-experiences-svta2053-2-ad-creative-signaling-in-dash-and-hls-3rd-edition-with-reference-implementations/
+    ann: "Work in progress; publication planned by January 2027."
   MOQT-SUBGROUP-PROPS:
     title: "Add Subgroup Properties"
     author:
@@ -654,6 +661,17 @@ rather than replace them: subgroup properties describe the break at the
 delivery position as it is delivered, while the Event Timeline describes
 the creatives ahead of the splice.
 
+The data model itself is also growing. SVTA is preparing a 3rd edition,
+{{SVTA2053-2}}, for non-linear (concurrent) ad and editorial
+presentations such as overlays, squeezebacks and L-shapes. It is
+specified as an additive extension of the Version 2 carriage envelope
+(a Viewport data type, a PresentationType enumeration and layout
+control) and defines carriage for DASH and HLS. This document carries
+the Version 2 envelope without interpreting the payload objects
+({{schema}}), so payloads using those extensions would ride unchanged on
+an ad creative signaling track. Carriage over the MSF Event Timeline, as
+defined here, is a candidate for a later SVTA2053 edition.
+
 # Open Issues {#open-issues}
 
 This section lists issues to be resolved through working group
@@ -1113,10 +1131,8 @@ against the record and payload checks of the implementation in
 tracks, which beyond the record rules verify the {{SVTA2053}} shape of
 each payload (member names and types, MediaTime values in seconds,
 required identifiers, non-empty `urls`, and defined event types). Both
-accept every valid vector and reject every invalid one, with one
-exception: that implementation publishes only `pod` envelopes, and its
-checks do not yet list the `verification` envelope type, so they reject
-the `verification` vector.
+accept every valid vector and reject every invalid one, each for the
+reason its name gives.
 
 # Changes since draft-riedl-moq-ad-creative-signaling-00 {#changes}
 {:numbered="false"}
@@ -1144,8 +1160,9 @@ the `verification` vector.
   title, with the Version 2 model named in an annotation; section
   references corrected.
 * New informative {{future-carriage}}: splitting ad signaling by
-  function across Event Timeline tracks, and break-level state in MOQT
-  subgroup properties {{MOQT-SUBGROUP-PROPS}}.
+  function across Event Timeline tracks, break-level state in MOQT
+  subgroup properties {{MOQT-SUBGROUP-PROPS}}, and the additive
+  non-linear extensions of the 3rd edition {{SVTA2053-2}}.
 * {{impl-status}} rewritten: the event class is now deployed, with
   measured results and an explicit list of what is not yet
   implemented. {{open-issues}} records the implementation experience
