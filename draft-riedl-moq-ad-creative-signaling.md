@@ -50,11 +50,15 @@ normative:
     # served "Revision 1.0" for what this document calls Version 2. Targeting the SVTA root
     # avoids pinning a URL that renames or redirects; the body always says "Version 2
     # carriage envelope", so the model version stays unambiguous in prose.
-    title: "SVTA2053-2: Ad Creative Signaling in DASH and HLS — Version 2 object model"
+    # -01: cite the PUBLISHED Revision 1.0 (2025-05-19). It already defines everything this
+    # document uses (Section 5.2: the Version 2 envelope, all four envelope types, `features`,
+    # `$remote`). Cite only published SVTA editions.
+    title: "SVTA2053-1: Ad Creative Signaling in DASH and HLS, Revision 1.0"
     author:
       - org: Streaming Video Technology Alliance (SVTA), Advertising Working Group
-    date: 2025
+    date: 2025-05-19
     target: https://www.svta.org/
+    ann: "This document uses the Version 2 data carriage scheme and object model (Sections 4 and 5.2)."
 
 informative:
   # INFORMATIVE, deliberately (Steven, 2026-08-11). Ad-creative signaling is independent of
@@ -66,6 +70,22 @@ informative:
   # draft advancing.
   SCTE35-MOQ: I-D.draft-wilaw-moq-scte35-event-timeline
   MOQT: I-D.ietf-moq-transport
+  VECTORS:
+    title: "draft-riedl-moq-ad-creative-signaling source repository: schema/ and vectors/"
+    author:
+      - ins: S. Riedl
+        name: Steven Riedl
+    date: false
+    target: https://github.com/riedlse/draft-riedl-moq-ad-creative-signaling
+  MOQT-SUBGROUP-PROPS:
+    title: "Add Subgroup Properties"
+    author:
+      - name: Michal Hošna
+        asciiFullname: Michal Hosna
+    date: 2026-10
+    target: https://github.com/moq-wg/moq-transport/pull/2023
+    seriesinfo:
+      "moq-transport": "Pull Request 2023"
   SCTE35:
     title: "Digital Program Insertion Cueing Message"
     author:
@@ -112,12 +132,13 @@ counterpart of the DASH and HLS carriage bindings defined by SVTA
 --- middle
 
 {::comment}
-Working copy lives at docs/proposals/draft-riedl-moq-ad-creative-signaling.md in the internal
-repo; rename to draft-riedl-moq-ad-creative-signaling.md when moved into
-its own i-d-template repository. Build: kdrfc <file>.md
+Build: `make` (editor's copy, -latest) or `make submission` (the numbered
+submission file; revision in the Makefile's SUB_REV).
 House rules for this document: external vocabulary only -- "insertion
 plan metadata", "distributor tracking endpoint / beacon proxy",
-"capability URL". No internal system or product names.
+"capability URL". No internal system or product names, and no captured
+identifiers, hostnames or tracking URLs: examples and vectors are
+anonymized to example.com / example.net placeholders.
 {:/comment}
 
 # Introduction {#introduction}
@@ -167,7 +188,9 @@ and its Event Timeline mechanism is the substrate here; this document
 and {{SCTE35-MOQ}} are individual submissions layered on that substrate,
 and this one is written to track {{MSF}} as it evolves under WG change
 control -- including following its registry, wherever that registry
-ultimately lands.
+ultimately lands. The event class is deployed: a continuously running
+server-side ad insertion deployment publishes it, and {{impl-status}}
+reports what was measured.
 
 # Conventions and Definitions {#conventions}
 
@@ -177,6 +200,11 @@ This document uses the terms Track, Group, Object, Event Timeline, and
 the index reference fields `t`, `l`, and `m` as defined in {{MSF}}, and
 the terms Pod, Slot, Tracking Event, Verification, and carriage envelope
 as defined in Sections 4 and 5 of {{SVTA2053}}.
+
+The index keys are spelled as in the published {{MSF}}. The MSF
+editor's copy has since renamed them `T`, `L` and `M`; this document
+will follow whichever spelling MSF settles on, and implementations may
+wish to accept both in the meantime.
 
 Additionally:
 
@@ -200,7 +228,9 @@ Capability URL:
 
 An MSF track carrying ad creative signaling:
 
-* MUST declare a packaging value of `"eventtimeline"`;
+* MUST declare a packaging value of `"eventtimeline"` and a `mimeType`
+  of `"application/json"`, as {{Section 8.2 of MSF}} requires of every
+  Event Timeline track;
 
 * MUST declare an `eventType` value of
   `"urn:svta:advertising-wg:ad-creative-signaling"`. This is the data
@@ -237,11 +267,21 @@ Each record is a JSON object {{RFC8259}} following the Event Timeline
 data format of {{Section 8.1 of MSF}}. A record MUST contain:
 
 * exactly one index reference field -- `t` (wallclock), `l` (MOQT
-  Location), or `m` (media time) -- selected per {{index-selection}};
-  and
+  Location), or `m` (media time) -- selected per {{index-selection}}
+  and typed as {{Section 8.1 of MSF}} defines it: `t` and `m` are JSON
+  Numbers of milliseconds (a wallclock index is milliseconds since the
+  Unix epoch, not a date string), and `l` is an Array of two Numbers,
+  the MOQT Group ID and Object ID; and
 
 * a `data` field whose value is exactly one Version 2 carriage
   envelope as defined in {{payload}}.
+
+Records are carried in the Objects of the track as {{Section 8.3 of MSF}}
+specifies: the first Object of each Group is the independent array of
+every record accumulated and accessible so far. A subscriber that joins
+at a Group boundary during a placement opportunity therefore receives
+its record, provided the publisher keeps the record accessible until the
+opportunity has ended.
 
 ## Index Reference Selection {#index-selection}
 
@@ -268,7 +308,7 @@ selection rules (its Section 4.2) to both tracks.
 The `data` field carries one SVTA 2053-1 Version 2 carriage envelope
 (Section 5.2.2.1 of {{SVTA2053}}) directly:
 
-~~~ json
+~~~
 { "version": 2, "type": "...", "payload": [ ... ],
   "features": { ... } }
 ~~~
@@ -280,14 +320,41 @@ Unlike the DASH and HLS bindings, where bare Version 1 payload objects
 are also legal, records in this binding MUST carry Version 2 envelopes
 only. On a fan-out transport the envelope's `features` flags are the
 only capability-signaling mechanism available, and the envelope `type`
-field is what allows a uniform track to carry `pod`, `slot`, and
-`trackingEvent` payloads interchangeably.
+field is what allows a uniform track to carry `pod`, `slot`,
+`trackingEvent`, and `verification` payloads interchangeably -- the four
+types Section 5.2.2.1 of {{SVTA2053}} defines.
+
+The envelope and its payload objects use the member names and units of
+{{SVTA2053}} unchanged. In particular, every timing member inside the
+envelope (`start`, `duration`, `offset`, `skipOffset`) is a MediaTime: a
+number of seconds (Section 4.2.1 of {{SVTA2053}}), not milliseconds.
+Only the record's index reference is in milliseconds, because {{MSF}}
+defines it so.
+
+A publisher MUST NOT set to `true` any `features` flag that {{SVTA2053}}
+does not define. Under Section 5.2.2.1 of {{SVTA2053}}, an interpreter
+that meets a flag set to `true` that it does not support raises an
+error and ignores the payload, so an undefined flag makes every
+conforming interpreter discard the record. The only flag defined today is
+`remoteFields`, which {{SVTA2053}} requires to be `true` when the payload
+uses `$remote` ({{capability-urls}}); a payload that does not use
+`$remote` can omit `features` entirely.
+
+Two inconsistencies in {{SVTA2053}} matter to parsers. Its TrackingEvent
+payload table (Table 11) lists `start` and `duration` where its object
+model (Section 4.4.5) defines `offset`, and its Remote Fields table
+(Table 16) says a `$remote.verifications` URI resolves to an envelope of
+type `verifications` where the envelope (Table 15) defines
+`verification`. This document follows the object model and the envelope
+definition: TrackingEvent timing is `offset`, and the envelope type is
+`verification`.
 
 It is RECOMMENDED that a publisher emit one `pod` envelope per
-placement opportunity. `slot` and `trackingEvent` envelopes MAY be used
-(mirroring the granularity options of the DASH binding), but
-deduplication under redelivery is simplest at pod granularity (see
-{{open-issues}}).
+placement opportunity. The `slot`, `trackingEvent`, and `verification`
+envelopes MAY be used (mirroring the granularity options of the DASH
+binding), but deduplication under redelivery is simplest at pod
+granularity, and a decomposed record loses the structural link to the
+slot it belongs to (see {{open-issues}}).
 
 ## Subscriber Invariance {#invariance}
 
@@ -345,6 +412,13 @@ a Tracking Event's `offset` is relative to its container. Only the
 record's index reference is absolute. Consequently, redelivery, looped
 schedules, and regional timeline shifts never require payload rewrites
 -- which matters where relays cache and re-serve objects.
+
+When an envelope carries Slot or TrackingEvent objects without their
+Pod (a `slot` or `trackingEvent` envelope), the record's index stands in
+for the missing container: a Slot's `start` and a Tracking Event's
+`offset` are relative to the record's index. A standalone Slot therefore
+normally has `start` 0, as the per-slot events of the DASH binding do
+(Section 6.1.2 of {{SVTA2053}}).
 
 # Worked Example {#example}
 
@@ -441,6 +515,11 @@ via `$remote` ({{capability-urls}}):
 }
 ~~~
 
+The `remoteFields` flag is set because slot 2 uses `$remote`. This
+record is also published as the `worked-example` test vector. The
+appendix on test vectors ({{schema}}) shows a record captured from the
+running deployment.
+
 # Tracking Indirection and Capability URLs {#capability-urls}
 
 Two patterns satisfy {{invariance}}. In the first, the record carries
@@ -453,7 +532,7 @@ accounting to the macros alone. The second, described in the remainder
 of this section, defers resolution to a distributor-operated endpoint.
 Both are conformant; a publisher chooses per deployment.
 
-Section 5.2.2.2 of {{SVTA2053}} already says interpreters SHOULD defer
+Section 5.2.2.2.2 of {{SVTA2053}} already says interpreters SHOULD defer
 `$remote` resolution until the containing object is about to become
 active. That deferral maps naturally onto broadcast fan-out, with one
 addition: on a shared timeline, the URLs in tracking and `$remote`
@@ -544,25 +623,72 @@ deserves its own. It is named here only as a design constraint: the
 event class defined in this document is intended to be overridden or
 parameterized by such a layer without being redefined by it.
 
+# Track Split and Future Carriage {#future-carriage}
+
+This section is informative; nothing in it changes the requirements
+above.
+
+Ad signaling is expected to grow by function rather than by record
+size. Interactivity, click-through handling, and third-party
+verification are each better carried on their own sibling Event
+Timeline track, with its own `eventType`, the same `depends` media
+track and the same index space, than as further members of the records
+defined here. A client then subscribes only to the functions it
+implements, which settles much of the feature-negotiation question for
+whole functions (item 6 of {{open-issues}}), and each function's
+records keep their own size, cadence and failure behavior. The cost is
+the missing placement identifier (item 8 of {{open-issues}}): once
+records describing one placement opportunity are spread across tracks,
+a shared index identifies the opportunity but not the slot within it.
+
+Separately, {{MOQT}} today defines properties at Track and Object scope
+only. A proposal before the MoQ Working Group {{MOQT-SUBGROUP-PROPS}}
+would carry properties in the subgroup header, where they travel with
+every stream that carries the subgroup, including FETCH responses,
+instead of riding a first Object that a mid-Group joiner, a filter or a
+FETCH range can miss. If it is adopted, break-level state -- an
+opportunity identifier, the remaining break duration, the Group at
+which content resumes -- could be carried in the subgroup headers of the
+media track itself. That would complement the records defined here
+rather than replace them: subgroup properties describe the break at the
+delivery position as it is delivered, while the Event Timeline describes
+the creatives ahead of the splice.
+
 # Open Issues {#open-issues}
 
 This section lists issues to be resolved through working group
 discussion; it is to be removed before publication.
 
 1. **Granularity**: one `pod` envelope per placement opportunity (the
-   RECOMMENDED default), or `slot`/`trackingEvent` envelopes per
-   creative? Redelivery deduplication is simpler at pod granularity.
+   RECOMMENDED default), or `slot`, `trackingEvent` and `verification`
+   envelopes per creative? Redelivery deduplication is simpler at pod
+   granularity. The deployment described in {{impl-status}} publishes
+   `pod` envelopes only and has not needed anything finer.
 
 2. **Update semantics for live**: pods change close to air. Is a later
    record at the same index a full supersede (last-writer-wins), or is
    a patch rule needed? {{SVTA2053}} has no cancel/supersede concept;
    SCTE-35 inherits cancellation from its payload semantics.
+   Implementation experience favors the simple rule. When a splice
+   fails, the deployed publisher publishes a complete new record with
+   the same `m`, dropping the failed slot and moving the later ones to
+   where they really air, and its player replaces only the events it has
+   not yet fired. No patch rule has been needed so far.
 
 3. **Deduplication and late joiners**: the DASH/HLS bindings give each
    event a manifest-unique id for dedup on re-encounter; MSF records
    carry no id. Is (eventType, index, payload) a sufficient dedup key
    under relay redelivery and FETCH catch-up -- and which past records
-   MUST a mid-break joiner fetch?
+   MUST a mid-break joiner fetch? Experience so far: with one `pod`
+   record per opportunity, `m` alone has served as the record key (a
+   changed payload at a known `m` is a supersede), and the player fires
+   each event at most once per (`m`, slot, event type). For late joiners
+   the deployed publisher keeps each record in every independent Object
+   until 60 s after its pod ends, and re-sends the retained array as a
+   new Group about every 3 s when nothing has changed, so a subscriber
+   that starts at the next Group rather than the latest one holds the
+   timeline within seconds. Whether that re-send deserves a SHOULD is
+   open.
 
 4. **Switching sets**: when ladder rungs are separate tracks, does one
    creative signaling track `depends` on all of them? Splice
@@ -588,8 +714,8 @@ discussion; it is to be removed before publication.
    does not, which would push the binding toward either a per-rung
    signaling track or an index defined against something other than the
    media track's Group IDs. The proposal was not resolved at the
-   2026-09-08 interim and is held for the following one; at least one
-   implementation (MOQtail) reports partial draft-18 support, so
+   2026-09-08 interim and remains open as of this revision; at least
+   one implementation (MOQtail) reports partial draft-18 support, so
    experience should be available before this document has to choose.
 
 5. **Common-format scope**: is the Event Timeline binding the whole
@@ -603,16 +729,19 @@ discussion; it is to be removed before publication.
    Should the catalog advertise which features a track uses so clients
    subscribe eyes-open? The `features` member this rests on is
    confirmed: the Version 2 base carriage envelope defines it as an
-   object of boolean flags, with `features.remoteFields` as the first,
-   and requires that an interpreter encountering a flag it does not
-   support SHOULD raise an error and ignore the payload. That rule is
-   written for unicast, where the publisher learns of the failure; on
-   one-to-many the publisher never hears, so the burden has to move to
-   subscribe time. Note also that if the per-function tracks of a split
-   are published as separate broadcasts rather than sibling tracks, a
-   subscriber selects the functions it supports by subscribing to them,
-   which answers much of this for the split case but not for flagged
-   features within a single track.
+   object of boolean flags, with `features.remoteFields` as the only
+   flag so far, and requires that an interpreter encountering a flag it
+   does not support SHOULD raise an error and ignore the payload. This
+   revision settles the easy half by forbidding flags that {{SVTA2053}}
+   does not define ({{payload}}); the hard half -- a defined flag that
+   some subscribers do not support -- remains. That rule is written for
+   unicast, where the publisher learns of the failure; on one-to-many
+   the publisher never hears, so the burden has to move to subscribe
+   time. Note also that if the per-function tracks of a split
+   ({{future-carriage}}) are published as separate broadcasts rather
+   than sibling tracks, a subscriber selects the functions it supports
+   by subscribing to them, which answers much of this for the split case
+   but not for flagged features within a single track.
 
 7. **Record integrity**: do these records need payload signing (JWS or
    COSE over the envelope, or a catalog-pinned key) beyond transport
@@ -631,19 +760,20 @@ discussion; it is to be removed before publication.
 
    While an envelope carries a whole pod, correlation is structural and
    the absence costs nothing. It only bites once records are decomposed
-   — which {{SVTA2053}} itself already does in two places, the `$remote`
+   -- which {{SVTA2053}} itself already does in two places, the `$remote`
    fields that resolve `slots`, `tracking` and `verifications`
    separately, and the HLS Interstitial ASSET-LIST mapping, whose own
    note observes that it "separates the Slot objects from the Pod
    objects without explicit reference". This document decomposes further
    still if the event class is split by function across sibling tracks
-   (see issue 1), because then a tracking record and the creative record
-   it belongs to arrive on different tracks: a shared index identifies
-   the placement opportunity, not which slot within it.
+   ({{future-carriage}}), because then a tracking or verification record
+   and the creative record it belongs to arrive on different tracks: a
+   shared index identifies the placement opportunity, not which slot
+   within it.
 
-   Three ways out. Derive a composite key from what already exists —
+   Three ways out. Derive a composite key from what already exists --
    creative `identifiers` plus the slot's ordinal position within the
-   pod, anchored by the shared index — which needs no change to
+   pod, anchored by the shared index -- which needs no change to
    {{SVTA2053}} but is positional and therefore fragile under pod
    rewriting. Or request stable `id` fields on Pod and Slot from the
    SVTA Advertising Working Group, which is the clean fix and the one
@@ -653,74 +783,137 @@ discussion; it is to be removed before publication.
    The first is what an implementation can do today; the second is what
    the ecosystem should have.
 
+   The deployed player ({{impl-status}}) takes the first way, with an
+   occurrence count in place of the raw ordinal: a slot's key is its
+   `identifiers` plus the number of earlier slots in the same pod that
+   carry the same identifiers. That keeps a superseding record that
+   drops a slot from shifting the other slots' firing history. It would
+   still mis-key two appearances of one creative if a rewrite reordered
+   them.
+
 # Implementation Status {#impl-status}
 
 (This section follows {{RFC7942}} and is to be removed before
 publication as an RFC.)
 
 The author operates a continuously running server-side ad insertion
-deployment over MoQ. This section states what that deployment does and
-does not implement, because the two are easy to conflate: the mechanism
-this document specifies is NOT yet what the deployment publishes.
+deployment over MoQ: fixed-timeline linear channels, publisher to relay
+to browser, with ad creatives spliced server-side into one shared
+broadcast, so every subscriber receives the same media objects -- the
+condition that motivates this document ({{introduction}}). The
+publisher and player are not publicly available. Since 2026-10-22 the deployment publishes the event class
+this document defines. This section reports what it does, what was
+measured, and what is not yet implemented. Contact: the author.
 
-Running today:
+Publisher, live on both of the deployment's ad-inserted channels since
+2026-10-22:
 
-* Fixed-timeline linear channels, publisher to relay to browser, with ad
-  creatives spliced server-side into one shared broadcast -- so every
-  subscriber receives the same media objects, which is the condition that
-  motivates this document ({{introduction}}).
-* Placement opportunities detected from **inbound** in-band SCTE-35
-  (`emsg`), parsed to a break window and duration. The deployment
-  consumes SCTE-35; it does not publish SCTE-35 records, and it does not
-  publish a splice signaling track.
-* Creative identity and per-creative tracking published **in band**,
-  ahead of the splice, on a control track the subscriber reads before the
-  first event renders. That validates the delivery model in
-  {{publication-lead}}. The track's schema is the deployment's own and is
-  NOT the event class defined here.
-* Tracking indirection exactly as described in {{capability-urls}}: a
-  proxy holds vendor beacon URLs and returns compact per-event
-  capability URLs, which devices fire with their own client identifier,
-  with per-`{uuid, event, client}` deduplication so a shared broadcast
-  yields per-device counts. This is the part of the document with the
-  most operational experience behind it. The deployment converged on it
-  for a concrete reason: a single impression in this inventory carries
+* Each channel's broadcast carries a sibling Event Timeline track named
+  `ad-creative`, beside the deployment's earlier proprietary control
+  track, which is still published in parallel.
+* Each placement opportunity is one record,
+  `{"m": ..., "data": {"version": 2, "type": "pod", "payload": [...]}}`,
+  where `m` is the media time, in milliseconds on the timeline of the
+  media track, of the pod's first video frame. Envelopes carry no
+  `features` member. Slot identifiers use a proprietary identifier
+  scheme; tracking URLs are capability URLs ({{capability-urls}}).
+* Objects follow {{Section 8.3 of MSF}}: each change starts a new Group
+  whose single Object is the independent array of every retained
+  record, with no incremental Objects. The first Group ID is taken from
+  the wallclock in milliseconds, per the restart rule of
+  {{Section 6.1 of MSF}}, and that first Object is the empty array.
+* A read-only validator subscribes to the track and checks every
+  Object: a JSON array of records, each with exactly one index field
+  and a Version 2 envelope whose payload has the {{SVTA2053}} shape
+  (member names and types, MediaTime values in seconds, identifiers,
+  non-empty `urls`, defined event types, no undefined feature flag). It
+  runs against the deployment's channels.
+
+Added on 2026-10-25:
+
+* Measured slots: each Slot's `start` and `duration` are measured from
+  the creatives actually spliced, rather than taken from the durations
+  the ad decision declares.
+* Supersede: when a splice fails, the publisher publishes a new record
+  with the same `m`, which drops the failed slot (item 2 of
+  {{open-issues}}).
+* Heartbeat: when nothing has changed for about 3 s, the retained array
+  is re-sent as a new Group, so a late joiner that starts at the next
+  Group receives the records within seconds (item 3 of
+  {{open-issues}}).
+* Device beacons: when device beacons are enabled, the browser player
+  fires tracking requests from the records on its synchronization clock
+  -- the media time it is presenting, the `sync.now()` clock of the
+  open-source `<moq-watch>` player element -- rather than from the
+  wallclock less an assumed latency. A late joiner fires `podStart` on
+  joining, nothing for the slot already in progress, and full chains for
+  the slots after it. The player falls back to the earlier control-track
+  model when that clock is unavailable or no record arrives within 5 s.
+
+Measured:
+
+* On a test rig (15 pods, one creative the importer refuses), every one
+  of the 31 slot boundaries the records claimed matched the splice gaps
+  in the exported media to the millisecond, and the refused creative
+  produced superseding records. The durations the ad decision declared
+  would have been 36 to 350 ms early.
+* Replaying the rig's captured records against a simulated playhead,
+  the player's fires came 0.3 to 5.0 ms after the media time, none early
+  (142 fires at a 4 s playback delay).
+* In an observe-only browser session against the running deployment on
+  2026-10-24 (requests logged, not sent), one 4-ad pod produced 33
+  events in order: `podStart`; then `impression`, `start`, the three
+  quartiles and `complete` for each ad; then `podEnd`. For its 25
+  time-based events, device times trailed the publisher's server-side
+  tracking by 3.58 to 4.07 s, which is the configured 4 s playback
+  delay, with at most 8 ms of spread within each ad.
+
+Unchanged from the previous revision:
+
+* Placement opportunities on the live channel detected from
+  **inbound** in-band SCTE-35, parsed to a break window and duration.
+  The deployment consumes SCTE-35; it does not publish a splice
+  signaling track.
+* Tracking indirection as described in {{capability-urls}}: a proxy
+  holds vendor beacon URLs and returns compact per-event capability
+  URLs, which devices request with their own client identifier, with
+  per-`{uuid, event, client}` deduplication so a shared broadcast
+  yields per-device counts. The deployment converged on it for a
+  concrete reason: a single impression in this inventory carries
   roughly 5 to 15 vendor tracking URLs, so firing them from the client
   directly means 5 to 15 device requests per impression, multiplied by
   every subscriber to a shared broadcast. A capability URL is one device
-  request that the proxy fans out server-side, which is what makes the
+  request that the proxy fans out server-side, which makes the
   device-side cost independent of how many vendors a creative carries
   ({{amplification}}).
 * An MSF catalog, published automatically by the MoQ implementation in
   use and verified against an interop profile by a tool in the same
-  codebase. A capture from the live deployment validates clean, so the
-  transport and catalog layers this document builds on are exercised,
-  not assumed.
+  codebase.
 
 NOT yet implemented:
 
-* The event class this document defines. No track advertises
-  `eventType` `urn:svta:advertising-wg:ad-creative-signaling`, and no
-  record carries an SVTA 2053-1 Version 2 carriage envelope
-  ({{payload}}). Migrating the control track to the envelope form is in
-  progress.
+* Catalog listing. The `ad-creative` track is not yet listed in the MSF
+  catalog, because the MoQ library in use does not yet emit
+  `eventtimeline` entries; that needs an upstream change. Consumers find
+  the track by name.
+* The publication lead of {{publication-lead}}. Records are published
+  when the break opens, immediately before the pod's first media
+  Object, not a full Group ahead. Devices still hold the record before
+  the splice renders because they present several seconds behind
+  delivery, but the SHOULD is not met.
+* Device requests on the running deployment. Its capability-URL
+  endpoint is internal: the URLs it publishes are neither reachable
+  from public clients nor `https` URLs ({{validation}}), so there the
+  device beacons have been observed but not sent. The publisher's own
+  server-side requests continue in parallel.
+* `slot`, `trackingEvent` and `verification` envelopes, `$remote`, and
+  the Slot members `media`, `verifications`, `skipOffset` and
+  `clickThrough`.
+* A splice signaling track, and so the correlation rules of
+  {{correlation}}.
 * The IANA registration in {{iana}}, which this document requests.
-* Correlation with a co-published splice signaling track
-  ({{correlation}}), since no such track is published.
 
-Consequently the timing and lead-time rules in {{timing}} and
-{{publication-lead}} derive from running code, while the record format
-in {{record-format}} and the payload constraint in {{payload}} are
-specified but unexercised. The JSON Schema and test vectors in
-{{schema}} are conformance examples written against this specification,
-not captured output; the rules they express are executed in the
-implementation's own test suite, so they are internally consistent, but
-they have not yet been produced by a publisher.
-
-{::comment} TODO after 2026-10-11: add results from the October MoQ
-interop event (moqt draft-19) -- publisher/relay pairings exercised,
-and any third-party clients that consumed the event track. Offer: JSON
-schemas, test vectors, and a live publisher endpoint. {:/comment}
+No independent implementation of this document is known to the author.
 
 # Security Considerations {#security}
 
@@ -788,93 +981,178 @@ coordination with that group.
 
 This document deliberately reuses the carriage pattern established by
 Will Law and Suhas Nandakumar in {{SCTE35-MOQ}}, and is designed to
-compose with it. The payload data model is the work of the SVTA
-Advertising Working Group {{SVTA2053}}.
+compose with it. Will Law also suggested splitting ad signaling by
+function across Event Timeline tracks ({{future-carriage}}). The payload
+data model is the work of the SVTA Advertising Working Group
+{{SVTA2053}}.
 
-{::comment} TODO: add October interop participants and early reviewers
-before submission. {:/comment}
+{::comment} TODO: add early reviewers before submission. {:/comment}
 
 # JSON Schema and Test Vectors {#schema}
 {:numbered="false"}
 
 A JSON Schema for the record shape and a set of test vectors are published
-alongside this document at
-<https://riedlse.github.io/draft-riedl-moq-ad-creative-signaling/>.
+in the `schema/` and `vectors/` directories of this document's source
+repository {{VECTORS}}.
 
-The schema encodes exactly the two requirements of {{record-structure}} -- one
-index reference field, and a `data` member holding one Version 2 envelope -- and
-nothing further; the envelope's own contents are governed by {{SVTA2053}}, not
-by this document.
+The schema encodes the record requirements of {{record-structure}} and
+{{payload}}: exactly one index reference field, typed as {{Section 8.1 of
+MSF}} requires, and a `data` member holding one Version 2 envelope that
+satisfies the envelope rules of Section 5.2.2.1 of {{SVTA2053}} --
+`version` 2, one of the four envelope types, a non-empty `payload`
+array, and no `features` flag set that {{SVTA2053}} does not define. It
+does not validate the payload objects themselves; those are governed by
+{{SVTA2053}}, not by this document.
 
-The vectors come in two sets, and both matter: six that MUST validate, and six
-that MUST NOT. A validator that accepts everything passes the first set alone.
-The rejecting cases pin the constraints most likely to be implemented loosely:
+The vectors come in two sets, and both matter: nine files holding eleven
+records that MUST validate, and ten records that MUST NOT. A validator
+that accepts everything passes the first set alone. The valid set covers
+each envelope type and each index type, back-to-back placement
+opportunities, the worked example of {{example}}, and one Object captured
+from the running deployment. Each rejecting case is otherwise valid, so
+it fails for the reason its name claims; together they pin the
+constraints most likely to be implemented loosely:
 
 | Vector | Rejected because |
 |---|---|
 | `two-index-fields` | carries both `m` and `t`; exactly one is allowed |
 | `no-index-field` | carries none |
+| `string-wallclock-index` | `t` is a date string; {{MSF}} requires a Number |
 | `missing-data` | index only, no envelope |
 | `v1-bare-payload` | a bare Version 1 payload object, which the DASH and HLS bindings accept and this one does not ({{payload}}) |
-| `wrong-envelope-version` | `"version": 1` inside `data` |
-| `unknown-envelope-type` | a `type` outside `pod`, `slot`, `trackingEvent` |
+| `unwrapped-pod` | a Version 2 Pod object with no envelope around it |
+| `wrong-envelope-version` | `"version": 1` in an otherwise Version 2 envelope |
+| `unknown-envelope-type` | a `type` outside `pod`, `slot`, `trackingEvent` and `verification` |
+| `empty-payload` | an empty `payload`; the envelope requires at least one object |
+| `undefined-feature-flag` | sets a `features` flag that {{SVTA2053}} does not define, so a conforming interpreter discards the record |
 
-A minimal conforming record, one `pod` envelope describing a single 30 s
-creative with its quartile chain (timings taken from a running deployment, so
-the values are the real ones a 30 s transcode produces -- note `30030`, not
-`30000`):
+The following record is the first of the two in the `captured-object`
+vector: one Event Timeline Object, captured read-only from the running
+deployment ({{impl-status}}) on 2026-10-26 and then anonymized. The
+creative identifiers, the identifier scheme, and every tracking URL
+(scheme, host and path) were replaced with placeholders; everything else
+is as published -- the index, the MediaTime values, the slot structure,
+and the event types and their order. The slot durations are measured
+from the spliced media rather than declared, which is why they are not
+round numbers:
 
 ~~~ json
 {
-  "m": 60000,
+  "m": 82005596,
   "data": {
     "version": 2,
     "type": "pod",
-    "payload": [
-      {
-        "id": "brk-947",
-        "startTime": 60000,
-        "duration": 30030,
-        "slots": [
-          {
-            "id": "ad-32600921",
-            "index": 0,
-            "startTime": 60000,
-            "duration": 30030,
-            "trackingEvents": [
-              { "event": "start",         "startTime": 0,
-                "urls": ["https://aip.example/9f2c/start"] },
-              { "event": "firstQuartile", "startTime": 7507,
-                "urls": ["https://aip.example/9f2c/firstQuartile"] },
-              { "event": "midpoint",      "startTime": 15015,
-                "urls": ["https://aip.example/9f2c/midpoint"] },
-              { "event": "thirdQuartile", "startTime": 22522,
-                "urls": ["https://aip.example/9f2c/thirdQuartile"] },
-              { "event": "complete",      "startTime": 30030,
-                "urls": ["https://aip.example/9f2c/complete"] }
-            ]
-          }
-        ]
-      }
-    ],
-    "features": { "capabilityUrls": true, "perDeviceDedup": true }
+    "payload": [{
+      "duration": 60.117,
+      "slots": [
+        {
+          "type": "linear",
+          "start": 0.0,
+          "duration": 30.058,
+          "identifiers": [{ "scheme": "urn:com:example:ads:id",
+                            "value": "example-30s-a" }],
+          "tracking": [
+            { "type": "impression", "urls": [
+              "https://beacons.example.com/c/d916217e/imp" ] },
+            { "type": "start", "urls": [
+              "https://beacons.example.com/c/d916217e/start" ] },
+            { "type": "firstQuartile", "urls": [
+              "https://beacons.example.com/c/d916217e/q1" ] },
+            { "type": "midpoint", "urls": [
+              "https://beacons.example.com/c/d916217e/q2" ] },
+            { "type": "thirdQuartile", "urls": [
+              "https://beacons.example.com/c/d916217e/q3" ] },
+            { "type": "complete", "urls": [
+              "https://beacons.example.com/c/d916217e/done" ] }
+          ]
+        },
+        {
+          "type": "linear",
+          "start": 30.058,
+          "duration": 30.059,
+          "identifiers": [{ "scheme": "urn:com:example:ads:id",
+                            "value": "example-30s-b" }],
+          "tracking": [
+            { "type": "impression", "urls": [
+              "https://beacons.example.com/c/2ea7e414/imp" ] },
+            { "type": "start", "urls": [
+              "https://beacons.example.com/c/2ea7e414/start" ] },
+            { "type": "firstQuartile", "urls": [
+              "https://beacons.example.com/c/2ea7e414/q1" ] },
+            { "type": "midpoint", "urls": [
+              "https://beacons.example.com/c/2ea7e414/q2" ] },
+            { "type": "thirdQuartile", "urls": [
+              "https://beacons.example.com/c/2ea7e414/q3" ] },
+            { "type": "complete", "urls": [
+              "https://beacons.example.com/c/2ea7e414/done" ] }
+          ]
+        }
+      ],
+      "tracking": [
+        { "type": "podStart", "urls": [
+          "https://beacons.example.com/c/bf847920/start" ] },
+        { "type": "podEnd", "urls": [
+          "https://beacons.example.com/c/bf847920/end" ] }
+      ]
+    }]
   }
 }
 ~~~
 
-The `urls` values are capability URLs ({{capability-urls}}), abbreviated here.
+The `urls` values are capability URLs ({{capability-urls}}). No event
+carries an `offset`, so each event's timing follows from its type
+(Section 4.4.5 of {{SVTA2053}}). The second record of the captured
+Object, about 100 s later on the same timeline, is a four-slot pod of
+15 s creatives.
 
-Two notes on provenance, so implementers know what these are and are not.
+Apart from `captured-object`, the vectors are conformance examples
+authored against this specification. Every vector was checked two ways:
+against the schema, with a JSON Schema draft 2020-12 validator; and
+against the record and payload checks of the implementation in
+{{impl-status}}, the same checks its read-only validator applies to live
+tracks, which beyond the record rules verify the {{SVTA2053}} shape of
+each payload (member names and types, MediaTime values in seconds,
+required identifiers, non-empty `urls`, and defined event types). Both
+accept every valid vector and reject every invalid one, with one
+exception: that implementation publishes only `pod` envelopes, and its
+checks do not yet list the `verification` envelope type, so they reject
+the `verification` vector.
 
-The vectors are **conformance examples authored against this specification**,
-not captured output. The reference implementation publishes its break timeline
-on a non-standard control track today; migrating it to the envelope form
-described here is in progress, and vectors captured from it will replace these
-once that lands. Their timings, identifiers and quartile offsets are taken from
-a live deployment, so they are realistic, but the record framing is this
-document's.
+# Changes since draft-riedl-moq-ad-creative-signaling-00 {#changes}
+{:numbered="false"}
 
-The rules the schema expresses are executable and run in that implementation's
-CI, so the published vectors cannot silently drift from the prose: the valid set
-is asserted to pass and the invalid set to fail, each for the specific reason its
-name claims.
+(To be removed before publication.)
+
+* SVTA 2053-1 conformance. The appendix example and the test vectors
+  now use the member names and units of {{SVTA2053}} (`start`,
+  `duration`, `offset`, `tracking`, `type`; MediaTime in seconds) in
+  place of invented ones (`id`, `startTime`, `trackingEvents`, `event`;
+  milliseconds), and no longer give Pod or Slot an `id`, which
+  {{SVTA2053}} does not define (item 8 of {{open-issues}}).
+* {{payload}}: adds the `verification` envelope type, which
+  {{SVTA2053}} defines; states that interior timing is in seconds; forbids
+  setting `features` flags that {{SVTA2053}} does not define (the -00
+  example set two, which a conforming interpreter would discard); and
+  notes two inconsistencies in {{SVTA2053}} that affect parsers.
+* {{record-structure}}: index values are typed as {{MSF}} requires (`t`
+  and `m` Numbers, `l` a two-Number Array; a -00 vector wrote `t` as a
+  date string); records map to Objects per {{Section 8.3 of MSF}}.
+  {{track-properties}} adds the `mimeType` that {{MSF}} requires.
+  {{interior-timing}} says what interior timing is relative to when an
+  envelope carries Slot or TrackingEvent objects without their Pod.
+* The {{SVTA2053}} reference now cites the published Revision 1.0 by
+  title, with the Version 2 model named in an annotation; section
+  references corrected.
+* New informative {{future-carriage}}: splitting ad signaling by
+  function across Event Timeline tracks, and break-level state in MOQT
+  subgroup properties {{MOQT-SUBGROUP-PROPS}}.
+* {{impl-status}} rewritten: the event class is now deployed, with
+  measured results and an explicit list of what is not yet
+  implemented. {{open-issues}} records the implementation experience
+  for items 1, 2, 3 and 8, and the open status of item 4. Item 8, the
+  missing placement identifier, stays open.
+* {{schema}}: the vectors are replaced, the schema checks index types
+  and the envelope rules, and an anonymized record captured from the
+  deployment replaces the invented example.
+* The MSF index-key spelling change in the MSF editor's copy is noted
+  in {{conventions}}.
