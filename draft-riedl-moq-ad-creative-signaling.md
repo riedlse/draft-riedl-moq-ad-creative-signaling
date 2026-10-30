@@ -828,10 +828,12 @@ The author operates a continuously running server-side ad insertion
 deployment over MoQ: fixed-timeline linear channels, publisher to relay
 to browser, with ad creatives spliced server-side into one shared
 broadcast, so every subscriber receives the same media objects -- the
-condition that motivates this document ({{introduction}}). The
-publisher and player are not publicly available. Since 2026-10-22 the deployment publishes the event class
-this document defines. This section reports what it does, what was
-measured, and what is not yet implemented. Contact: the author.
+condition that motivates this document ({{introduction}}). The relay
+is the open-source moq-relay, version 0.17.9 as of this revision; the
+publisher and player are not publicly available. Since 2026-10-22 the
+deployment publishes the event class this document defines. This
+section reports what it does, what was measured, and what is not yet
+implemented. Contact: the author.
 
 Publisher, live on both of the deployment's ad-inserted channels since
 2026-10-22:
@@ -929,11 +931,12 @@ NOT yet implemented:
   Object, not a full Group ahead. Devices still hold the record before
   the splice renders because they present several seconds behind
   delivery, but the SHOULD is not met.
-* Device requests on the running deployment. Its capability-URL
-  endpoint is internal: the URLs it publishes are neither reachable
-  from public clients nor `https` URLs ({{validation}}), so there the
-  device beacons have been observed but not sent. The publisher's own
-  server-side requests continue in parallel.
+* Device requests on the running deployment. The tracking endpoint the
+  deployment publishes is reachable only from the service network, so
+  there the device beacons have been observed but not sent, and the
+  publisher's own server-side requests continue in parallel. A
+  publicly reachable endpoint that satisfies {{validation}} is the
+  remaining step.
 * `slot`, `trackingEvent` and `verification` envelopes, `$remote`, and
   the Slot members `media`, `verifications`, `skipOffset` and
   `clickThrough`.
