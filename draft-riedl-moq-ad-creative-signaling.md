@@ -349,6 +349,14 @@ conforming interpreter discard the record. The only flag defined today is
 uses `$remote` ({{capability-urls}}); a payload that does not use
 `$remote` can omit `features` entirely.
 
+This document places no requirement of its own on receivers. A receiver
+applies Section 5.2.2.1 of {{SVTA2053}} unchanged: a flag set to `true`
+that it does not support means it ignores that payload, while a flag set
+to `false`, or an absent `features` member, asks nothing of it. The
+publisher-side rule is needed because on one-to-many delivery the
+publisher never learns that a record was discarded (item 6 of
+{{open-issues}}).
+
 Two inconsistencies in {{SVTA2053}} matter to parsers. Its TrackingEvent
 payload table (Table 11) lists `start` and `duration` where its object
 model (Section 4.4.5) defines `offset`, and its Remote Fields table
