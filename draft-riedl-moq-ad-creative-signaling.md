@@ -45,19 +45,20 @@ normative:
   MSF: I-D.ietf-moq-msf
   RFC8259:
   SVTA2053:
-    # Cited by document title + the Version 2 object model, NOT by SVTA's product slug.
-    # SVTA's slugs are unstable and inconsistently versioned: the svta2053-1 product page
-    # served "Revision 1.0" for what this document calls Version 2. Targeting the SVTA root
-    # avoids pinning a URL that renames or redirects; the body always says "Version 2
-    # carriage envelope", so the model version stays unambiguous in prose.
-    # -01: cite the PUBLISHED Revision 1.0 (2025-05-19). It already defines everything this
-    # document uses (Section 5.2: the Version 2 envelope, all four envelope types, `features`,
-    # `$remote`). Cite only published SVTA editions.
-    title: "SVTA2053-1: Ad Creative Signaling in DASH and HLS, Revision 1.0"
+    # Verified on svta.org 2026-10-30. Product page: "SVTA2053-1: Ad Creative Signaling in DASH
+    # and HLS Revision 1.0", Advertising Working Group, published 2025-05-19, 41 pages; its
+    # predecessor is SVTA2053 Version 1.1 (2023-06-19). SVTA's project page calls SVTA2053-1 the
+    # second edition ("Version 2.0" project); its data model is what the body calls the Version 2
+    # carriage envelope (Section 5.2). The SVTA number and revision ride in seriesinfo so the
+    # title stays the document's own. The product URL is slug-stable (it is the document number)
+    # and replaces the SVTA root used in -00. Cite only published SVTA editions.
+    title: "Ad Creative Signaling in DASH and HLS"
     author:
       - org: Streaming Video Technology Alliance (SVTA), Advertising Working Group
     date: 2025-05-19
-    target: https://www.svta.org/
+    seriesinfo:
+      SVTA: "2053-1, Revision 1.0"
+    target: https://www.svta.org/product/svta2053-1/
     ann: "This document uses the Version 2 data carriage scheme and object model (Sections 4 and 5.2)."
 
 informative:
@@ -78,7 +79,8 @@ informative:
     date: false
     target: https://github.com/riedlse/draft-riedl-moq-ad-creative-signaling
   SVTA2053-2:
-    title: "SVTA2053-2: Ad Creative Signaling in DASH and HLS, 3rd Edition, with Reference Implementations (Non-Linear (Concurrent) Ad and Media Experiences)"
+    # Title as on the SVTA project page, verified 2026-10-30; no document is published yet.
+    title: "Non-Linear (Concurrent) Ad and Media Experiences: SVTA2053-2 Ad Creative Signaling in DASH and HLS, 3rd Edition, with Reference Implementations"
     author:
       - org: Streaming Video Technology Alliance (SVTA)
     date: false
