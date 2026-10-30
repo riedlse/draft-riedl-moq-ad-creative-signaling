@@ -1020,7 +1020,8 @@ function across Event Timeline tracks ({{future-carriage}}). The payload
 data model is the work of the SVTA Advertising Working Group
 {{SVTA2053}}.
 
-{::comment} TODO: add early reviewers before submission. {:/comment}
+Thanks to Will Law, Suhas Nandakumar, Gwendal Simon and Giovanni Marzot
+for early review and discussion of this document.
 
 # JSON Schema and Test Vectors {#schema}
 {:numbered="false"}
