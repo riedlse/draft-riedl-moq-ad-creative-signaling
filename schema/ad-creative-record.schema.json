@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://riedlse.github.io/draft-riedl-moq-ad-creative-signaling/schema/ad-creative-record.schema.json",
+  "$id": "https://raw.githubusercontent.com/riedlse/draft-riedl-moq-ad-creative-signaling/main/schema/ad-creative-record.schema.json",
   "title": "Ad creative signaling Event Timeline record",
   "description": "One record on an MSF Event Timeline track whose eventType is urn:svta:advertising-wg:ad-creative-signaling. Encodes the record requirements of draft-riedl-moq-ad-creative-signaling Section 4: exactly one index reference field, typed as MSF-01 Section 8.1 requires, and a data member holding exactly one SVTA 2053-1 Version 2 carriage envelope, with the envelope-level rules of SVTA 2053-1 Section 5.2.2.1 (Table 15). The payload objects (Pod, Slot, TrackingEvent, Verification) are governed by SVTA 2053-1 and are not checked here. Note the DASH and HLS bindings also accept bare Version 1 payload objects; this binding does not.",
   "type": "object",
