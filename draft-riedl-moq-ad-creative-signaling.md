@@ -1165,28 +1165,33 @@ reason its name gives.
 * {{payload}}: adds the `verification` envelope type, which
   {{SVTA2053}} defines; states that interior timing is in seconds; forbids
   setting `features` flags that {{SVTA2053}} does not define (the -00
-  example set two, which a conforming interpreter would discard); and
-  notes two inconsistencies in {{SVTA2053}} that affect parsers.
+  example set two, which a conforming interpreter would discard), while
+  leaving receiver behavior to {{SVTA2053}}; and notes two
+  inconsistencies in {{SVTA2053}} that affect parsers.
 * {{record-structure}}: index values are typed as {{MSF}} requires (`t`
   and `m` Numbers, `l` a two-Number Array; a -00 vector wrote `t` as a
   date string); records map to Objects per {{Section 8.3 of MSF}}.
   {{track-properties}} adds the `mimeType` that {{MSF}} requires.
   {{interior-timing}} says what interior timing is relative to when an
   envelope carries Slot or TrackingEvent objects without their Pod.
-* The {{SVTA2053}} reference now cites the published Revision 1.0 by
-  title, with the Version 2 model named in an annotation; section
-  references corrected.
+* The {{SVTA2053}} reference now cites the published SVTA 2053-1,
+  Revision 1.0, by its document title and product page, with the
+  Version 2 model named in an annotation; section references
+  corrected.
 * New informative {{future-carriage}}: splitting ad signaling by
   function across Event Timeline tracks, break-level state in MOQT
   subgroup properties {{MOQT-SUBGROUP-PROPS}}, and the additive
   non-linear extensions of the 3rd edition {{SVTA2053-2}}.
-* {{impl-status}} rewritten: the event class is now deployed, with
-  measured results and an explicit list of what is not yet
-  implemented. {{open-issues}} records the implementation experience
-  for items 1, 2, 3 and 8, and the open status of item 4. Item 8, the
-  missing placement identifier, stays open.
+* {{impl-status}} rewritten: the event class is now deployed (publisher
+  since 2026-10-22, device-side firing since 2026-10-25), with measured
+  results and an explicit list of what is not yet implemented;
+  {{introduction}} says so. {{open-issues}} records the implementation
+  experience for items 1, 2, 3, 6 and 8, and the status of item 4 after
+  the 2026-10-14 interim. Item 8, the missing placement identifier,
+  stays open.
 * {{schema}}: the vectors are replaced, the schema checks index types
   and the envelope rules, and an anonymized record captured from the
   deployment replaces the invented example.
 * The MSF index-key spelling change in the MSF editor's copy is noted
   in {{conventions}}.
+* Acknowledgments name the early reviewers.
