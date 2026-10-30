@@ -742,9 +742,12 @@ discussion; it is to be removed before publication.
    does not, which would push the binding toward either a per-rung
    signaling track or an index defined against something other than the
    media track's Group IDs. The proposal was not resolved at the
-   2026-09-08 interim and remains open as of this revision; at least
-   one implementation (MOQtail) reports partial draft-18 support, so
-   experience should be available before this document has to choose.
+   2026-09-08 interim; at the 2026-10-14 interim the working group took
+   the direction of reducing it to the group-aligned mode, with other
+   modes left to extensions, and a consensus call is pending as of this
+   revision. At least one implementation (MOQtail) reports partial
+   draft-18 support, so experience should be available before this
+   document has to choose.
 
 5. **Common-format scope**: is the Event Timeline binding the whole
    story, or is a container-level mapping (the envelope in CMAF `emsg`)
