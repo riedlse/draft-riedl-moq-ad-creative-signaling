@@ -26,7 +26,7 @@ endif
 # fails otherwise). SUB_REV is the revision being submitted; it replaces "-latest" in the
 # source on the way into kramdown-rfc, so the submission file carries the real number.
 # Bump it after each submission. Override on the command line: make submission SUB_REV=02
-SUB_REV     ?= 01
+SUB_REV     ?= 02
 SUB_SRC     := draft-riedl-moq-ad-creative-signaling.md
 SUB_LATEST  := $(shell sed -n 's/^docname: *//p' $(SUB_SRC))
 SUB_DOCNAME := $(patsubst %-latest,%-$(SUB_REV),$(SUB_LATEST))
