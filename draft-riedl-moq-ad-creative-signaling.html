@@ -18,7 +18,7 @@ how their playback is to be measured. This binding is the MSF
 counterpart of the DASH and HLS carriage bindings defined by SVTA
 2053-1, which defines none for MOQT. 
     " name="description">
-<meta content="xml2rfc 3.34.0" name="generator">
+<meta content="xml2rfc 3.34.1" name="generator">
 <meta content="media over quic" name="keyword">
 <meta content="moq" name="keyword">
 <meta content="msf" name="keyword">
@@ -29,19 +29,19 @@ counterpart of the DASH and HLS carriage bindings defined by SVTA
 <meta content="beacon" name="keyword">
 <meta content="draft-riedl-moq-ad-creative-signaling-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.34.0
-    Python 3.14.5
-    ConfigArgParse 1.7.5
+  xml2rfc 3.34.1
+    Python 3.14.8
+    ConfigArgParse 1.8.0
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.11.0
+    platformdirs 4.13.4
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
-    wcwidth 0.8.2
+    wcwidth 0.9.2
 -->
 <link href="draft-riedl-moq-ad-creative-signaling.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -1057,11 +1057,11 @@ svg {
 <thead><tr>
 <td class="left">Internet-Draft</td>
 <td class="center">MSF Ad Creative Signaling</td>
-<td class="right">August 2026</td>
+<td class="right">November 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Riedl</td>
-<td class="center">Expires 14 February 2027</td>
+<td class="center">Expires 5 May 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1074,12 +1074,12 @@ svg {
 <dd class="internet-draft">draft-riedl-moq-ad-creative-signaling-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-08-13" class="published">13 August 2026</time>
+<time datetime="2026-11-01" class="published">1 November 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-02-14">14 February 2027</time></dd>
+<dd class="expires"><time datetime="2027-05-05">5 May 2027</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1138,7 +1138,7 @@ counterpart of the DASH and HLS carriage bindings defined by SVTA
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 14 February 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 5 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1188,6 +1188,12 @@ counterpart of the DASH and HLS carriage bindings defined by SVTA
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
                 <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-payload-version-2-carriage-" class="internal xref">Payload: Version 2 Carriage Envelope</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4">
+                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-subscriber-invariance" class="internal xref">Subscriber Invariance</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.5">
+                <p id="section-toc.1-1.4.2.5.1"><a href="#section-4.5" class="auto internal xref">4.5</a>.  <a href="#name-record-signature" class="internal xref">Record Signature</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
@@ -1225,50 +1231,56 @@ counterpart of the DASH and HLS carriage bindings defined by SVTA
             <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-per-session-insertion-plans" class="internal xref">Per-Session Insertion Plans</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-open-issues" class="internal xref">Open Issues</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-track-split-and-future-carr" class="internal xref">Track Split and Future Carriage</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-implementation-status" class="internal xref">Implementation Status</a></p>
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-open-issues" class="internal xref">Open Issues</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
-            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
-                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="auto internal xref">11.1</a>.  <a href="#name-integrity-of-tracking-recor" class="internal xref">Integrity of Tracking Records</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
-                <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="auto internal xref">11.2</a>.  <a href="#name-amplification-and-load" class="internal xref">Amplification and Load</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.3">
-                <p id="section-toc.1-1.11.2.3.1"><a href="#section-11.3" class="auto internal xref">11.3</a>.  <a href="#name-payload-validation" class="internal xref">Payload Validation</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.4">
-                <p id="section-toc.1-1.11.2.4.1"><a href="#section-11.4" class="auto internal xref">11.4</a>.  <a href="#name-privacy" class="internal xref">Privacy</a></p>
-</li>
-            </ul>
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-implementation-status" class="internal xref">Implementation Status</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
-            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
-            <p id="section-toc.1-1.13.1"><a href="#section-13" class="auto internal xref">13</a>. <a href="#name-references" class="internal xref">References</a></p>
+            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1">
-                <p id="section-toc.1-1.13.2.1.1"><a href="#section-13.1" class="auto internal xref">13.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1">
+                <p id="section-toc.1-1.12.2.1.1"><a href="#section-12.1" class="auto internal xref">12.1</a>.  <a href="#name-integrity-of-tracking-recor" class="internal xref">Integrity of Tracking Records</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.2">
-                <p id="section-toc.1-1.13.2.2.1"><a href="#section-13.2" class="auto internal xref">13.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2">
+                <p id="section-toc.1-1.12.2.2.1"><a href="#section-12.2" class="auto internal xref">12.2</a>.  <a href="#name-amplification-and-load" class="internal xref">Amplification and Load</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3">
+                <p id="section-toc.1-1.12.2.3.1"><a href="#section-12.3" class="auto internal xref">12.3</a>.  <a href="#name-payload-validation" class="internal xref">Payload Validation</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.4">
+                <p id="section-toc.1-1.12.2.4.1"><a href="#section-12.4" class="auto internal xref">12.4</a>.  <a href="#name-privacy" class="internal xref">Privacy</a></p>
 </li>
             </ul>
 </li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#section-13" class="auto internal xref">13</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
-            <p id="section-toc.1-1.14.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.14.1"><a href="#section-14" class="auto internal xref">14</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.1">
+                <p id="section-toc.1-1.14.2.1.1"><a href="#section-14.1" class="auto internal xref">14.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.2">
+                <p id="section-toc.1-1.14.2.2.1"><a href="#section-14.2" class="auto internal xref">14.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
-            <p id="section-toc.1-1.15.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-json-schema-and-test-vector" class="internal xref">JSON Schema and Test Vectors</a></p>
+            <p id="section-toc.1-1.15.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16">
-            <p id="section-toc.1-1.16.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+            <p id="section-toc.1-1.16.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-json-schema-and-test-vector" class="internal xref">JSON Schema and Test Vectors</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.17">
+            <p id="section-toc.1-1.17.1"><a href="#appendix-C" class="auto internal xref"></a><a href="#name-changes-since-draft-riedl-m" class="internal xref">Changes since draft-riedl-moq-ad-creative-signaling-00</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.18">
+            <p id="section-toc.1-1.18.1"><a href="#appendix-D" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
 </li>
         </ul>
 </nav>
@@ -1310,8 +1322,9 @@ and none for MOQT.<a href="#section-1-3" class="pilcrow">¶</a></p>
 <span>[<a href="#SCTE35-MOQ" class="cite xref">SCTE35-MOQ</a>]</span> already put in place: it defines an Event Timeline event
 class whose records carry SVTA 2053-1 Version 2 carriage envelopes,
 specifies how those records are timed and correlated with splice
-signaling, and gives operational guidance for tracking on one-to-many
-delivery. It changes nothing in the SVTA 2053-1 data model; payload
+signaling, requires that each record carry the distributor's signature
+so that a subscriber can verify it independently of the relay path, and
+gives operational guidance for tracking on one-to-many delivery. It changes nothing in the SVTA 2053-1 data model; payload
 normativity remains with <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>, and this binding could
 additionally be published as a carriage section in a future revision of
 that specification.<a href="#section-1-4" class="pilcrow">¶</a></p>
@@ -1320,7 +1333,9 @@ and its Event Timeline mechanism is the substrate here; this document
 and <span>[<a href="#SCTE35-MOQ" class="cite xref">SCTE35-MOQ</a>]</span> are individual submissions layered on that substrate,
 and this one is written to track <span>[<a href="#MSF" class="cite xref">MSF</a>]</span> as it evolves under WG change
 control -- including following its registry, wherever that registry
-ultimately lands.<a href="#section-1-5" class="pilcrow">¶</a></p>
+ultimately lands. The event class is deployed: a continuously running
+server-side ad insertion deployment publishes it, and <a href="#impl-status" class="auto internal xref">Section 11</a>
+reports what was measured.<a href="#section-1-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="conventions">
@@ -1336,30 +1351,34 @@ appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶<
 the index reference fields <code>t</code>, <code>l</code>, and <code>m</code> as defined in <span>[<a href="#MSF" class="cite xref">MSF</a>]</span>, and
 the terms Pod, Slot, Tracking Event, Verification, and carriage envelope
 as defined in Sections 4 and 5 of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>.<a href="#section-2-2" class="pilcrow">¶</a></p>
-<p id="section-2-3">Additionally:<a href="#section-2-3" class="pilcrow">¶</a></p>
-<span class="break"></span><dl class="dlParallel" id="section-2-4">
-        <dt id="section-2-4.1">Distributor:</dt>
-        <dd style="margin-left: 1.5em" id="section-2-4.2">
-          <p id="section-2-4.2.1">The party operating the publisher that emits the media and signaling
-tracks (typically the party performing ad insertion).<a href="#section-2-4.2.1" class="pilcrow">¶</a></p>
+<p id="section-2-3">The index keys are spelled as in the published <span>[<a href="#MSF" class="cite xref">MSF</a>]</span>. The MSF
+editor's copy has since renamed them <code>T</code>, <code>L</code> and <code>M</code>; this document
+will follow whichever spelling MSF settles on, and implementations may
+wish to accept both in the meantime.<a href="#section-2-3" class="pilcrow">¶</a></p>
+<p id="section-2-4">Additionally:<a href="#section-2-4" class="pilcrow">¶</a></p>
+<span class="break"></span><dl class="dlParallel" id="section-2-5">
+        <dt id="section-2-5.1">Distributor:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-5.2">
+          <p id="section-2-5.2.1">The party operating the publisher that emits the media and signaling
+tracks (typically the party performing ad insertion).<a href="#section-2-5.2.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-4.3">Placement opportunity:</dt>
-        <dd style="margin-left: 1.5em" id="section-2-4.4">
-          <p id="section-2-4.4.1">A window on the media timeline, typically signaled by SCTE-35, in
-which advertising content plays.<a href="#section-2-4.4.1" class="pilcrow">¶</a></p>
+<dt id="section-2-5.3">Placement opportunity:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-5.4">
+          <p id="section-2-5.4.1">A window on the media timeline, typically signaled by SCTE-35, in
+which advertising content plays.<a href="#section-2-5.4.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-4.5">Splice signaling track:</dt>
-        <dd style="margin-left: 1.5em" id="section-2-4.6">
-          <p id="section-2-4.6.1">An Event Timeline track carrying SCTE-35 records per <span>[<a href="#SCTE35-MOQ" class="cite xref">SCTE35-MOQ</a>]</span>.<a href="#section-2-4.6.1" class="pilcrow">¶</a></p>
+<dt id="section-2-5.5">Splice signaling track:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-5.6">
+          <p id="section-2-5.6.1">An Event Timeline track carrying SCTE-35 records per <span>[<a href="#SCTE35-MOQ" class="cite xref">SCTE35-MOQ</a>]</span>.<a href="#section-2-5.6.1" class="pilcrow">¶</a></p>
 </dd>
         <dd class="break"></dd>
-<dt id="section-2-4.7">Capability URL:</dt>
-        <dd style="margin-left: 1.5em" id="section-2-4.8">
-          <p id="section-2-4.8.1">A URL whose knowledge alone grants the ability to perform a narrow
+<dt id="section-2-5.7">Capability URL:</dt>
+        <dd style="margin-left: 1.5em" id="section-2-5.8">
+          <p id="section-2-5.8.1">A URL whose knowledge alone grants the ability to perform a narrow
 action, used here as a short-lived, opaque reference to a
-distributor-operated tracking endpoint <span>[<a href="#CAP-URLS" class="cite xref">CAP-URLS</a>]</span>.<a href="#section-2-4.8.1" class="pilcrow">¶</a></p>
+distributor-operated tracking endpoint <span>[<a href="#CAP-URLS" class="cite xref">CAP-URLS</a>]</span>.<a href="#section-2-5.8.1" class="pilcrow">¶</a></p>
 </dd>
       <dd class="break"></dd>
 </dl>
@@ -1373,7 +1392,9 @@ distributor-operated tracking endpoint <span>[<a href="#CAP-URLS" class="cite xr
 <p id="section-3-1">An MSF track carrying ad creative signaling:<a href="#section-3-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-3-2.1">
-          <p id="section-3-2.1.1"><span class="bcp14">MUST</span> declare a packaging value of <code>"eventtimeline"</code>;<a href="#section-3-2.1.1" class="pilcrow">¶</a></p>
+          <p id="section-3-2.1.1"><span class="bcp14">MUST</span> declare a packaging value of <code>"eventtimeline"</code> and a <code>mimeType</code>
+of <code>"application/json"</code>, as <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-01#section-8.2" class="relref">Section 8.2</a> of [<a href="#MSF" class="cite xref">MSF</a>]</span> requires of every
+Event Timeline track;<a href="#section-3-2.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-3-2.2">
           <p id="section-3-2.2.1"><span class="bcp14">MUST</span> declare an <code>eventType</code> value of
@@ -1420,14 +1441,27 @@ data format of <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-m
 <ul class="normal">
 <li class="normal" id="section-4.1-2.1">
             <p id="section-4.1-2.1.1">exactly one index reference field -- <code>t</code> (wallclock), <code>l</code> (MOQT
-Location), or <code>m</code> (media time) -- selected per <a href="#index-selection" class="auto internal xref">Section 4.2</a>;
-and<a href="#section-4.1-2.1.1" class="pilcrow">¶</a></p>
+Location), or <code>m</code> (media time) -- selected per <a href="#index-selection" class="auto internal xref">Section 4.2</a>
+and typed as <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-01#section-8.1" class="relref">Section 8.1</a> of [<a href="#MSF" class="cite xref">MSF</a>]</span> defines it: <code>t</code> and <code>m</code> are JSON
+Numbers of milliseconds (a wallclock index is milliseconds since the
+Unix epoch, not a date string), and <code>l</code> is an Array of two Numbers,
+the MOQT Group ID and Object ID;<a href="#section-4.1-2.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-4.1-2.2">
             <p id="section-4.1-2.2.1">a <code>data</code> field whose value is exactly one Version 2 carriage
-envelope as defined in <a href="#payload" class="auto internal xref">Section 4.3</a>.<a href="#section-4.1-2.2.1" class="pilcrow">¶</a></p>
+envelope as defined in <a href="#payload" class="auto internal xref">Section 4.3</a>; and<a href="#section-4.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-4.1-2.3">
+            <p id="section-4.1-2.3.1">a <code>sig</code> member holding the distributor's signature over the record,
+as <a href="#signing" class="auto internal xref">Section 4.5</a> defines.<a href="#section-4.1-2.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
+<p id="section-4.1-3">Records are carried in the Objects of the track as <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-01#section-8.3" class="relref">Section 8.3</a> of [<a href="#MSF" class="cite xref">MSF</a>]</span>
+specifies: the first Object of each Group is the independent array of
+every record accumulated and accessible so far. A subscriber that joins
+at a Group boundary during a placement opportunity therefore receives
+its record, provided the publisher keeps the record accessible until the
+opportunity has ended.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="index-selection">
@@ -1460,7 +1494,7 @@ selection rules (its Section 4.2) to both tracks.<a href="#section-4.2-2" class=
         </h3>
 <p id="section-4.3-1">The <code>data</code> field carries one SVTA 2053-1 Version 2 carriage envelope
 (Section 5.2.2.1 of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>) directly:<a href="#section-4.3-1" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="section-4.3-2">
+<div class="alignLeft art-text artwork" id="section-4.3-2">
 <pre>
 { "version": 2, "type": "...", "payload": [ ... ],
   "features": { ... } }
@@ -1472,13 +1506,125 @@ selection rules (its Section 4.2) to both tracks.<a href="#section-4.2-2" class=
 are also legal, records in this binding <span class="bcp14">MUST</span> carry Version 2 envelopes
 only. On a fan-out transport the envelope's <code>features</code> flags are the
 only capability-signaling mechanism available, and the envelope <code>type</code>
-field is what allows a uniform track to carry <code>pod</code>, <code>slot</code>, and
-<code>trackingEvent</code> payloads interchangeably.<a href="#section-4.3-4" class="pilcrow">¶</a></p>
-<p id="section-4.3-5">It is <span class="bcp14">RECOMMENDED</span> that a publisher emit one <code>pod</code> envelope per
-placement opportunity. <code>slot</code> and <code>trackingEvent</code> envelopes <span class="bcp14">MAY</span> be used
-(mirroring the granularity options of the DASH binding), but
-deduplication under redelivery is simplest at pod granularity (see
-<a href="#open-issues" class="auto internal xref">Section 9</a>).<a href="#section-4.3-5" class="pilcrow">¶</a></p>
+field is what allows a uniform track to carry <code>pod</code>, <code>slot</code>,
+<code>trackingEvent</code>, and <code>verification</code> payloads interchangeably -- the four
+types Section 5.2.2.1 of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> defines.<a href="#section-4.3-4" class="pilcrow">¶</a></p>
+<p id="section-4.3-5">The envelope and its payload objects use the member names and units of
+<span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> unchanged. In particular, every timing member inside the
+envelope (<code>start</code>, <code>duration</code>, <code>offset</code>, <code>skipOffset</code>) is a MediaTime: a
+number of seconds (Section 4.2.1 of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>), not milliseconds.
+Only the record's index reference is in milliseconds, because <span>[<a href="#MSF" class="cite xref">MSF</a>]</span>
+defines it so.<a href="#section-4.3-5" class="pilcrow">¶</a></p>
+<p id="section-4.3-6">A publisher <span class="bcp14">MUST NOT</span> set to <code>true</code> any <code>features</code> flag that <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>
+does not define. Under Section 5.2.2.1 of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>, an interpreter
+that meets a flag set to <code>true</code> that it does not support raises an
+error and ignores the payload, so an undefined flag makes every
+conforming interpreter discard the record. The only flag defined today is
+<code>remoteFields</code>, which <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> requires to be <code>true</code> when the payload
+uses <code>$remote</code> (<a href="#capability-urls" class="auto internal xref">Section 7</a>); a payload that does not use
+<code>$remote</code> can omit <code>features</code> entirely.<a href="#section-4.3-6" class="pilcrow">¶</a></p>
+<p id="section-4.3-7">This document places no requirement of its own on receivers. A receiver
+applies Section 5.2.2.1 of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> unchanged: a flag set to <code>true</code>
+that it does not support means it ignores that payload, while a flag set
+to <code>false</code>, or an absent <code>features</code> member, asks nothing of it. The
+publisher-side rule is needed because on one-to-many delivery the
+publisher never learns that a record was discarded (item 6 of
+<a href="#open-issues" class="auto internal xref">Section 10</a>).<a href="#section-4.3-7" class="pilcrow">¶</a></p>
+<p id="section-4.3-8">Two inconsistencies in <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> matter to parsers. Its TrackingEvent
+payload table (Table 11) lists <code>start</code> and <code>duration</code> where its object
+model (Section 4.4.5) defines <code>offset</code>, and its Remote Fields table
+(Table 16) says a <code>$remote.verifications</code> URI resolves to an envelope of
+type <code>verifications</code> where the envelope (Table 15) defines
+<code>verification</code>. This document follows the object model and the envelope
+definition: TrackingEvent timing is <code>offset</code>, and the envelope type is
+<code>verification</code>.<a href="#section-4.3-8" class="pilcrow">¶</a></p>
+<p id="section-4.3-9">It is <span class="bcp14">RECOMMENDED</span> that a publisher emit one <code>pod</code> envelope per
+placement opportunity. The <code>slot</code>, <code>trackingEvent</code>, and <code>verification</code>
+envelopes <span class="bcp14">MAY</span> be used (mirroring the granularity options of the DASH
+binding), but deduplication under redelivery is simplest at pod
+granularity, and a decomposed record loses the structural link to the
+slot it belongs to (see <a href="#open-issues" class="auto internal xref">Section 10</a>).<a href="#section-4.3-9" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="invariance">
+<section id="section-4.4">
+        <h3 id="name-subscriber-invariance">
+<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-subscriber-invariance" class="section-name selfRef">Subscriber Invariance</a>
+        </h3>
+<p id="section-4.4-1">Records on this track <span class="bcp14">MUST</span> be subscriber-invariant: no field value may
+vary between subscribers. Per-session values enter only after delivery,
+either by client-side macro substitution (Section 6 of <span>[<a href="#VAST" class="cite xref">VAST</a>]</span>) against
+broadcast templates, or by request-time indirection through capability
+URLs (<a href="#capability-urls" class="auto internal xref">Section 7</a>). A macro template is conformant precisely
+because the template is identical for every subscriber; substitution is
+a post-delivery operation.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
+<p id="section-4.4-2">The DASH and HLS bindings of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> assume a per-session manifest,
+so payload fields carrying session-scoped tracking values are
+well-formed in those bindings. That assumption does not hold here:
+records on a shared Event Timeline track are delivered identically to
+every subscriber and are relay-cacheable, so a session-scoped field
+would both leak across sessions and defeat caching.<a href="#section-4.4-2" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="signing">
+<section id="section-4.5">
+        <h3 id="name-record-signature">
+<a href="#section-4.5" class="section-number selfRef">4.5. </a><a href="#name-record-signature" class="section-name selfRef">Record Signature</a>
+        </h3>
+<p id="section-4.5-1">Every record <span class="bcp14">MUST</span> carry a <code>sig</code> member holding a signature by the
+distributor over the rest of the record, so that a subscriber can
+verify a record's origin and integrity without trusting the relay path
+(<a href="#integrity" class="auto internal xref">Section 12.1</a>). The signature is a JWS <span>[<a href="#RFC7515" class="cite xref">RFC7515</a>]</span> in the JWS Compact
+Serialization with a detached, unencoded payload <span>[<a href="#RFC7797" class="cite xref">RFC7797</a>]</span>: the
+protected header carries <code>"b64": false</code> and <code>"crit": ["b64"]</code>, and the
+<code>sig</code> value has the form <code>BASE64URL(protected header) ".."
+BASE64URL(signature)</code>.<a href="#section-4.5-1" class="pilcrow">¶</a></p>
+<p id="section-4.5-2">The JWS Payload is the JSON Canonicalization Scheme <span>[<a href="#RFC8785" class="cite xref">RFC8785</a>]</span>
+serialization of the record object with its <code>sig</code> member removed: the
+index reference and the <code>data</code> envelope, canonicalized. The canonical
+form is the signing input only. The record is transmitted in whatever
+serialization the publisher produces, and a relay or library may
+re-serialize it -- member order, whitespace, number formatting within
+the rules of <span>[<a href="#RFC8785" class="cite xref">RFC8785</a>]</span> -- without invalidating the signature. The
+signature is per record rather than per Object because <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-01#section-8.3" class="relref">Section 8.3</a> of [<a href="#MSF" class="cite xref">MSF</a>]</span> re-forms the array of accumulated records at every Group; a
+per-record signature survives that and lets each record be verified on
+its own.<a href="#section-4.5-2" class="pilcrow">¶</a></p>
+<p id="section-4.5-3">The protected header <span class="bcp14">MUST</span> contain <code>alg</code> and <code>kid</code>. Publishers and
+verifiers <span class="bcp14">MUST</span> support <code>"alg": "EdDSA"</code> with Ed25519 keys <span>[<a href="#RFC8032" class="cite xref">RFC8032</a>]</span>
+          <span>[<a href="#RFC8037" class="cite xref">RFC8037</a>]</span>; other asymmetric JWS algorithms <span class="bcp14">MAY</span> be used where a
+distributor and its clients agree. The algorithm <span class="bcp14">MUST</span> be an asymmetric
+signature: <code>"none"</code> and the MAC algorithms (<code>HS256</code>, <code>HS384</code>, <code>HS512</code>)
+<span class="bcp14">MUST NOT</span> be used by publishers and <span class="bcp14">MUST</span> be rejected by verifiers,
+because every subscriber holds the verification key, and a key that
+verifies a MAC also forges one. Verifiers <span class="bcp14">MUST NOT</span> take keys from
+<code>jku</code>, <code>jwk</code>, <code>x5u</code> or <code>x5c</code> header parameters; a record that carries
+them is verified against the provisioned key set as if they were
+absent.<a href="#section-4.5-3" class="pilcrow">¶</a></p>
+<p id="section-4.5-4">A distributor publishes its verification keys as a JWK Set
+<span>[<a href="#RFC7517" class="cite xref">RFC7517</a>]</span>, each key carrying the <code>kid</code> its signatures name. How a
+client obtains the key set is out of scope for this document; a
+deployment typically provisions it with the playback session, alongside
+the client identifier of <a href="#client-identity" class="auto internal xref">Section 7.1</a>. Keys are rotated by
+publishing the new key before any record is signed with it, and
+retiring the old key only after every record signed with it has left
+the accessible window (<a href="#record-structure" class="auto internal xref">Section 4.1</a>). A distributor <span class="bcp14">SHOULD</span> use
+a distinct <code>kid</code> per channel, so that a verifier can reject a validly
+signed record substituted from another channel.<a href="#section-4.5-4" class="pilcrow">¶</a></p>
+<p id="section-4.5-5">A verifier <span class="bcp14">MUST</span> check that the <code>sig</code> member is present and well formed,
+that <code>alg</code> is permitted, that <code>kid</code> names a key in the current set, and
+that the signature verifies over the canonical payload. A record that
+fails any of these checks <span class="bcp14">MUST</span> be treated as absent for the purposes of
+<a href="#capability-urls" class="auto internal xref">Section 7</a>: no tracking, <code>$remote</code>, verification or
+click-through resource it names is requested. Media playback is
+unaffected; the record is advisory. A verifier <span class="bcp14">MAY</span> report the failure
+to the distributor over a channel established out of band, which gives
+the distributor evidence of tampering on paths it does not operate.<a href="#section-4.5-5" class="pilcrow">¶</a></p>
+<p id="section-4.5-6">The signature is subscriber-invariant (<a href="#invariance" class="auto internal xref">Section 4.4</a>) and so remains
+relay-cacheable. It costs one 64-byte signature and a short protected
+header per record, and one Ed25519 verification per record received.
+<span>[<a href="#VECTORS" class="cite xref">VECTORS</a>]</span> contains a signed record with the test key that signed it
+and a script that signs and verifies records; the example in
+<a href="#example" class="auto internal xref">Section 6</a> omits <code>sig</code> for brevity.<a href="#section-4.5-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1537,6 +1683,12 @@ a Tracking Event's <code>offset</code> is relative to its container. Only the
 record's index reference is absolute. Consequently, redelivery, looped
 schedules, and regional timeline shifts never require payload rewrites
 -- which matters where relays cache and re-serve objects.<a href="#section-5.4-1" class="pilcrow">¶</a></p>
+<p id="section-5.4-2">When an envelope carries Slot or TrackingEvent objects without their
+Pod (a <code>slot</code> or <code>trackingEvent</code> envelope), the record's index stands in
+for the missing container: a Slot's <code>start</code> and a Tracking Event's
+<code>offset</code> are relative to the record's index. A standalone Slot therefore
+normally has <code>start</code> 0, as the per-slot events of the DASH binding do
+(Section 6.1.2 of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>).<a href="#section-5.4-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1639,6 +1791,10 @@ via <code>$remote</code> (<a href="#capability-urls" class="auto internal xref">
 }
 </pre><a href="#section-6-4" class="pilcrow">¶</a>
 </div>
+<p id="section-6-5">The <code>remoteFields</code> flag is set because slot 2 uses <code>$remote</code>. This
+record is also published as the <code>worked-example</code> test vector. The
+appendix on test vectors (<a href="#schema" class="auto internal xref">Appendix "JSON Schema and Test Vectors"</a>) shows a record captured from the
+running deployment.<a href="#section-6-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="capability-urls">
@@ -1646,28 +1802,37 @@ via <code>$remote</code> (<a href="#capability-urls" class="auto internal xref">
       <h2 id="name-tracking-indirection-and-ca">
 <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-tracking-indirection-and-ca" class="section-name selfRef">Tracking Indirection and Capability URLs</a>
       </h2>
-<p id="section-7-1">Section 5.2.2.2 of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> already says interpreters <span class="bcp14">SHOULD</span> defer
+<p id="section-7-1">Two patterns satisfy <a href="#invariance" class="auto internal xref">Section 4.4</a>. In the first, the record carries
+broadcast tracking templates and the client performs macro substitution
+locally at activation; SVTA 2053-1 payloads carry over from the DASH and
+HLS bindings unchanged and no distributor infrastructure is required, at
+the cost of exposing vendor endpoint inventory in shared bytes,
+inflating every record by the full tracking list, and leaving per-device
+accounting to the macros alone. The second, described in the remainder
+of this section, defers resolution to a distributor-operated endpoint.
+Both are conformant; a publisher chooses per deployment.<a href="#section-7-1" class="pilcrow">¶</a></p>
+<p id="section-7-2">Section 5.2.2.2.2 of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> already says interpreters <span class="bcp14">SHOULD</span> defer
 <code>$remote</code> resolution until the containing object is about to become
 active. That deferral maps naturally onto broadcast fan-out, with one
 addition: on a shared timeline, the URLs in tracking and <code>$remote</code>
 fields <span class="bcp14">SHOULD</span> be short-lived capability URLs <span>[<a href="#CAP-URLS" class="cite xref">CAP-URLS</a>]</span> referencing a
 distributor-operated tracking endpoint (a "beacon proxy"), rather than
-raw measurement-vendor URLs.<a href="#section-7-1" class="pilcrow">¶</a></p>
-<p id="section-7-2">At activation, the client requests the capability URL (or resolves
+raw measurement-vendor URLs.<a href="#section-7-2" class="pilcrow">¶</a></p>
+<p id="section-7-3">At activation, the client requests the capability URL (or resolves
 <code>$remote</code> from it), appending a client identifier (<a href="#client-identity" class="auto internal xref">Section 7.1</a>).
 The endpoint performs macro substitution per Section 6 of <span>[<a href="#VAST" class="cite xref">VAST</a>]</span> (as
 Section 5.2.3 of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> provides) and requests the corresponding
 vendor resources with the calling device's context. Two properties fall
-out for free on one-to-many delivery:<a href="#section-7-2" class="pilcrow">¶</a></p>
+out for free on one-to-many delivery:<a href="#section-7-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-7-3.1">
-          <p id="section-7-3.1.1"><strong>Payload size</strong>: shared-timeline records stay small even for heavy
-vendor tracking lists, with late binding after the pod record ships.<a href="#section-7-3.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-7-4.1">
+          <p id="section-7-4.1.1"><strong>Payload size</strong>: shared-timeline records stay small even for heavy
+vendor tracking lists, with late binding after the pod record ships.<a href="#section-7-4.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-7-3.2">
-          <p id="section-7-3.2.1"><strong>Privacy and cache-safety</strong>: no per-user macro values and no vendor
+        <li class="normal" id="section-7-4.2">
+          <p id="section-7-4.2.1"><strong>Privacy and cache-safety</strong>: no per-user macro values and no vendor
 endpoint inventory appear in bytes that every subscriber and relay
-cache can read.<a href="#section-7-3.2.1" class="pilcrow">¶</a></p>
+cache can read.<a href="#section-7-4.2.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <div id="client-identity">
@@ -1680,6 +1845,8 @@ measurement requires the device to identify itself at request time, not
 in the payload. A client <span class="bcp14">SHOULD</span> append a pseudonymous, session-scoped
 client identifier (issued and signed out of band, for example with the
 playback session) as a query parameter when requesting capability URLs.
+This mechanism applies to the indirection pattern; under client-side
+substitution, per-device accounting rests on the macro values alone.
 The tracking endpoint can then deduplicate on (resource, event, client
 identifier), count unique reach, and forward at most one request per
 device per event to vendor resources with that device's context --
@@ -1695,7 +1862,9 @@ payloads. Raw device identifiers <span class="bcp14">MUST NOT</span> appear in r
 <p id="section-7.2-1">On a shared fixed timeline, every subscriber reaches the same tracking
 instant at the same wallclock moment; naive activation-time behavior
 synchronizes both the <code>$remote</code> resolution fetches and the tracking
-requests of the entire audience. Clients <span class="bcp14">SHOULD</span> resolve <code>$remote</code>
+requests of the entire audience. This applies with particular force
+under client-side substitution, where no distributor endpoint sits in
+the path to absorb the burst. Clients <span class="bcp14">SHOULD</span> resolve <code>$remote</code>
 fields within a randomized window ahead of activation (the publication
 lead of <a href="#publication-lead" class="auto internal xref">Section 5.3</a> provides the margin), and <span class="bcp14">SHOULD</span> apply
 bounded random jitter to tracking requests whose measurement semantics
@@ -1724,40 +1893,115 @@ opportunity, its capability URLs, and policy fields -- which composes
 with the shared events defined here (the shared timeline announces
 placement geometry and the broadcast/default pod; the insertion plan
 overlays the per-session decision).<a href="#section-8-1" class="pilcrow">¶</a></p>
-<p id="section-8-2">That mechanism is out of scope for this document and deserves its own.
-It is named here only as a design constraint: the event class defined
-in this document is intended to be overridden or parameterized by such
-a layer without being redefined by it.<a href="#section-8-2" class="pilcrow">¶</a></p>
+<p id="section-8-2">Between those two extremes there is a third scope worth naming,
+because the choice is not binary. Records can be published per
+<strong>cohort</strong>: one track per distinct ad decision, shared by every device
+that resolves to it. Per-device plans are by definition uncacheable --
+one subscriber per track -- which forfeits the fan-out that motivates
+one-to-many delivery in the first place and reduces to per-session
+manifest stitching with extra steps. Cohort scope keeps relay fan-out
+within each cohort and bounds the number of distinct tracks by the
+number of decisions rather than the number of viewers. Server-guided
+insertion can therefore be served at whichever of the three scopes the
+deployment's decisioning actually requires.<a href="#section-8-2" class="pilcrow">¶</a></p>
+<p id="section-8-3">The event class defined here is unchanged across all three: shared,
+per-cohort, and per-session differ in the scope of the track carrying
+the records, not in the records themselves. That is deliberate --
+scope is a deployment decision, and this binding should not have to be
+redefined to follow it.<a href="#section-8-3" class="pilcrow">¶</a></p>
+<p id="section-8-4">That per-session mechanism is out of scope for this document and
+deserves its own. It is named here only as a design constraint: the
+event class defined in this document is intended to be overridden or
+parameterized by such a layer without being redefined by it.<a href="#section-8-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="future-carriage">
+<section id="section-9">
+      <h2 id="name-track-split-and-future-carr">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-track-split-and-future-carr" class="section-name selfRef">Track Split and Future Carriage</a>
+      </h2>
+<p id="section-9-1">This section is informative; nothing in it changes the requirements
+above.<a href="#section-9-1" class="pilcrow">¶</a></p>
+<p id="section-9-2">Ad signaling is expected to grow by function rather than by record
+size. Interactivity, click-through handling, and third-party
+verification are each better carried on their own sibling Event
+Timeline track, with its own <code>eventType</code>, the same <code>depends</code> media
+track and the same index space, than as further members of the records
+defined here. A client then subscribes only to the functions it
+implements, which settles much of the feature-negotiation question for
+whole functions (item 6 of <a href="#open-issues" class="auto internal xref">Section 10</a>), and each function's
+records keep their own size, cadence and failure behavior. The cost is
+the missing placement identifier (item 8 of <a href="#open-issues" class="auto internal xref">Section 10</a>): once
+records describing one placement opportunity are spread across tracks,
+a shared index identifies the opportunity but not the slot within it.<a href="#section-9-2" class="pilcrow">¶</a></p>
+<p id="section-9-3">Separately, <span>[<a href="#MOQT" class="cite xref">MOQT</a>]</span> today defines properties at Track and Object scope
+only. A proposal before the MoQ Working Group <span>[<a href="#MOQT-SUBGROUP-PROPS" class="cite xref">MOQT-SUBGROUP-PROPS</a>]</span>
+would carry properties in the subgroup header, where they travel with
+every stream that carries the subgroup, including FETCH responses,
+instead of riding a first Object that a mid-Group joiner, a filter or a
+FETCH range can miss. If it is adopted, break-level state -- an
+opportunity identifier, the remaining break duration, the Group at
+which content resumes -- could be carried in the subgroup headers of the
+media track itself. That would complement the records defined here
+rather than replace them: subgroup properties describe the break at the
+delivery position as it is delivered, while the Event Timeline describes
+the creatives ahead of the splice.<a href="#section-9-3" class="pilcrow">¶</a></p>
+<p id="section-9-4">The data model itself is also growing. SVTA is preparing a 3rd edition,
+<span>[<a href="#SVTA2053-2" class="cite xref">SVTA2053-2</a>]</span>, for non-linear (concurrent) ad and editorial
+presentations such as overlays, squeezebacks and L-shapes. It is
+specified as an additive extension of the Version 2 carriage envelope
+(a Viewport data type, a PresentationType enumeration and layout
+control) and defines carriage for DASH and HLS. This document carries
+the Version 2 envelope without interpreting the payload objects
+(<a href="#schema" class="auto internal xref">Appendix "JSON Schema and Test Vectors"</a>), so payloads using those extensions would ride unchanged on
+an ad creative signaling track. Carriage over the MSF Event Timeline, as
+defined here, is a candidate for a later SVTA2053 edition.<a href="#section-9-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="open-issues">
-<section id="section-9">
+<section id="section-10">
       <h2 id="name-open-issues">
-<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-open-issues" class="section-name selfRef">Open Issues</a>
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-open-issues" class="section-name selfRef">Open Issues</a>
       </h2>
-<p id="section-9-1">This section lists issues to be resolved through working group
-discussion; it is to be removed before publication.<a href="#section-9-1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-9-2">
-<li id="section-9-2.1">
-          <p id="section-9-2.1.1"><strong>Granularity</strong>: one <code>pod</code> envelope per placement opportunity (the
-<span class="bcp14">RECOMMENDED</span> default), or <code>slot</code>/<code>trackingEvent</code> envelopes per
-creative? Redelivery deduplication is simpler at pod granularity.<a href="#section-9-2.1.1" class="pilcrow">¶</a></p>
+<p id="section-10-1">This section lists issues to be resolved through working group
+discussion; it is to be removed before publication.<a href="#section-10-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-10-2">
+<li id="section-10-2.1">
+          <p id="section-10-2.1.1"><strong>Granularity</strong>: one <code>pod</code> envelope per placement opportunity (the
+<span class="bcp14">RECOMMENDED</span> default), or <code>slot</code>, <code>trackingEvent</code> and <code>verification</code>
+envelopes per creative? Redelivery deduplication is simpler at pod
+granularity. The deployment described in <a href="#impl-status" class="auto internal xref">Section 11</a> publishes
+<code>pod</code> envelopes only and has not needed anything finer.<a href="#section-10-2.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-9-2.2">
-          <p id="section-9-2.2.1"><strong>Update semantics for live</strong>: pods change close to air. Is a later
+        <li id="section-10-2.2">
+          <p id="section-10-2.2.1"><strong>Update semantics for live</strong>: pods change close to air. Is a later
 record at the same index a full supersede (last-writer-wins), or is
 a patch rule needed? <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> has no cancel/supersede concept;
-SCTE-35 inherits cancellation from its payload semantics.<a href="#section-9-2.2.1" class="pilcrow">¶</a></p>
+SCTE-35 inherits cancellation from its payload semantics.
+Implementation experience favors the simple rule. When a splice
+fails, the deployed publisher publishes a complete new record with
+the same <code>m</code>, dropping the failed slot and moving the later ones to
+where they really air, and its player replaces only the events it has
+not yet fired. No patch rule has been needed so far.<a href="#section-10-2.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-9-2.3">
-          <p id="section-9-2.3.1"><strong>Deduplication and late joiners</strong>: the DASH/HLS bindings give each
+        <li id="section-10-2.3">
+          <p id="section-10-2.3.1"><strong>Deduplication and late joiners</strong>: the DASH/HLS bindings give each
 event a manifest-unique id for dedup on re-encounter; MSF records
 carry no id. Is (eventType, index, payload) a sufficient dedup key
 under relay redelivery and FETCH catch-up -- and which past records
-<span class="bcp14">MUST</span> a mid-break joiner fetch?<a href="#section-9-2.3.1" class="pilcrow">¶</a></p>
+<span class="bcp14">MUST</span> a mid-break joiner fetch? Experience so far: with one <code>pod</code>
+record per opportunity, <code>m</code> alone has served as the record key (a
+changed payload at a known <code>m</code> is a supersede), and the player fires
+each event at most once per (<code>m</code>, slot, event type). For late joiners
+the deployed publisher keeps each record in every independent Object
+until 60 s after its pod ends, and re-sends the retained array as a
+new Group about every 3 s when nothing has changed, so a subscriber
+that starts at the next Group rather than the latest one holds the
+timeline within seconds. Whether that re-send deserves a <span class="bcp14">SHOULD</span> is
+open.<a href="#section-10-2.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-9-2.4">
-          <p id="section-9-2.4.1"><strong>Switching sets</strong>: when ladder rungs are separate tracks, does one
+        <li id="section-10-2.4">
+          <p id="section-10-2.4.1"><strong>Switching sets</strong>: when ladder rungs are separate tracks, does one
 creative signaling track <code>depends</code> on all of them? Splice
 conditioning can land at slightly different media times per rung;
 container-relative interior offsets survive that, but a single <code>m</code>
@@ -1768,178 +2012,389 @@ remain valid for every rung of a switching set, (b) splice
 conditioning must keep switching sets coherent at placement
 boundaries, and (c) the delivered rendition is known only at the
 client, so rendition-level measurement is necessarily
-client-observed.<a href="#section-9-2.4.1" class="pilcrow">¶</a></p>
+client-observed.<a href="#section-10-2.4.1" class="pilcrow">¶</a></p>
+<p id="section-10-2.4.2">
+That mechanism now has a concrete shape to test against. The
+<code>SWITCH_FROM</code> proposal distinguishes an <em>aligned</em> switch, where Group
+IDs from the two tracks are compared, from an <em>unaligned</em> switch,
+where they are not. The distinction decides this issue directly: a
+single <code>m</code> on one signaling track can only address a switching set if
+switches are aligned, since an unaligned switch leaves no common
+Group-ID frame in which one index means the same instant on every
+rung. Under unaligned switching the interior offsets survive but <code>m</code>
+does not, which would push the binding toward either a per-rung
+signaling track or an index defined against something other than the
+media track's Group IDs. The proposal was not resolved at the
+2026-09-08 interim; at the 2026-10-14 interim the working group took
+the direction of reducing it to the group-aligned mode, with other
+modes left to extensions, and a consensus call is pending as of this
+revision. At least one implementation (MOQtail) reports partial
+draft-18 support, so experience should be available before this
+document has to choose.<a href="#section-10-2.4.2" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-9-2.5">
-          <p id="section-9-2.5.1"><strong>Common-format scope</strong>: is the Event Timeline binding the whole
+        <li id="section-10-2.5">
+          <p id="section-10-2.5.1"><strong>Common-format scope</strong>: is the Event Timeline binding the whole
 story, or is a container-level mapping (the envelope in CMAF <code>emsg</code>)
 also wanted so one payload survives packager transit across
-HLS/DASH/MOQT boundaries?<a href="#section-9-2.5.1" class="pilcrow">¶</a></p>
+HLS/DASH/MOQT boundaries?<a href="#section-10-2.5.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-9-2.6">
-          <p id="section-9-2.6.1"><strong>Feature negotiation on one-to-many</strong>: <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> interpreters
+        <li id="section-10-2.6">
+          <p id="section-10-2.6.1"><strong>Feature negotiation on one-to-many</strong>: <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> interpreters
 <span class="bcp14">SHOULD</span> error on unsupported flagged features -- sensible unicast
 behavior, but a broadcast publisher cannot negotiate per subscriber.
 Should the catalog advertise which features a track uses so clients
-subscribe eyes-open?<a href="#section-9-2.6.1" class="pilcrow">¶</a></p>
+subscribe eyes-open? The <code>features</code> member this rests on is
+confirmed: the Version 2 base carriage envelope defines it as an
+object of boolean flags, with <code>features.remoteFields</code> as the only
+flag so far, and requires that an interpreter encountering a flag it
+does not support <span class="bcp14">SHOULD</span> raise an error and ignore the payload. This
+revision settles the easy half by forbidding flags that <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>
+does not define (<a href="#payload" class="auto internal xref">Section 4.3</a>); the hard half -- a defined flag that
+some subscribers do not support -- remains. That rule is written for
+unicast, where the publisher learns of the failure; on one-to-many
+the publisher never hears, so the burden has to move to subscribe
+time. Note also that if the per-function tracks of a split
+(<a href="#future-carriage" class="auto internal xref">Section 9</a>) are published as separate broadcasts rather
+than sibling tracks, a subscriber selects the functions it supports
+by subscribing to them, which answers much of this for the split case
+but not for flagged features within a single track.<a href="#section-10-2.6.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-9-2.7">
-          <p id="section-9-2.7.1"><strong>Record integrity</strong>: do these records need payload signing (JWS or
-COSE over the envelope, or a catalog-pinned key) beyond transport
-authentication? See <a href="#security" class="auto internal xref">Section 11</a>.<a href="#section-9-2.7.1" class="pilcrow">¶</a></p>
+        <li id="section-10-2.7">
+          <p id="section-10-2.7.1"><strong>Record integrity</strong>: resolved in this revision in favor of
+per-record signing (<a href="#signing" class="auto internal xref">Section 4.5</a>: a detached JWS over the canonical
+record, EdDSA with Ed25519 mandatory to implement; <a href="#integrity" class="auto internal xref">Section 12.1</a>
+gives the reasoning). Two questions remain. Key distribution: the
+key set is provisioned out of band today; a key, or a key set
+location, pinned in the catalog or in a track property would let a
+client that found the track by name verify it without a separate
+channel, and is a possible <span>[<a href="#MSF" class="cite xref">MSF</a>]</span> follow-up. And the <code>sig</code> member is
+a binding-level addition to the record structure of <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-01#section-8.1" class="relref">Section 8.1</a> of [<a href="#MSF" class="cite xref">MSF</a>]</span>; a record signature defined by <span>[<a href="#MSF" class="cite xref">MSF</a>]</span> itself would serve every
+Event Timeline event class, and the authors intend to raise it
+there. A COSE encoding was considered and set aside because the
+records are JSON.<a href="#section-10-2.7.1" class="pilcrow">¶</a></p>
+</li>
+        <li id="section-10-2.8">
+          <p id="section-10-2.8.1"><strong>No stable placement identifier</strong>: <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> gives neither the Pod
+nor the Slot object an identifier. A Pod carries <code>start</code>, <code>duration</code>,
+<code>slots</code> and <code>tracking</code>; a Slot carries <code>type</code>, <code>start</code>, <code>duration</code>,
+<code>media</code>, <code>identifiers</code>, <code>tracking</code>, <code>verifications</code>, <code>skipOffset</code> and
+<code>clickThrough</code>. <code>MediaReference</code> does have an <code>id</code>, but the
+specification states that uniqueness of that value "is desired, but
+not required", so it cannot be relied on as a key. The Slot
+<code>identifiers</code> array identifies the <strong>creative</strong>, not the
+<strong>placement</strong>: the same creative may legitimately appear twice in one
+pod, and each appearance is measured separately.<a href="#section-10-2.8.1" class="pilcrow">¶</a></p>
+<p id="section-10-2.8.2">
+While an envelope carries a whole pod, correlation is structural and
+the absence costs nothing. It only bites once records are decomposed
+-- which <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> itself already does in two places, the <code>$remote</code>
+fields that resolve <code>slots</code>, <code>tracking</code> and <code>verifications</code>
+separately, and the HLS Interstitial ASSET-LIST mapping, whose own
+note observes that it "separates the Slot objects from the Pod
+objects without explicit reference". This document decomposes further
+still if the event class is split by function across sibling tracks
+(<a href="#future-carriage" class="auto internal xref">Section 9</a>), because then a tracking or verification record
+and the creative record it belongs to arrive on different tracks: a
+shared index identifies the placement opportunity, not which slot
+within it.<a href="#section-10-2.8.2" class="pilcrow">¶</a></p>
+<p id="section-10-2.8.3">
+Three ways out. Derive a composite key from what already exists --
+creative <code>identifiers</code> plus the slot's ordinal position within the
+pod, anchored by the shared index -- which needs no change to
+<span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> but is positional and therefore fragile under pod
+rewriting. Or request stable <code>id</code> fields on Pod and Slot from the
+SVTA Advertising Working Group, which is the clean fix and the one
+their ASSET-LIST note already argues for. Or define identifiers in
+this document, which is the wrong layer: payload normativity belongs
+with <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> and this binding should not fork the data model.
+The first is what an implementation can do today; the second is what
+the ecosystem should have.<a href="#section-10-2.8.3" class="pilcrow">¶</a></p>
+<p id="section-10-2.8.4">
+The deployed player (<a href="#impl-status" class="auto internal xref">Section 11</a>) takes the first way, with an
+occurrence count in place of the raw ordinal: a slot's key is its
+<code>identifiers</code> plus the number of earlier slots in the same pod that
+carry the same identifiers. That keeps a superseding record that
+drops a slot from shifting the other slots' firing history. It would
+still mis-key two appearances of one creative if a rewrite reordered
+them.<a href="#section-10-2.8.4" class="pilcrow">¶</a></p>
 </li>
       </ol>
 </section>
 </div>
 <div id="impl-status">
-<section id="section-10">
+<section id="section-11">
       <h2 id="name-implementation-status">
-<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-implementation-status" class="section-name selfRef">Implementation Status</a>
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-implementation-status" class="section-name selfRef">Implementation Status</a>
       </h2>
-<p id="section-10-1">(This section follows <span>[<a href="#RFC7942" class="cite xref">RFC7942</a>]</span> and is to be removed before
-publication as an RFC.)<a href="#section-10-1" class="pilcrow">¶</a></p>
-<p id="section-10-2">The author operates a continuously running server-side ad insertion
-deployment over MoQ. This section states what that deployment does and
-does not implement, because the two are easy to conflate: the mechanism
-this document specifies is NOT yet what the deployment publishes.<a href="#section-10-2" class="pilcrow">¶</a></p>
-<p id="section-10-3">Running today:<a href="#section-10-3" class="pilcrow">¶</a></p>
+<p id="section-11-1">(This section follows <span>[<a href="#RFC7942" class="cite xref">RFC7942</a>]</span> and is to be removed before
+publication as an RFC.)<a href="#section-11-1" class="pilcrow">¶</a></p>
+<p id="section-11-2">The author operates a continuously running server-side ad insertion
+deployment over MoQ: fixed-timeline linear channels, publisher to relay
+to browser, with ad creatives spliced server-side into one shared
+broadcast, so every subscriber receives the same media objects -- the
+condition that motivates this document (<a href="#introduction" class="auto internal xref">Section 1</a>). The relay
+is the open-source moq-relay, version 0.17.9 as of this revision; the
+publisher and player are not publicly available. Since 2026-10-22 the
+deployment publishes the event class this document defines. This
+section reports what it does, what was measured, and what is not yet
+implemented. Contact: the author.<a href="#section-11-2" class="pilcrow">¶</a></p>
+<p id="section-11-3">Publisher, live on both of the deployment's ad-inserted channels since
+2026-10-22:<a href="#section-11-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-10-4.1">
-          <p id="section-10-4.1.1">Fixed-timeline linear channels, publisher to relay to browser, with ad
-creatives spliced server-side into one shared broadcast -- so every
-subscriber receives the same media objects, which is the condition that
-motivates this document (<a href="#introduction" class="auto internal xref">Section 1</a>).<a href="#section-10-4.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-11-4.1">
+          <p id="section-11-4.1.1">Each channel's broadcast carries a sibling Event Timeline track named
+<code>ad-creative</code>, beside the deployment's earlier proprietary control
+track, which is still published in parallel.<a href="#section-11-4.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-10-4.2">
-          <p id="section-10-4.2.1">Placement opportunities detected from <strong>inbound</strong> in-band SCTE-35
-(<code>emsg</code>), parsed to a break window and duration. The deployment
-consumes SCTE-35; it does not publish SCTE-35 records, and it does not
-publish a splice signaling track.<a href="#section-10-4.2.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-11-4.2">
+          <p id="section-11-4.2.1">Each placement opportunity is one record,
+<code>{"m": ..., "data": {"version": 2, "type": "pod", "payload": [...]}}</code>,
+where <code>m</code> is the media time, in milliseconds on the timeline of the
+media track, of the pod's first video frame. Envelopes carry no
+<code>features</code> member. Slot identifiers use a proprietary identifier
+scheme; tracking URLs are capability URLs (<a href="#capability-urls" class="auto internal xref">Section 7</a>).<a href="#section-11-4.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-10-4.3">
-          <p id="section-10-4.3.1">Creative identity and per-creative tracking published <strong>in band</strong>,
-ahead of the splice, on a control track the subscriber reads before the
-first event renders. That validates the delivery model in
-<a href="#publication-lead" class="auto internal xref">Section 5.3</a>. The track's schema is the deployment's own and is
-NOT the event class defined here.<a href="#section-10-4.3.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-11-4.3">
+          <p id="section-11-4.3.1">Objects follow <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-01#section-8.3" class="relref">Section 8.3</a> of [<a href="#MSF" class="cite xref">MSF</a>]</span>: each change starts a new Group
+whose single Object is the independent array of every retained
+record, with no incremental Objects. The first Group ID is taken from
+the wallclock in milliseconds, per the restart rule of
+<span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-01#section-6.1" class="relref">Section 6.1</a> of [<a href="#MSF" class="cite xref">MSF</a>]</span>, and that first Object is the empty array.<a href="#section-11-4.3.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-10-4.4">
-          <p id="section-10-4.4.1">Tracking indirection exactly as described in <a href="#capability-urls" class="auto internal xref">Section 7</a>: a
-proxy holds vendor beacon URLs and returns compact per-event
-capability URLs, which devices fire with their own client identifier,
-with per-<code>{uuid, event, client}</code> deduplication so a shared broadcast
-yields per-device counts. This is the part of the document with the
-most operational experience behind it.<a href="#section-10-4.4.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-11-4.4">
+          <p id="section-11-4.4.1">A read-only validator subscribes to the track and checks every
+Object: a JSON array of records, each with exactly one index field
+and a Version 2 envelope whose payload has the <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> shape
+(member names and types, MediaTime values in seconds, identifiers,
+non-empty <code>urls</code>, defined event types, no undefined feature flag). It
+runs against the deployment's channels.<a href="#section-11-4.4.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-10-4.5">
-          <p id="section-10-4.5.1">An MSF catalog, published automatically by the MoQ implementation in
+      </ul>
+<p id="section-11-5">Added on 2026-10-25:<a href="#section-11-5" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-11-6.1">
+          <p id="section-11-6.1.1">Measured slots: each Slot's <code>start</code> and <code>duration</code> are measured from
+the creatives actually spliced, rather than taken from the durations
+the ad decision declares.<a href="#section-11-6.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-11-6.2">
+          <p id="section-11-6.2.1">Supersede: when a splice fails, the publisher publishes a new record
+with the same <code>m</code>, which drops the failed slot (item 2 of
+<a href="#open-issues" class="auto internal xref">Section 10</a>).<a href="#section-11-6.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-11-6.3">
+          <p id="section-11-6.3.1">Heartbeat: when nothing has changed for about 3 s, the retained array
+is re-sent as a new Group, so a late joiner that starts at the next
+Group receives the records within seconds (item 3 of
+<a href="#open-issues" class="auto internal xref">Section 10</a>).<a href="#section-11-6.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-11-6.4">
+          <p id="section-11-6.4.1">Device beacons: when device beacons are enabled, the browser player
+fires tracking requests from the records on its synchronization clock
+-- the media time it is presenting, the <code>sync.now()</code> clock of the
+open-source <code>&lt;moq-watch&gt;</code> player element -- rather than from the
+wallclock less an assumed latency. A late joiner fires <code>podStart</code> on
+joining, nothing for the slot already in progress, and full chains for
+the slots after it. The player falls back to the earlier control-track
+model when that clock is unavailable or no record arrives within 5 s.<a href="#section-11-6.4.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-11-7">Measured:<a href="#section-11-7" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-11-8.1">
+          <p id="section-11-8.1.1">On a test rig (15 pods, one creative the importer refuses), every one
+of the 31 slot boundaries the records claimed matched the splice gaps
+in the exported media to the millisecond, and the refused creative
+produced superseding records. The durations the ad decision declared
+would have been 36 to 350 ms early.<a href="#section-11-8.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-11-8.2">
+          <p id="section-11-8.2.1">Replaying the rig's captured records against a simulated playhead,
+the player's fires came 0.3 to 5.0 ms after the media time, none early
+(142 fires at a 4 s playback delay).<a href="#section-11-8.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-11-8.3">
+          <p id="section-11-8.3.1">In an observe-only browser session against the running deployment on
+2026-10-24 (requests logged, not sent), one 4-ad pod produced 33
+events in order: <code>podStart</code>; then <code>impression</code>, <code>start</code>, the three
+quartiles and <code>complete</code> for each ad; then <code>podEnd</code>. For its 25
+time-based events, device times trailed the publisher's server-side
+tracking by 3.58 to 4.07 s, which is the configured 4 s playback
+delay, with at most 8 ms of spread within each ad.<a href="#section-11-8.3.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-11-9">Unchanged from the previous revision:<a href="#section-11-9" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-11-10.1">
+          <p id="section-11-10.1.1">Placement opportunities on the live channel detected from
+<strong>inbound</strong> in-band SCTE-35, parsed to a break window and duration.
+The deployment consumes SCTE-35; it does not publish a splice
+signaling track.<a href="#section-11-10.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-11-10.2">
+          <p id="section-11-10.2.1">Tracking indirection as described in <a href="#capability-urls" class="auto internal xref">Section 7</a>: a proxy
+holds vendor beacon URLs and returns compact per-event capability
+URLs, which devices request with their own client identifier, with
+per-<code>{uuid, event, client}</code> deduplication so a shared broadcast
+yields per-device counts. The deployment converged on it for a
+concrete reason: a single impression in this inventory carries
+roughly 5 to 15 vendor tracking URLs, so firing them from the client
+directly means 5 to 15 device requests per impression, multiplied by
+every subscriber to a shared broadcast. A capability URL is one device
+request that the proxy fans out server-side, which makes the
+device-side cost independent of how many vendors a creative carries
+(<a href="#amplification" class="auto internal xref">Section 12.2</a>).<a href="#section-11-10.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-11-10.3">
+          <p id="section-11-10.3.1">An MSF catalog, published automatically by the MoQ implementation in
 use and verified against an interop profile by a tool in the same
-codebase. A capture from the live deployment validates clean, so the
-transport and catalog layers this document builds on are exercised,
-not assumed.<a href="#section-10-4.5.1" class="pilcrow">¶</a></p>
+codebase.<a href="#section-11-10.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-10-5">NOT yet implemented:<a href="#section-10-5" class="pilcrow">¶</a></p>
+<p id="section-11-11">NOT yet implemented:<a href="#section-11-11" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-10-6.1">
-          <p id="section-10-6.1.1">The event class this document defines. No track advertises
-<code>eventType</code> <code>urn:svta:advertising-wg:ad-creative-signaling</code>, and no
-record carries an SVTA 2053-1 Version 2 carriage envelope
-(<a href="#payload" class="auto internal xref">Section 4.3</a>). Migrating the control track to the envelope form is in
-progress.<a href="#section-10-6.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-11-12.1">
+          <p id="section-11-12.1.1">Record signatures (<a href="#signing" class="auto internal xref">Section 4.5</a>). Records are published without a
+<code>sig</code> member as of this revision, and the validator does not check
+one. The signing and verification code is the published script
+(<span>[<a href="#VECTORS" class="cite xref">VECTORS</a>]</span>), not yet the publisher.<a href="#section-11-12.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-10-6.2">
-          <p id="section-10-6.2.1">The IANA registration in <a href="#iana" class="auto internal xref">Section 12</a>, which this document requests.<a href="#section-10-6.2.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-11-12.2">
+          <p id="section-11-12.2.1">Catalog listing. The <code>ad-creative</code> track is not yet listed in the MSF
+catalog, because the MoQ library in use does not yet emit
+<code>eventtimeline</code> entries; that needs an upstream change. Consumers find
+the track by name.<a href="#section-11-12.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-10-6.3">
-          <p id="section-10-6.3.1">Correlation with a co-published splice signaling track
-(<a href="#correlation" class="auto internal xref">Section 5.2</a>), since no such track is published.<a href="#section-10-6.3.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-11-12.3">
+          <p id="section-11-12.3.1">The publication lead of <a href="#publication-lead" class="auto internal xref">Section 5.3</a>. Records are published
+when the break opens, immediately before the pod's first media
+Object, not a full Group ahead. Devices still hold the record before
+the splice renders because they present several seconds behind
+delivery, but the <span class="bcp14">SHOULD</span> is not met.<a href="#section-11-12.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-11-12.4">
+          <p id="section-11-12.4.1">Device requests on the running deployment. The tracking endpoint the
+deployment publishes is reachable only from the service network, so
+there the device beacons have been observed but not sent, and the
+publisher's own server-side requests continue in parallel. A
+publicly reachable endpoint that satisfies <a href="#validation" class="auto internal xref">Section 12.3</a> is the
+remaining step.<a href="#section-11-12.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-11-12.5">
+          <p id="section-11-12.5.1"><code>slot</code>, <code>trackingEvent</code> and <code>verification</code> envelopes, <code>$remote</code>, and
+the Slot members <code>media</code>, <code>verifications</code>, <code>skipOffset</code> and
+<code>clickThrough</code>.<a href="#section-11-12.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-11-12.6">
+          <p id="section-11-12.6.1">A splice signaling track, and so the correlation rules of
+<a href="#correlation" class="auto internal xref">Section 5.2</a>.<a href="#section-11-12.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-11-12.7">
+          <p id="section-11-12.7.1">The IANA registration in <a href="#iana" class="auto internal xref">Section 13</a>, which this document requests.<a href="#section-11-12.7.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-10-7">Consequently the timing and lead-time rules in <a href="#timing" class="auto internal xref">Section 5</a> and
-<a href="#publication-lead" class="auto internal xref">Section 5.3</a> derive from running code, while the record format
-in <a href="#record-format" class="auto internal xref">Section 4</a> and the payload constraint in <a href="#payload" class="auto internal xref">Section 4.3</a> are
-specified but unexercised. The JSON Schema and test vectors in
-<a href="#schema" class="auto internal xref">Appendix "JSON Schema and Test Vectors"</a> are conformance examples written against this specification,
-not captured output; the rules they express are executed in the
-implementation's own test suite, so they are internally consistent, but
-they have not yet been produced by a publisher.<a href="#section-10-7" class="pilcrow">¶</a></p>
-<p id="section-10-8"></p>
+<p id="section-11-13">No independent implementation of this document is known to the author.<a href="#section-11-13" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="security">
-<section id="section-11">
+<section id="section-12">
       <h2 id="name-security-considerations">
-<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
 <div id="integrity">
-<section id="section-11.1">
+<section id="section-12.1">
         <h3 id="name-integrity-of-tracking-recor">
-<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-integrity-of-tracking-recor" class="section-name selfRef">Integrity of Tracking Records</a>
+<a href="#section-12.1" class="section-number selfRef">12.1. </a><a href="#name-integrity-of-tracking-recor" class="section-name selfRef">Integrity of Tracking Records</a>
         </h3>
-<p id="section-11.1-1">Tracking URLs move money. A relay path is not end-to-end confidential
-or authentic by default, and a tampered creative signaling record turns
-a large synchronized audience into a request cannon aimed at an
-arbitrary URL -- amplifying the denial-of-service concerns already
+<p id="section-12.1-1">Tracking URLs move money. A relay path is not end-to-end confidential
+or authentic by default: each hop has its own transport security, but a
+relay, a cache, or any party able to rewrite Objects between publisher
+and subscriber can alter a record, and a tampered creative signaling
+record turns a large synchronized audience into a request cannon aimed
+at an arbitrary URL -- amplifying the denial-of-service concerns already
 noted for splice records (Section 6.3 of <span>[<a href="#SCTE35-MOQ" class="cite xref">SCTE35-MOQ</a>]</span>) with an
-attacker-chosen target. Deployments <span class="bcp14">MUST</span> authenticate the publication
-path for this track, and receivers <span class="bcp14">SHOULD</span> restrict tracking requests to
-URL authorities the distributor has designated (capability URLs at a
-distributor endpoint make this restriction natural). Whether records
-additionally need payload signing is tracked in <a href="#open-issues" class="auto internal xref">Section 9</a>.<a href="#section-11.1-1" class="pilcrow">¶</a></p>
+attacker-chosen target. The same party can suppress measurement by
+deleting tracking entries, or misattribute it by substituting a record
+meant for another placement.<a href="#section-12.1-1" class="pilcrow">¶</a></p>
+<p id="section-12.1-2">This is why <a href="#signing" class="auto internal xref">Section 4.5</a> requires every record to carry a public key
+signature that the subscriber verifies: transport authentication
+protects a hop, the signature protects the record. The signature
+covers the whole record -- index reference and envelope -- so deletion,
+insertion and reordering of tracking entries are detectable, not only
+changes to URLs. It is asymmetric so that holding the verification key,
+as every subscriber does, confers no ability to forge; a shared secret
+would make every subscriber a potential publisher. Deployments <span class="bcp14">MUST</span>
+additionally authenticate the publication path for this track: an
+unauthenticated publisher cannot forge a record that verifies, but it
+can replace or suppress the track, which no signature prevents.
+Receivers <span class="bcp14">SHOULD</span> restrict tracking requests to URL authorities the
+distributor has designated; capability URLs at a distributor endpoint
+make this restriction natural.<a href="#section-12.1-2" class="pilcrow">¶</a></p>
+<p id="section-12.1-3">Verification has limits. A hostile client can skip the check, so the
+signature is detection and deterrence on the network path, not
+prevention at the device; enforcement against forged requests belongs
+at the distributor's tracking endpoint. A signature over content proves
+origin, not freshness. Replay is bounded by the index reference -- a
+record is acted on at the media time it names, and the accessible
+window of <a href="#record-structure" class="auto internal xref">Section 4.1</a> is short -- and substitution is bounded
+by per-channel keys (<a href="#signing" class="auto internal xref">Section 4.5</a>); a deployment that needs tighter
+binding can place further context in the protected header by agreement
+with its clients. In return, verifying clients give the distributor
+something a publisher cannot otherwise observe on one-to-many
+delivery: evidence of tampering on paths it does not operate.<a href="#section-12.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="amplification">
-<section id="section-11.2">
+<section id="section-12.2">
         <h3 id="name-amplification-and-load">
-<a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-amplification-and-load" class="section-name selfRef">Amplification and Load</a>
+<a href="#section-12.2" class="section-number selfRef">12.2. </a><a href="#name-amplification-and-load" class="section-name selfRef">Amplification and Load</a>
         </h3>
-<p id="section-11.2-1">Even absent an attacker, activation-synchronized behavior across a
+<p id="section-12.2-1">Even absent an attacker, activation-synchronized behavior across a
 broadcast audience is a self-inflicted denial of service; the
 mitigations in <a href="#load-shaping" class="auto internal xref">Section 7.2</a> are accordingly stated as client
 SHOULDs. Capability URLs bound the blast radius of both cases: devices
 address the distributor's endpoint, which applies its own policy before
-any vendor is contacted.<a href="#section-11.2-1" class="pilcrow">¶</a></p>
+any vendor is contacted.<a href="#section-12.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="validation">
-<section id="section-11.3">
+<section id="section-12.3">
         <h3 id="name-payload-validation">
-<a href="#section-11.3" class="section-number selfRef">11.3. </a><a href="#name-payload-validation" class="section-name selfRef">Payload Validation</a>
+<a href="#section-12.3" class="section-number selfRef">12.3. </a><a href="#name-payload-validation" class="section-name selfRef">Payload Validation</a>
         </h3>
-<p id="section-11.3-1">Receivers <span class="bcp14">MUST</span> treat record payloads as untrusted input: enforce size
+<p id="section-12.3-1">Receivers <span class="bcp14">MUST</span> treat record payloads as untrusted input: enforce size
 and nesting limits on the JSON envelope, and accept only <code>https</code> URLs
 in tracking, <code>$remote</code>, and verification fields. Verification resources
 are executable code; clients <span class="bcp14">MUST</span> apply their platform's script-loading
-policy and <span class="bcp14">SHOULD</span> load them only for slots that will actually render.<a href="#section-11.3-1" class="pilcrow">¶</a></p>
+policy and <span class="bcp14">SHOULD</span> load them only for slots that will actually render.<a href="#section-12.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="privacy">
-<section id="section-11.4">
+<section id="section-12.4">
         <h3 id="name-privacy">
-<a href="#section-11.4" class="section-number selfRef">11.4. </a><a href="#name-privacy" class="section-name selfRef">Privacy</a>
+<a href="#section-12.4" class="section-number selfRef">12.4. </a><a href="#name-privacy" class="section-name selfRef">Privacy</a>
         </h3>
-<p id="section-11.4-1">By construction, the shared timeline carries no per-user data: records
+<p id="section-12.4-1">By construction, the shared timeline carries no per-user data: records
 are identical for every subscriber, per-device identity is appended by
 the client at request time (<a href="#client-identity" class="auto internal xref">Section 7.1</a>), and identifiers are
 pseudonymous and session-scoped. Indirection through capability URLs
 additionally keeps vendor endpoint inventories and macro-expanded
 values out of relay caches. Distributor tracking endpoints handle real
 device context (addresses, user agents) and <span class="bcp14">MUST</span> apply applicable
-consent and data-protection policy before forwarding it to vendors.<a href="#section-11.4-1" class="pilcrow">¶</a></p>
+consent and data-protection policy before forwarding it to vendors.<a href="#section-12.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="iana">
-<section id="section-12">
+<section id="section-13">
       <h2 id="name-iana-considerations">
-<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-13" class="section-number selfRef">13. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-12-1">This document requests registration of the following entry in the "MSF
+<p id="section-13-1">This document requests registration of the following entry in the "MSF
 Event Timeline Types" registry established by <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-01#section-14.2" class="relref">Section 14.2</a> of [<a href="#MSF" class="cite xref">MSF</a>]</span>.
 <span>[<a href="#SCTE35-MOQ" class="cite xref">SCTE35-MOQ</a>]</span> registers entries in that same registry; this document
-follows the same pattern.<a href="#section-12-1" class="pilcrow">¶</a></p>
+follows the same pattern.<a href="#section-13-1" class="pilcrow">¶</a></p>
 <span id="name-addition-to-the-msf-event-t"></span><table class="center" id="table-1">
         <caption>
 <a href="#table-1" class="selfRef">Table 1</a>:
@@ -1961,20 +2416,20 @@ follows the same pattern.<a href="#section-12-1" class="pilcrow">¶</a></p>
           </tr>
         </tbody>
       </table>
-<p id="section-12-3">Editor's note (to be resolved before publication): the URN is defined and
+<p id="section-13-3">Editor's note (to be resolved before publication): the URN is defined and
 owned by the SVTA Advertising Working Group; this registration is made in
-coordination with that group.<a href="#section-12-3" class="pilcrow">¶</a></p>
+coordination with that group.<a href="#section-13-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="sec-combined-references">
-<section id="section-13">
+<section id="section-14">
       <h2 id="name-references">
-<a href="#section-13" class="section-number selfRef">13. </a><a href="#name-references" class="section-name selfRef">References</a>
+<a href="#section-14" class="section-number selfRef">14. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
 <div id="sec-normative-references">
-<section id="section-13.1">
+<section id="section-14.1">
         <h3 id="name-normative-references">
-<a href="#section-13.1" class="section-number selfRef">13.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<a href="#section-14.1" class="section-number selfRef">14.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
 <dt id="MSF">[MSF]</dt>
@@ -1985,6 +2440,26 @@ coordination with that group.<a href="#section-12-3" class="pilcrow">¶</a></p>
         <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC7515">[RFC7515]</dt>
+        <dd>
+<span class="refAuthor">Jones, M.</span>, <span class="refAuthor">Bradley, J.</span>, and <span class="refAuthor">N. Sakimura</span>, <span class="refTitle">"JSON Web Signature (JWS)"</span>, <span class="seriesInfo">RFC 7515</span>, <span class="seriesInfo">DOI 10.17487/RFC7515</span>, <time datetime="2015-05" class="refDate">May 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7515">https://www.rfc-editor.org/rfc/rfc7515</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7517">[RFC7517]</dt>
+        <dd>
+<span class="refAuthor">Jones, M.</span>, <span class="refTitle">"JSON Web Key (JWK)"</span>, <span class="seriesInfo">RFC 7517</span>, <span class="seriesInfo">DOI 10.17487/RFC7517</span>, <time datetime="2015-05" class="refDate">May 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7517">https://www.rfc-editor.org/rfc/rfc7517</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC7797">[RFC7797]</dt>
+        <dd>
+<span class="refAuthor">Jones, M.</span>, <span class="refTitle">"JSON Web Signature (JWS) Unencoded Payload Option"</span>, <span class="seriesInfo">RFC 7797</span>, <span class="seriesInfo">DOI 10.17487/RFC7797</span>, <time datetime="2016-02" class="refDate">February 2016</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7797">https://www.rfc-editor.org/rfc/rfc7797</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8032">[RFC8032]</dt>
+        <dd>
+<span class="refAuthor">Josefsson, S.</span> and <span class="refAuthor">I. Liusvaara</span>, <span class="refTitle">"Edwards-Curve Digital Signature Algorithm (EdDSA)"</span>, <span class="seriesInfo">RFC 8032</span>, <span class="seriesInfo">DOI 10.17487/RFC8032</span>, <time datetime="2017-01" class="refDate">January 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8032">https://www.rfc-editor.org/rfc/rfc8032</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="RFC8037">[RFC8037]</dt>
+        <dd>
+<span class="refAuthor">Liusvaara, I.</span>, <span class="refTitle">"CFRG Elliptic Curve Diffie-Hellman (ECDH) and Signatures in JSON Object Signing and Encryption (JOSE)"</span>, <span class="seriesInfo">RFC 8037</span>, <span class="seriesInfo">DOI 10.17487/RFC8037</span>, <time datetime="2017-01" class="refDate">January 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8037">https://www.rfc-editor.org/rfc/rfc8037</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
         <dd>
 <span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
@@ -1993,17 +2468,22 @@ coordination with that group.<a href="#section-12-3" class="pilcrow">¶</a></p>
         <dd>
 <span class="refAuthor">Bray, T., Ed.</span>, <span class="refTitle">"The JavaScript Object Notation (JSON) Data Interchange Format"</span>, <span class="seriesInfo">STD 90</span>, <span class="seriesInfo">RFC 8259</span>, <span class="seriesInfo">DOI 10.17487/RFC8259</span>, <time datetime="2017-12" class="refDate">December 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8259">https://www.rfc-editor.org/rfc/rfc8259</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="RFC8785">[RFC8785]</dt>
+        <dd>
+<span class="refAuthor">Rundgren, A.</span>, <span class="refAuthor">Jordan, B.</span>, and <span class="refAuthor">S. Erdtman</span>, <span class="refTitle">"JSON Canonicalization Scheme (JCS)"</span>, <span class="seriesInfo">RFC 8785</span>, <span class="seriesInfo">DOI 10.17487/RFC8785</span>, <time datetime="2020-06" class="refDate">June 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8785">https://www.rfc-editor.org/rfc/rfc8785</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="SVTA2053">[SVTA2053]</dt>
       <dd>
-<span class="refAuthor">Streaming Video Technology Alliance (SVTA), Advertising Working Group</span>, <span class="refTitle">"SVTA 2053-1: Ad Creative Signaling in DASH and HLS, Revision 1.0"</span>, <time datetime="2025-05-19" class="refDate">19 May 2025</time>, <span>&lt;<a href="https://www.svta.org/">https://www.svta.org/</a>&gt;</span>. </dd>
+<span class="refAuthor">Streaming Video Technology Alliance (SVTA), Advertising Working Group</span>, <span class="refTitle">"Ad Creative Signaling in DASH and HLS"</span>, <span class="seriesInfo">SVTA 2053-1, Revision 1.0</span>, <time datetime="2025-05-19" class="refDate">19 May 2025</time>, <span>&lt;<a href="https://www.svta.org/product/svta2053-1/">https://www.svta.org/product/svta2053-1/</a>&gt;</span>. <span class="annotation">This document uses the Version 2 data carriage scheme and object model (Sections 4 and 5.2).</span>
+        </dd>
 <dd class="break"></dd>
 </dl>
 </section>
 </div>
 <div id="sec-informative-references">
-<section id="section-13.2">
+<section id="section-14.2">
         <h3 id="name-informative-references">
-<a href="#section-13.2" class="section-number selfRef">13.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+<a href="#section-14.2" class="section-number selfRef">14.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
 <dt id="CAP-URLS">[CAP-URLS]</dt>
@@ -2012,7 +2492,11 @@ coordination with that group.<a href="#section-12-3" class="pilcrow">¶</a></p>
 <dd class="break"></dd>
 <dt id="MOQT">[MOQT]</dt>
         <dd>
-<span class="refAuthor">Nandakumar, S.</span>, <span class="refAuthor">Vasiliev, V.</span>, <span class="refAuthor">Swett, I.</span>, and <span class="refAuthor">A. Frindell</span>, <span class="refTitle">"Media over QUIC Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-transport-19</span>, <time datetime="2026-07-06" class="refDate">6 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-19">https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-19</a>&gt;</span>. </dd>
+<span class="refAuthor">Nandakumar, S.</span>, <span class="refAuthor">Vasiliev, V.</span>, <span class="refAuthor">Swett, I.</span>, and <span class="refAuthor">A. Frindell</span>, <span class="refTitle">"Media over QUIC Transport"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-moq-transport-22</span>, <time datetime="2026-10-01" class="refDate">1 October 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22">https://datatracker.ietf.org/doc/html/draft-ietf-moq-transport-22</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="MOQT-SUBGROUP-PROPS">[MOQT-SUBGROUP-PROPS]</dt>
+        <dd>
+<span class="refAuthor">Hošna, M.</span>, <span class="refTitle">"Add Subgroup Properties"</span>, <span class="seriesInfo">moq-transport Pull Request 2023</span>, <time datetime="2026-10" class="refDate">October 2026</time>, <span>&lt;<a href="https://github.com/moq-wg/moq-transport/pull/2023">https://github.com/moq-wg/moq-transport/pull/2023</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="OMSDK">[OMSDK]</dt>
         <dd>
@@ -2030,9 +2514,18 @@ coordination with that group.<a href="#section-12-3" class="pilcrow">¶</a></p>
         <dd>
 <span class="refAuthor">Law, W.</span> and <span class="refAuthor">S. Nandakumar</span>, <span class="refTitle">"SCTE35 transmission over MSF Event Timeline"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-wilaw-moq-scte35-event-timeline-00</span>, <time datetime="2026-07-06" class="refDate">6 July 2026</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-wilaw-moq-scte35-event-timeline-00">https://datatracker.ietf.org/doc/html/draft-wilaw-moq-scte35-event-timeline-00</a>&gt;</span>. </dd>
 <dd class="break"></dd>
+<dt id="SVTA2053-2">[SVTA2053-2]</dt>
+        <dd>
+<span class="refAuthor">Streaming Video Technology Alliance (SVTA)</span>, <span class="refTitle">"Non-Linear (Concurrent) Ad and Media Experiences: SVTA2053-2 Ad Creative Signaling in DASH and HLS, 3rd Edition, with Reference Implementations"</span>, <span>&lt;<a href="https://www.svta.org/project/non-linear-concurrent-ad-and-media-experiences-svta2053-2-ad-creative-signaling-in-dash-and-hls-3rd-edition-with-reference-implementations/">https://www.svta.org/project/non-linear-concurrent-ad-and-media-experiences-svta2053-2-ad-creative-signaling-in-dash-and-hls-3rd-edition-with-reference-implementations/</a>&gt;</span>. <span class="annotation">Work in progress; publication planned by January 2027.</span>
+        </dd>
+<dd class="break"></dd>
 <dt id="VAST">[VAST]</dt>
-      <dd>
+        <dd>
 <span class="refAuthor">IAB Technology Laboratory</span>, <span class="refTitle">"Digital Video Ad Serving Template (VAST), Version 4.2"</span>, <time datetime="2019-06" class="refDate">June 2019</time>, <span>&lt;<a href="https://iabtechlab.com/standards/vast/">https://iabtechlab.com/standards/vast/</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+<dt id="VECTORS">[VECTORS]</dt>
+      <dd>
+<span class="refAuthor">Riedl, S.</span>, <span class="refTitle">"draft-riedl-moq-ad-creative-signaling source repository: schema/ and vectors/"</span>, <span>&lt;<a href="https://github.com/riedlse/draft-riedl-moq-ad-creative-signaling">https://github.com/riedlse/draft-riedl-moq-ad-creative-signaling</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
@@ -2046,9 +2539,12 @@ coordination with that group.<a href="#section-12-3" class="pilcrow">¶</a></p>
       </h2>
 <p id="appendix-A-1">This document deliberately reuses the carriage pattern established by
 Will Law and Suhas Nandakumar in <span>[<a href="#SCTE35-MOQ" class="cite xref">SCTE35-MOQ</a>]</span>, and is designed to
-compose with it. The payload data model is the work of the SVTA
-Advertising Working Group <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
-<p id="appendix-A-2"></p>
+compose with it. Will Law also suggested splitting ad signaling by
+function across Event Timeline tracks (<a href="#future-carriage" class="auto internal xref">Section 9</a>). The payload
+data model is the work of the SVTA Advertising Working Group
+<span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-2">Thanks to Will Law, Suhas Nandakumar, Gwendal Simon and Giovanni Marzot
+for early review and discussion of this document.<a href="#appendix-A-2" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="schema">
@@ -2057,15 +2553,30 @@ Advertising Working Group <span>[<a href="#SVTA2053" class="cite xref">SVTA2053<
 <a href="#name-json-schema-and-test-vector" class="section-name selfRef">JSON Schema and Test Vectors</a>
       </h2>
 <p id="appendix-B-1">A JSON Schema for the record shape and a set of test vectors are published
-alongside this document at
-<a href="https://riedlse.github.io/draft-riedl-moq-ad-creative-signaling/">https://riedlse.github.io/draft-riedl-moq-ad-creative-signaling/</a>.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
-<p id="appendix-B-2">The schema encodes exactly the two requirements of <a href="#record-structure" class="auto internal xref">Section 4.1</a> — one
-index reference field, and a <code>data</code> member holding one Version 2 envelope — and
-nothing further; the envelope's own contents are governed by <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>, not
-by this document.<a href="#appendix-B-2" class="pilcrow">¶</a></p>
-<p id="appendix-B-3">The vectors come in two sets, and both matter: six that <span class="bcp14">MUST</span> validate, and six
-that <span class="bcp14">MUST NOT</span>. A validator that accepts everything passes the first set alone.
-The rejecting cases pin the constraints most likely to be implemented loosely:<a href="#appendix-B-3" class="pilcrow">¶</a></p>
+in the <code>schema/</code> and <code>vectors/</code> directories of this document's source
+repository <span>[<a href="#VECTORS" class="cite xref">VECTORS</a>]</span>.<a href="#appendix-B-1" class="pilcrow">¶</a></p>
+<p id="appendix-B-2">The schema encodes the record requirements of <a href="#record-structure" class="auto internal xref">Section 4.1</a> and
+<a href="#payload" class="auto internal xref">Section 4.3</a>: exactly one index reference field, typed as <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-01#section-8.1" class="relref">Section 8.1</a> of [<a href="#MSF" class="cite xref">MSF</a>]</span> requires, and a <code>data</code> member holding one Version 2 envelope that
+satisfies the envelope rules of Section 5.2.2.1 of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> --
+<code>version</code> 2, one of the four envelope types, a non-empty <code>payload</code>
+array, and no <code>features</code> flag set that <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> does not define. It
+does not validate the payload objects themselves; those are governed by
+<span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>, not by this document. It checks the shape of the <code>sig</code>
+member of <a href="#signing" class="auto internal xref">Section 4.5</a> when one is present but does not require it, so
+that it continues to validate the unsigned records the deployment
+publishes today (<a href="#impl-status" class="auto internal xref">Section 11</a>); verifying a signature is in any case
+not a schema check.<a href="#appendix-B-2" class="pilcrow">¶</a></p>
+<p id="appendix-B-3">The vectors come in two sets, and both matter: ten files holding twelve
+records that <span class="bcp14">MUST</span> validate, and eleven records that <span class="bcp14">MUST NOT</span>. A validator
+that accepts everything passes the first set alone. The valid set covers
+each envelope type and each index type, back-to-back placement
+opportunities, the worked example of <a href="#example" class="auto internal xref">Section 6</a>, one Object captured
+from the running deployment, and <code>signed-pod</code>, a record carrying the
+<code>sig</code> member of <a href="#signing" class="auto internal xref">Section 4.5</a>; the Ed25519 test key that signed it is
+published beside it under <code>vectors/keys/</code>, with a script under
+<code>scripts/</code> that signs and verifies records. Each rejecting case is otherwise valid, so
+it fails for the reason its name claims; together they pin the
+constraints most likely to be implemented loosely:<a href="#appendix-B-3" class="pilcrow">¶</a></p>
 <table class="center" id="table-2">
         <caption><a href="#table-2" class="selfRef">Table 2</a></caption>
 <thead>
@@ -2089,6 +2600,13 @@ The rejecting cases pin the constraints most likely to be implemented loosely:<a
           </tr>
           <tr>
             <td class="text-left" rowspan="1" colspan="1">
+              <code>string-wallclock-index</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>t</code> is a date string; <span>[<a href="#MSF" class="cite xref">MSF</a>]</span> requires a Number</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
               <code>missing-data</code>
 </td>
             <td class="text-left" rowspan="1" colspan="1">index only, no envelope</td>
@@ -2101,81 +2619,219 @@ The rejecting cases pin the constraints most likely to be implemented loosely:<a
           </tr>
           <tr>
             <td class="text-left" rowspan="1" colspan="1">
+              <code>unwrapped-pod</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">a Version 2 Pod object with no envelope around it</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
               <code>wrong-envelope-version</code>
 </td>
             <td class="text-left" rowspan="1" colspan="1">
-              <code>"version": 1</code> inside <code>data</code>
-</td>
+              <code>"version": 1</code> in an otherwise Version 2 envelope</td>
           </tr>
           <tr>
             <td class="text-left" rowspan="1" colspan="1">
               <code>unknown-envelope-type</code>
 </td>
-            <td class="text-left" rowspan="1" colspan="1">a <code>type</code> outside <code>pod</code>, <code>slot</code>, <code>trackingEvent</code>
+            <td class="text-left" rowspan="1" colspan="1">a <code>type</code> outside <code>pod</code>, <code>slot</code>, <code>trackingEvent</code> and <code>verification</code>
 </td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>empty-payload</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">an empty <code>payload</code>; the envelope requires at least one object</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>undefined-feature-flag</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">sets a <code>features</code> flag that <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> does not define, so a conforming interpreter discards the record</td>
+          </tr>
+          <tr>
+            <td class="text-left" rowspan="1" colspan="1">
+              <code>malformed-signature</code>
+</td>
+            <td class="text-left" rowspan="1" colspan="1">a <code>sig</code> member that is not a detached compact JWS (<a href="#signing" class="auto internal xref">Section 4.5</a>)</td>
           </tr>
         </tbody>
       </table>
-<p id="appendix-B-5">A minimal conforming record, one <code>pod</code> envelope describing a single 30 s
-creative with its quartile chain (timings taken from a running deployment, so
-the values are the real ones a 30 s transcode produces -- note <code>30030</code>, not
-<code>30000</code>):<a href="#appendix-B-5" class="pilcrow">¶</a></p>
-<div class="lang-json sourcecode" id="appendix-B-6">
+<p id="appendix-B-5">The following record is the first of the two in the <code>captured-object</code>
+vector: one Event Timeline Object, captured read-only from the running
+deployment (<a href="#impl-status" class="auto internal xref">Section 11</a>) on 2026-10-26 and then anonymized. The
+creative identifiers, the identifier scheme, and every tracking URL
+(scheme, host and path) were replaced with placeholders; everything else
+is as published -- the index, the MediaTime values, the slot structure,
+and the event types and their order. The slot durations are measured
+from the spliced media rather than declared, which is why they are not
+round numbers:<a href="#appendix-B-5" class="pilcrow">¶</a></p>
+<div class="breakable lang-json sourcecode" id="appendix-B-6">
 <pre>
 {
-  "m": 60000,
+  "m": 82005596,
   "data": {
     "version": 2,
     "type": "pod",
-    "payload": [
-      {
-        "id": "brk-947",
-        "startTime": 60000,
-        "duration": 30030,
-        "slots": [
-          {
-            "id": "ad-32600921",
-            "index": 0,
-            "startTime": 60000,
-            "duration": 30030,
-            "trackingEvents": [
-              { "event": "start",         "startTime": 0,
-                "urls": ["https://aip.example/v2/impression/9f2c1e84-.../start"] },
-              { "event": "firstQuartile", "startTime": 7507,
-                "urls": ["https://aip.example/v2/impression/9f2c1e84-.../firstQuartile"] },
-              { "event": "midpoint",      "startTime": 15015,
-                "urls": ["https://aip.example/v2/impression/9f2c1e84-.../midpoint"] },
-              { "event": "thirdQuartile", "startTime": 22522,
-                "urls": ["https://aip.example/v2/impression/9f2c1e84-.../thirdQuartile"] },
-              { "event": "complete",      "startTime": 30030,
-                "urls": ["https://aip.example/v2/impression/9f2c1e84-.../complete"] }
-            ]
-          }
-        ]
-      }
-    ],
-    "features": { "capabilityUrls": true, "perDeviceDedup": true }
+    "payload": [{
+      "duration": 60.117,
+      "slots": [
+        {
+          "type": "linear",
+          "start": 0.0,
+          "duration": 30.058,
+          "identifiers": [{ "scheme": "urn:com:example:ads:id",
+                            "value": "example-30s-a" }],
+          "tracking": [
+            { "type": "impression", "urls": [
+              "https://beacons.example.com/c/d916217e/imp" ] },
+            { "type": "start", "urls": [
+              "https://beacons.example.com/c/d916217e/start" ] },
+            { "type": "firstQuartile", "urls": [
+              "https://beacons.example.com/c/d916217e/q1" ] },
+            { "type": "midpoint", "urls": [
+              "https://beacons.example.com/c/d916217e/q2" ] },
+            { "type": "thirdQuartile", "urls": [
+              "https://beacons.example.com/c/d916217e/q3" ] },
+            { "type": "complete", "urls": [
+              "https://beacons.example.com/c/d916217e/done" ] }
+          ]
+        },
+        {
+          "type": "linear",
+          "start": 30.058,
+          "duration": 30.059,
+          "identifiers": [{ "scheme": "urn:com:example:ads:id",
+                            "value": "example-30s-b" }],
+          "tracking": [
+            { "type": "impression", "urls": [
+              "https://beacons.example.com/c/2ea7e414/imp" ] },
+            { "type": "start", "urls": [
+              "https://beacons.example.com/c/2ea7e414/start" ] },
+            { "type": "firstQuartile", "urls": [
+              "https://beacons.example.com/c/2ea7e414/q1" ] },
+            { "type": "midpoint", "urls": [
+              "https://beacons.example.com/c/2ea7e414/q2" ] },
+            { "type": "thirdQuartile", "urls": [
+              "https://beacons.example.com/c/2ea7e414/q3" ] },
+            { "type": "complete", "urls": [
+              "https://beacons.example.com/c/2ea7e414/done" ] }
+          ]
+        }
+      ],
+      "tracking": [
+        { "type": "podStart", "urls": [
+          "https://beacons.example.com/c/bf847920/start" ] },
+        { "type": "podEnd", "urls": [
+          "https://beacons.example.com/c/bf847920/end" ] }
+      ]
+    }]
   }
 }
 </pre><a href="#appendix-B-6" class="pilcrow">¶</a>
 </div>
-<p id="appendix-B-7">The <code>urls</code> values are capability URLs (<a href="#capability-urls" class="auto internal xref">Section 7</a>), abbreviated here.<a href="#appendix-B-7" class="pilcrow">¶</a></p>
-<p id="appendix-B-8">Two notes on provenance, so implementers know what these are and are not.<a href="#appendix-B-8" class="pilcrow">¶</a></p>
-<p id="appendix-B-9">The vectors are <strong>conformance examples authored against this specification</strong>,
-not captured output. The reference implementation publishes its break timeline
-on a non-standard control track today; migrating it to the envelope form
-described here is in progress, and vectors captured from it will replace these
-once that lands. Their timings, identifiers and quartile offsets are taken from
-a live deployment, so they are realistic, but the record framing is this
-document's.<a href="#appendix-B-9" class="pilcrow">¶</a></p>
-<p id="appendix-B-10">The rules the schema expresses are executable and run in that implementation's
-CI, so the published vectors cannot silently drift from the prose: the valid set
-is asserted to pass and the invalid set to fail, each for the specific reason its
-name claims.<a href="#appendix-B-10" class="pilcrow">¶</a></p>
+<p id="appendix-B-7">The <code>urls</code> values are capability URLs (<a href="#capability-urls" class="auto internal xref">Section 7</a>). No event
+carries an <code>offset</code>, so each event's timing follows from its type
+(Section 4.4.5 of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>). The second record of the captured
+Object, about 100 s later on the same timeline, is a four-slot pod of
+15 s creatives.<a href="#appendix-B-7" class="pilcrow">¶</a></p>
+<p id="appendix-B-8">Apart from <code>captured-object</code>, the vectors are conformance examples
+authored against this specification. Every vector other than the two
+signature vectors was checked two ways:
+against the schema, with a JSON Schema draft 2020-12 validator; and
+against the record and payload checks of the implementation in
+<a href="#impl-status" class="auto internal xref">Section 11</a>, the same checks its read-only validator applies to live
+tracks, which beyond the record rules verify the <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> shape of
+each payload (member names and types, MediaTime values in seconds,
+required identifiers, non-empty <code>urls</code>, and defined event types). Both
+accept every valid vector and reject every invalid one, each for the
+reason its name gives. The two signature vectors were checked against
+the schema, and <code>signed-pod</code> was verified with the published script,
+which also rejects it once any byte of the record changes and accepts
+it re-serialized with its members reordered.<a href="#appendix-B-8" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="changes">
+<section id="appendix-C">
+      <h2 id="name-changes-since-draft-riedl-m">
+<a href="#name-changes-since-draft-riedl-m" class="section-name selfRef">Changes since draft-riedl-moq-ad-creative-signaling-00</a>
+      </h2>
+<p id="appendix-C-1">(To be removed before publication.)<a href="#appendix-C-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="appendix-C-2.1">
+          <p id="appendix-C-2.1.1">SVTA 2053-1 conformance. The appendix example and the test vectors
+now use the member names and units of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> (<code>start</code>,
+<code>duration</code>, <code>offset</code>, <code>tracking</code>, <code>type</code>; MediaTime in seconds) in
+place of invented ones (<code>id</code>, <code>startTime</code>, <code>trackingEvents</code>, <code>event</code>;
+milliseconds), and no longer give Pod or Slot an <code>id</code>, which
+<span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> does not define (item 8 of <a href="#open-issues" class="auto internal xref">Section 10</a>).<a href="#appendix-C-2.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-2.2">
+          <p id="appendix-C-2.2.1"><a href="#payload" class="auto internal xref">Section 4.3</a>: adds the <code>verification</code> envelope type, which
+<span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> defines; states that interior timing is in seconds; forbids
+setting <code>features</code> flags that <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> does not define (the -00
+example set two, which a conforming interpreter would discard), while
+leaving receiver behavior to <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span>; and notes two
+inconsistencies in <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> that affect parsers.<a href="#appendix-C-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-2.3">
+          <p id="appendix-C-2.3.1"><a href="#record-structure" class="auto internal xref">Section 4.1</a>: index values are typed as <span>[<a href="#MSF" class="cite xref">MSF</a>]</span> requires (<code>t</code>
+and <code>m</code> Numbers, <code>l</code> a two-Number Array; a -00 vector wrote <code>t</code> as a
+date string); records map to Objects per <span><a href="https://datatracker.ietf.org/doc/html/draft-ietf-moq-msf-01#section-8.3" class="relref">Section 8.3</a> of [<a href="#MSF" class="cite xref">MSF</a>]</span>.
+<a href="#track-properties" class="auto internal xref">Section 3</a> adds the <code>mimeType</code> that <span>[<a href="#MSF" class="cite xref">MSF</a>]</span> requires.
+<a href="#interior-timing" class="auto internal xref">Section 5.4</a> says what interior timing is relative to when an
+envelope carries Slot or TrackingEvent objects without their Pod.<a href="#appendix-C-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-2.4">
+          <p id="appendix-C-2.4.1">The <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> reference now cites the published SVTA 2053-1,
+Revision 1.0, by its document title and product page, with the
+Version 2 model named in an annotation; section references
+corrected.<a href="#appendix-C-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-2.5">
+          <p id="appendix-C-2.5.1">New informative <a href="#future-carriage" class="auto internal xref">Section 9</a>: splitting ad signaling by
+function across Event Timeline tracks, break-level state in MOQT
+subgroup properties <span>[<a href="#MOQT-SUBGROUP-PROPS" class="cite xref">MOQT-SUBGROUP-PROPS</a>]</span>, and the additive
+non-linear extensions of the 3rd edition <span>[<a href="#SVTA2053-2" class="cite xref">SVTA2053-2</a>]</span>.<a href="#appendix-C-2.5.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-2.6">
+          <p id="appendix-C-2.6.1"><a href="#impl-status" class="auto internal xref">Section 11</a> rewritten: the event class is now deployed (publisher
+since 2026-10-22, device-side firing since 2026-10-25), with measured
+results and an explicit list of what is not yet implemented;
+<a href="#introduction" class="auto internal xref">Section 1</a> says so. <a href="#open-issues" class="auto internal xref">Section 10</a> records the implementation
+experience for items 1, 2, 3, 6 and 8, and the status of item 4 after
+the 2026-10-14 interim. Item 8, the missing placement identifier,
+stays open.<a href="#appendix-C-2.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-2.7">
+          <p id="appendix-C-2.7.1"><a href="#schema" class="auto internal xref">Appendix "JSON Schema and Test Vectors"</a>: the vectors are replaced, the schema checks index types
+and the envelope rules, and an anonymized record captured from the
+deployment replaces the invented example.<a href="#appendix-C-2.7.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-2.8">
+          <p id="appendix-C-2.8.1">The MSF index-key spelling change in the MSF editor's copy is noted
+in <a href="#conventions" class="auto internal xref">Section 2</a>.<a href="#appendix-C-2.8.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-2.9">
+          <p id="appendix-C-2.9.1">Acknowledgments name the early reviewers.<a href="#appendix-C-2.9.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-2.10">
+          <p id="appendix-C-2.10.1">New <a href="#signing" class="auto internal xref">Section 4.5</a>: every record carries a <code>sig</code> member, a detached JWS
+(<span>[<a href="#RFC7515" class="cite xref">RFC7515</a>]</span>, <span>[<a href="#RFC7797" class="cite xref">RFC7797</a>]</span>) over the <span>[<a href="#RFC8785" class="cite xref">RFC8785</a>]</span> canonical record,
+with <code>EdDSA</code> over Ed25519 (<span>[<a href="#RFC8032" class="cite xref">RFC8032</a>]</span>, <span>[<a href="#RFC8037" class="cite xref">RFC8037</a>]</span>) mandatory to
+implement and verification keys as a JWK Set <span>[<a href="#RFC7517" class="cite xref">RFC7517</a>]</span>.
+<a href="#integrity" class="auto internal xref">Section 12.1</a> says why transport authentication alone is not enough
+and what a verifier checks; item 7 of <a href="#open-issues" class="auto internal xref">Section 10</a> is resolved
+accordingly, with key distribution left open; <a href="#impl-status" class="auto internal xref">Section 11</a> records
+that the deployment does not sign yet. The schema admits <code>sig</code>, and
+the vectors gain a signed record, its test key, a malformed-signature
+case, and a signing script.<a href="#appendix-C-2.10.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
 </section>
 </div>
 <div id="authors-addresses">
-<section id="appendix-C">
+<section id="appendix-D">
       <h2 id="name-authors-address">
 <a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
       </h2>
