@@ -49,7 +49,8 @@ export function verifyRecord(record, jwks) {
   const header = JSON.parse(unb64u(m[1]).toString('utf8'));
   if (header.alg !== 'EdDSA') throw new Error(`alg ${header.alg} not permitted`);
   if (header.b64 !== false || !Array.isArray(header.crit) || !header.crit.includes('b64')) throw new Error('payload must be unencoded (b64:false, crit:[b64])');
-  for (const p of ['jku', 'jwk', 'x5u', 'x5c']) if (p in header) throw new Error(`${p} header parameter is not trusted`);
+  // jku, jwk, x5u and x5c are not consulted: the draft says a record carrying them is verified
+  // against the provisioned key set as if they were absent.
   const jwk = (jwks.keys || []).find((k) => k.kid === header.kid && k.kty === 'OKP' && k.crv === 'Ed25519');
   if (!jwk) throw new Error(`unknown kid ${header.kid}`);
   const key = createPublicKey({ key: { kty: jwk.kty, crv: jwk.crv, x: jwk.x }, format: 'jwk' });
