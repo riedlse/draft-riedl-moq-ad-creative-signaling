@@ -25,7 +25,12 @@
       "minItems": 2,
       "maxItems": 2
     },
-    "data": { "$ref": "#/$defs/envelope" }
+    "data": { "$ref": "#/$defs/envelope" },
+    "sig": {
+      "description": "Distributor signature over the record (draft Section 4.5, Record Signature): a JWS Compact Serialization with a detached, unencoded payload (RFC 7797), BASE64URL(protected header) '..' BASE64URL(signature), whose payload is the RFC 8785 canonical form of the record without sig; EdDSA over Ed25519 is mandatory to implement. The schema checks the shape only; verifying the signature is not a schema check, and sig is not required here so that records published before signing still validate.",
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_-]+\\.\\.[A-Za-z0-9_-]+$"
+    }
   },
   "required": ["data"],
   "oneOf": [

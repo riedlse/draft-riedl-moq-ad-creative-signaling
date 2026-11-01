@@ -1,0 +1,78 @@
+{
+  "m": 60000,
+  "data": {
+    "version": 2,
+    "type": "pod",
+    "payload": [
+      {
+        "duration": 30.03,
+        "slots": [
+          {
+            "type": "linear",
+            "start": 0,
+            "duration": 30.03,
+            "identifiers": [
+              {
+                "scheme": "urn:com:example:ads:id",
+                "value": "example-30s-a"
+              }
+            ],
+            "tracking": [
+              {
+                "type": "impression",
+                "urls": [
+                  "https://beacons.example.com/c/357b537e/imp"
+                ]
+              },
+              {
+                "type": "start",
+                "urls": [
+                  "https://beacons.example.com/c/357b537e/start"
+                ]
+              },
+              {
+                "type": "firstQuartile",
+                "urls": [
+                  "https://beacons.example.com/c/357b537e/q1"
+                ]
+              },
+              {
+                "type": "midpoint",
+                "urls": [
+                  "https://beacons.example.com/c/357b537e/q2"
+                ]
+              },
+              {
+                "type": "thirdQuartile",
+                "urls": [
+                  "https://beacons.example.com/c/357b537e/q3"
+                ]
+              },
+              {
+                "type": "complete",
+                "urls": [
+                  "https://beacons.example.com/c/357b537e/done"
+                ]
+              }
+            ]
+          }
+        ],
+        "tracking": [
+          {
+            "type": "podStart",
+            "urls": [
+              "https://beacons.example.com/c/91a5a6d0/start"
+            ]
+          },
+          {
+            "type": "podEnd",
+            "urls": [
+              "https://beacons.example.com/c/91a5a6d0/end"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "sig": "eyJhbGciOiJFZERTQSIsImtpZCI6InRlc3QtMjAyNi0xMSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..4dfpA-MNNhzo_SChNLe5OkTQqlrCn5FnJtOKl--rdAkey1ilBnBxKh-SON68Vy8wYHLfsVOSDgqTcnRp-Q1uBA"
+}

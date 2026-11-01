@@ -44,6 +44,12 @@ author:
 normative:
   MSF: I-D.ietf-moq-msf
   RFC8259:
+  RFC7515:
+  RFC7517:
+  RFC7797:
+  RFC8032:
+  RFC8037:
+  RFC8785:
   SVTA2053:
     # Verified on svta.org 2026-10-30. Product page: "SVTA2053-1: Ad Creative Signaling in DASH
     # and HLS Revision 1.0", Advertising Working Group, published 2025-05-19, 41 pages; its
@@ -186,8 +192,9 @@ This document fills that gap using the structures {{MSF}} and
 {{SCTE35-MOQ}} already put in place: it defines an Event Timeline event
 class whose records carry SVTA 2053-1 Version 2 carriage envelopes,
 specifies how those records are timed and correlated with splice
-signaling, and gives operational guidance for tracking on one-to-many
-delivery. It changes nothing in the SVTA 2053-1 data model; payload
+signaling, requires that each record carry the distributor's signature
+so that a subscriber can verify it independently of the relay path, and
+gives operational guidance for tracking on one-to-many delivery. It changes nothing in the SVTA 2053-1 data model; payload
 normativity remains with {{SVTA2053}}, and this binding could
 additionally be published as a carriage section in a future revision of
 that specification.
@@ -280,10 +287,13 @@ data format of {{Section 8.1 of MSF}}. A record MUST contain:
   and typed as {{Section 8.1 of MSF}} defines it: `t` and `m` are JSON
   Numbers of milliseconds (a wallclock index is milliseconds since the
   Unix epoch, not a date string), and `l` is an Array of two Numbers,
-  the MOQT Group ID and Object ID; and
+  the MOQT Group ID and Object ID;
 
 * a `data` field whose value is exactly one Version 2 carriage
-  envelope as defined in {{payload}}.
+  envelope as defined in {{payload}}; and
+
+* a `sig` member holding the distributor's signature over the record,
+  as {{signing}} defines.
 
 Records are carried in the Objects of the track as {{Section 8.3 of MSF}}
 specifies: the first Object of each Group is the independent array of
@@ -389,6 +399,69 @@ well-formed in those bindings. That assumption does not hold here:
 records on a shared Event Timeline track are delivered identically to
 every subscriber and are relay-cacheable, so a session-scoped field
 would both leak across sessions and defeat caching.
+
+## Record Signature {#signing}
+
+Every record MUST carry a `sig` member holding a signature by the
+distributor over the rest of the record, so that a subscriber can
+verify a record's origin and integrity without trusting the relay path
+({{integrity}}). The signature is a JWS {{RFC7515}} in the JWS Compact
+Serialization with a detached, unencoded payload {{RFC7797}}: the
+protected header carries `"b64": false` and `"crit": ["b64"]`, and the
+`sig` value has the form `BASE64URL(protected header) ".."
+BASE64URL(signature)`.
+
+The JWS Payload is the JSON Canonicalization Scheme {{RFC8785}}
+serialization of the record object with its `sig` member removed: the
+index reference and the `data` envelope, canonicalized. The canonical
+form is the signing input only. The record is transmitted in whatever
+serialization the publisher produces, and a relay or library may
+re-serialize it -- member order, whitespace, number formatting within
+the rules of {{RFC8785}} -- without invalidating the signature. The
+signature is per record rather than per Object because {{Section 8.3
+of MSF}} re-forms the array of accumulated records at every Group; a
+per-record signature survives that and lets each record be verified on
+its own.
+
+The protected header MUST contain `alg` and `kid`. Publishers and
+verifiers MUST support `"alg": "EdDSA"` with Ed25519 keys {{RFC8032}}
+{{RFC8037}}; other asymmetric JWS algorithms MAY be used where a
+distributor and its clients agree. The algorithm MUST be an asymmetric
+signature: `"none"` and the MAC algorithms (`HS256`, `HS384`, `HS512`)
+MUST NOT be used by publishers and MUST be rejected by verifiers,
+because every subscriber holds the verification key, and a key that
+verifies a MAC also forges one. Verifiers MUST NOT take keys from
+`jku`, `jwk`, `x5u` or `x5c` header parameters; a record that carries
+them is verified against the provisioned key set as if they were
+absent.
+
+A distributor publishes its verification keys as a JWK Set
+{{RFC7517}}, each key carrying the `kid` its signatures name. How a
+client obtains the key set is out of scope for this document; a
+deployment typically provisions it with the playback session, alongside
+the client identifier of {{client-identity}}. Keys are rotated by
+publishing the new key before any record is signed with it, and
+retiring the old key only after every record signed with it has left
+the accessible window ({{record-structure}}). A distributor SHOULD use
+a distinct `kid` per channel, so that a verifier can reject a validly
+signed record substituted from another channel.
+
+A verifier MUST check that the `sig` member is present and well formed,
+that `alg` is permitted, that `kid` names a key in the current set, and
+that the signature verifies over the canonical payload. A record that
+fails any of these checks MUST be treated as absent for the purposes of
+{{capability-urls}}: no tracking, `$remote`, verification or
+click-through resource it names is requested. Media playback is
+unaffected; the record is advisory. A verifier MAY report the failure
+to the distributor over a channel established out of band, which gives
+the distributor evidence of tampering on paths it does not operate.
+
+The signature is subscriber-invariant ({{invariance}}) and so remains
+relay-cacheable. It costs one 64-byte signature and a short protected
+header per record, and one Ed25519 verification per record received.
+{{VECTORS}} contains a signed record with the test key that signed it
+and a script that signs and verifies records; the example in
+{{example}} omits `sig` for brevity.
 
 # Timing and Correlation {#timing}
 
@@ -774,9 +847,19 @@ discussion; it is to be removed before publication.
    by subscribing to them, which answers much of this for the split case
    but not for flagged features within a single track.
 
-7. **Record integrity**: do these records need payload signing (JWS or
-   COSE over the envelope, or a catalog-pinned key) beyond transport
-   authentication? See {{security}}.
+7. **Record integrity**: resolved in this revision in favor of
+   per-record signing ({{signing}}: a detached JWS over the canonical
+   record, EdDSA with Ed25519 mandatory to implement; {{integrity}}
+   gives the reasoning). Two questions remain. Key distribution: the
+   key set is provisioned out of band today; a key, or a key set
+   location, pinned in the catalog or in a track property would let a
+   client that found the track by name verify it without a separate
+   channel, and is a possible {{MSF}} follow-up. And the `sig` member is
+   a binding-level addition to the record structure of {{Section 8.1 of
+   MSF}}; a record signature defined by {{MSF}} itself would serve every
+   Event Timeline event class, and the authors intend to raise it
+   there. A COSE encoding was considered and set aside because the
+   records are JSON.
 
 8. **No stable placement identifier**: {{SVTA2053}} gives neither the Pod
    nor the Slot object an identifier. A Pod carries `start`, `duration`,
@@ -925,6 +1008,10 @@ Unchanged from the previous revision:
 
 NOT yet implemented:
 
+* Record signatures ({{signing}}). Records are published without a
+  `sig` member as of this revision, and the validator does not check
+  one. The signing and verification code is the published script
+  ({{VECTORS}}), not yet the publisher.
 * Catalog listing. The `ad-creative` track is not yet listed in the MSF
   catalog, because the MoQ library in use does not yet emit
   `eventtimeline` entries; that needs an upstream change. Consumers find
@@ -954,15 +1041,43 @@ No independent implementation of this document is known to the author.
 ## Integrity of Tracking Records {#integrity}
 
 Tracking URLs move money. A relay path is not end-to-end confidential
-or authentic by default, and a tampered creative signaling record turns
-a large synchronized audience into a request cannon aimed at an
-arbitrary URL -- amplifying the denial-of-service concerns already
+or authentic by default: each hop has its own transport security, but a
+relay, a cache, or any party able to rewrite Objects between publisher
+and subscriber can alter a record, and a tampered creative signaling
+record turns a large synchronized audience into a request cannon aimed
+at an arbitrary URL -- amplifying the denial-of-service concerns already
 noted for splice records (Section 6.3 of {{SCTE35-MOQ}}) with an
-attacker-chosen target. Deployments MUST authenticate the publication
-path for this track, and receivers SHOULD restrict tracking requests to
-URL authorities the distributor has designated (capability URLs at a
-distributor endpoint make this restriction natural). Whether records
-additionally need payload signing is tracked in {{open-issues}}.
+attacker-chosen target. The same party can suppress measurement by
+deleting tracking entries, or misattribute it by substituting a record
+meant for another placement.
+
+This is why {{signing}} requires every record to carry a public key
+signature that the subscriber verifies: transport authentication
+protects a hop, the signature protects the record. The signature
+covers the whole record -- index reference and envelope -- so deletion,
+insertion and reordering of tracking entries are detectable, not only
+changes to URLs. It is asymmetric so that holding the verification key,
+as every subscriber does, confers no ability to forge; a shared secret
+would make every subscriber a potential publisher. Deployments MUST
+additionally authenticate the publication path for this track: an
+unauthenticated publisher cannot forge a record that verifies, but it
+can replace or suppress the track, which no signature prevents.
+Receivers SHOULD restrict tracking requests to URL authorities the
+distributor has designated; capability URLs at a distributor endpoint
+make this restriction natural.
+
+Verification has limits. A hostile client can skip the check, so the
+signature is detection and deterrence on the network path, not
+prevention at the device; enforcement against forged requests belongs
+at the distributor's tracking endpoint. A signature over content proves
+origin, not freshness. Replay is bounded by the index reference -- a
+record is acted on at the media time it names, and the accessible
+window of {{record-structure}} is short -- and substitution is bounded
+by per-channel keys ({{signing}}); a deployment that needs tighter
+binding can place further context in the protected header by agreement
+with its clients. In return, verifying clients give the distributor
+something a publisher cannot otherwise observe on one-to-many
+delivery: evidence of tampering on paths it does not operate.
 
 ## Amplification and Load {#amplification}
 
@@ -1037,14 +1152,21 @@ satisfies the envelope rules of Section 5.2.2.1 of {{SVTA2053}} --
 `version` 2, one of the four envelope types, a non-empty `payload`
 array, and no `features` flag set that {{SVTA2053}} does not define. It
 does not validate the payload objects themselves; those are governed by
-{{SVTA2053}}, not by this document.
+{{SVTA2053}}, not by this document. It checks the shape of the `sig`
+member of {{signing}} when one is present but does not require it, so
+that it continues to validate the unsigned records the deployment
+publishes today ({{impl-status}}); verifying a signature is in any case
+not a schema check.
 
-The vectors come in two sets, and both matter: nine files holding eleven
-records that MUST validate, and ten records that MUST NOT. A validator
+The vectors come in two sets, and both matter: ten files holding twelve
+records that MUST validate, and eleven records that MUST NOT. A validator
 that accepts everything passes the first set alone. The valid set covers
 each envelope type and each index type, back-to-back placement
-opportunities, the worked example of {{example}}, and one Object captured
-from the running deployment. Each rejecting case is otherwise valid, so
+opportunities, the worked example of {{example}}, one Object captured
+from the running deployment, and `signed-pod`, a record carrying the
+`sig` member of {{signing}}; the Ed25519 test key that signed it is
+published beside it under `vectors/keys/`, with a script under
+`scripts/` that signs and verifies records. Each rejecting case is otherwise valid, so
 it fails for the reason its name claims; together they pin the
 constraints most likely to be implemented loosely:
 
@@ -1060,6 +1182,7 @@ constraints most likely to be implemented loosely:
 | `unknown-envelope-type` | a `type` outside `pod`, `slot`, `trackingEvent` and `verification` |
 | `empty-payload` | an empty `payload`; the envelope requires at least one object |
 | `undefined-feature-flag` | sets a `features` flag that {{SVTA2053}} does not define, so a conforming interpreter discards the record |
+| `malformed-signature` | a `sig` member that is not a detached compact JWS ({{signing}}) |
 
 The following record is the first of the two in the `captured-object`
 vector: one Event Timeline Object, captured read-only from the running
@@ -1141,7 +1264,8 @@ Object, about 100 s later on the same timeline, is a four-slot pod of
 15 s creatives.
 
 Apart from `captured-object`, the vectors are conformance examples
-authored against this specification. Every vector was checked two ways:
+authored against this specification. Every vector other than the two
+signature vectors was checked two ways:
 against the schema, with a JSON Schema draft 2020-12 validator; and
 against the record and payload checks of the implementation in
 {{impl-status}}, the same checks its read-only validator applies to live
@@ -1149,7 +1273,10 @@ tracks, which beyond the record rules verify the {{SVTA2053}} shape of
 each payload (member names and types, MediaTime values in seconds,
 required identifiers, non-empty `urls`, and defined event types). Both
 accept every valid vector and reject every invalid one, each for the
-reason its name gives.
+reason its name gives. The two signature vectors were checked against
+the schema, and `signed-pod` was verified with the published script,
+which also rejects it once any byte of the record changes and accepts
+it re-serialized with its members reordered.
 
 # Changes since draft-riedl-moq-ad-creative-signaling-00 {#changes}
 {:numbered="false"}
@@ -1195,3 +1322,13 @@ reason its name gives.
 * The MSF index-key spelling change in the MSF editor's copy is noted
   in {{conventions}}.
 * Acknowledgments name the early reviewers.
+* New {{signing}}: every record carries a `sig` member, a detached JWS
+  ({{RFC7515}}, {{RFC7797}}) over the {{RFC8785}} canonical record,
+  with `EdDSA` over Ed25519 ({{RFC8032}}, {{RFC8037}}) mandatory to
+  implement and verification keys as a JWK Set {{RFC7517}}.
+  {{integrity}} says why transport authentication alone is not enough
+  and what a verifier checks; item 7 of {{open-issues}} is resolved
+  accordingly, with key distribution left open; {{impl-status}} records
+  that the deployment does not sign yet. The schema admits `sig`, and
+  the vectors gain a signed record, its test key, a malformed-signature
+  case, and a signing script.
