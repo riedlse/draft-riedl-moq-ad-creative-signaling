@@ -1,0 +1,38 @@
+{
+  "m": 120000,
+  "data": {
+    "version": 2,
+    "type": "pod",
+    "x-example": {"decisionLabel": "example-decision-1"},
+    "payload": [
+      {
+        "duration": 30.03,
+        "x-example": {"breakLabel": "example-break-a"},
+        "slots": [
+          {
+            "type": "linear",
+            "start": 0.0,
+            "duration": 30.03,
+            "identifiers": [{"scheme": "urn:com:example:ads:id", "value": "example-30s-a"}],
+            "x-example": {
+              "creativeParameters": {"example-measurement": "{\"campaign\":\"example\"}"},
+              "categories": ["example-category"]
+            },
+            "tracking": [
+              {"type": "impression", "urls": ["https://beacons.example.com/c/4c1d9a52/imp"]},
+              {"type": "start", "urls": ["https://beacons.example.com/c/4c1d9a52/start"]},
+              {"type": "firstQuartile", "urls": ["https://beacons.example.com/c/4c1d9a52/q1"]},
+              {"type": "midpoint", "urls": ["https://beacons.example.com/c/4c1d9a52/q2"]},
+              {"type": "thirdQuartile", "urls": ["https://beacons.example.com/c/4c1d9a52/q3"]},
+              {"type": "complete", "urls": ["https://beacons.example.com/c/4c1d9a52/done"]}
+            ]
+          }
+        ],
+        "tracking": [
+          {"type": "podStart", "urls": ["https://beacons.example.com/c/a07e33b1/start"]},
+          {"type": "podEnd", "urls": ["https://beacons.example.com/c/a07e33b1/end"]}
+        ]
+      }
+    ]
+  }
+}

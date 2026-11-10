@@ -359,8 +359,8 @@ conforming interpreter discard the record. The only flag defined today is
 uses `$remote` ({{capability-urls}}); a payload that does not use
 `$remote` can omit `features` entirely.
 
-This document places no requirement of its own on receivers. A receiver
-applies Section 5.2.2.1 of {{SVTA2053}} unchanged: a flag set to `true`
+This document places no requirement of its own on how a receiver
+handles `features`. A receiver applies Section 5.2.2.1 of {{SVTA2053}} unchanged: a flag set to `true`
 that it does not support means it ignores that payload, while a flag set
 to `false`, or an absent `features` member, asks nothing of it. The
 publisher-side rule is needed because on one-to-many delivery the
@@ -382,6 +382,58 @@ envelopes MAY be used (mirroring the granularity options of the DASH
 binding), but deduplication under redelivery is simplest at pod
 granularity, and a decomposed record loses the structural link to the
 slot it belongs to (see {{open-issues}}).
+
+### Extension Members {#extensions}
+
+{{SVTA2053}} defines no member for data that one operator or vendor
+defines for itself, and no rule for what an interpreter does with a
+member it does not recognize. The places it offers today are narrow: a
+Slot's `identifiers`, whose schemes may be proprietary, and the
+`parameters` string of a Verification. Deployments have such data all
+the same -- creative parameters handed to a measurement vendor, labels
+from the ad decision, content classifications -- and on a shared track
+a publisher cannot agree on a private format with each receiver. Until
+{{SVTA2053}} defines an extension point (item 9 of {{open-issues}}),
+the rules of this section apply to records on this track.
+
+A publisher that adds data to a record beyond what {{SVTA2053}}, or a
+later edition of it, defines MUST place that data in an extension
+member: a member of the object the data describes -- the envelope, or
+an object within its payload such as a Pod or a Slot -- whose value is
+a JSON object and whose name identifies the party that defines the
+contents. An object MUST NOT carry more than one extension member for
+the same defining party. This document does not fix the form of the
+name; the test vectors ({{schema}}) use `x-example`, and
+{{impl-status}} gives the name the author's deployment intends to use.
+
+A publisher MUST NOT place such data anywhere else in the envelope. In
+particular it MUST NOT place it inside `features`, and MUST NOT set a
+`features` flag to announce it: a flag set to `true` requires every
+interpreter to support it or discard the payload, which is the opposite
+of what an extension needs. This document defines no extension member
+at the top level of a record, whose members are those of
+{{record-structure}} and {{signing}}.
+
+A record MUST remain complete and correct for a receiver that ignores
+every extension member. Anything a receiver needs in order to present
+or measure an ad belongs in the members {{SVTA2053}} defines, and an
+identifier belongs in a Slot's `identifiers` under a scheme of the
+publisher's choosing.
+
+A receiver MUST ignore a member of the envelope, or of an object within
+its payload, that it does not recognize, and MUST NOT treat the record
+as malformed because of it. This does not change the handling of
+`features` flags, which stays as {{SVTA2053}} defines it. Ignoring a
+member does not mean removing it: the signature of {{signing}} covers
+the record as published, extension members included, so a receiver
+verifies the signature over the record it received and only then
+disregards what it does not use.
+
+In every other respect an extension member is part of the record. It is
+subscriber-invariant ({{invariance}}), it is untrusted input to a
+receiver that acts on it ({{validation}}), and it is repeated in every
+Object that repeats the record ({{Section 8.3 of MSF}}), so it is best
+kept small.
 
 ## Subscriber Invariance {#invariance}
 
@@ -905,6 +957,25 @@ discussion; it is to be removed before publication.
    still mis-key two appearances of one creative if a rewrite reordered
    them.
 
+9. **No extension point**: {{SVTA2053}} has no member for data that one
+   operator or vendor defines for itself, and no statement of what an
+   interpreter does with a member it does not recognize. {{VAST}} has
+   the first: its `Extensions` and `CreativeExtensions` elements hold
+   custom content, each entry carrying a `type` attribute. A deployment
+   whose ad decisions arrive as VAST therefore has fields with nowhere
+   to go in this model. The `features` object cannot serve, because a
+   flag set there has to be supported by every interpreter (item 6).
+
+   {{extensions}} is an interim rule for this track: one member per
+   defining party, ignored by a receiver that does not recognize it. As
+   with item 8, the lasting answer is not this document's to give,
+   because payload normativity belongs with {{SVTA2053}}. What this
+   binding needs from the SVTA Advertising Working Group is twofold: a
+   statement that an interpreter ignores members it does not recognize,
+   and an optional extension container on the envelope, Pod and Slot,
+   keyed by a name its definer controls. With both in {{SVTA2053}},
+   {{extensions}} reduces to a reference to them.
+
 # Implementation Status {#impl-status}
 
 (This section follows {{RFC7942}} and is to be removed before
@@ -1030,6 +1101,12 @@ NOT yet implemented:
 * `slot`, `trackingEvent` and `verification` envelopes, `$remote`, and
   the Slot members `media`, `verifications`, `skipOffset` and
   `clickThrough`.
+* Extension members ({{extensions}}). Records carry none as of this
+  revision. The validator and the player read only the members they
+  know, so both already ignore any other: the valid vector that carries
+  extension members ({{schema}}) passes the validator's checks, and the
+  player schedules the same events from it with and without them. The
+  name the deployment intends to use for its own data is `x-pluto`.
 * A splice signaling track, and so the correlation rules of
   {{correlation}}.
 * The IANA registration in {{iana}}, which this document requests.
@@ -1107,6 +1184,10 @@ values out of relay caches. Distributor tracking endpoints handle real
 device context (addresses, user agents) and MUST apply applicable
 consent and data-protection policy before forwarding it to vendors.
 
+Extension members ({{extensions}}) reach every subscriber and every
+relay on the path as the rest of the record does, so commercially
+sensitive values, such as the terms of a deal, do not belong in them.
+
 # IANA Considerations {#iana}
 
 This document requests registration of the following entry in the "MSF
@@ -1152,18 +1233,21 @@ satisfies the envelope rules of Section 5.2.2.1 of {{SVTA2053}} --
 `version` 2, one of the four envelope types, a non-empty `payload`
 array, and no `features` flag set that {{SVTA2053}} does not define. It
 does not validate the payload objects themselves; those are governed by
-{{SVTA2053}}, not by this document. It checks the shape of the `sig`
+{{SVTA2053}}, not by this document. It permits members it does not
+list, which {{extensions}} requires a receiver to ignore. It checks the shape of the `sig`
 member of {{signing}} when one is present but does not require it, so
 that it continues to validate the unsigned records the deployment
 publishes today ({{impl-status}}); verifying a signature is in any case
 not a schema check.
 
-The vectors come in two sets, and both matter: ten files holding twelve
-records that MUST validate, and eleven records that MUST NOT. A validator
+The vectors come in two sets, and both matter: eleven files holding
+thirteen records that MUST validate, and eleven records that MUST NOT. A validator
 that accepts everything passes the first set alone. The valid set covers
 each envelope type and each index type, back-to-back placement
 opportunities, the worked example of {{example}}, one Object captured
-from the running deployment, and `signed-pod`, a record carrying the
+from the running deployment, `extension-member`, a record with the
+extension members of {{extensions}} at the envelope, Pod and Slot
+levels, and `signed-pod`, a record carrying the
 `sig` member of {{signing}}; the Ed25519 test key that signed it is
 published beside it under `vectors/keys/`, with a script under
 `scripts/` that signs and verifies records. Each rejecting case is otherwise valid, so
@@ -1277,6 +1361,26 @@ reason its name gives. The two signature vectors were checked against
 the schema, and `signed-pod` was verified with the published script,
 which also rejects it once any byte of the record changes and accepts
 it re-serialized with its members reordered.
+
+# Changes since draft-riedl-moq-ad-creative-signaling-01 {#changes-01}
+{:numbered="false"}
+
+(To be removed before publication.)
+
+* New {{extensions}}: an interim rule for data that {{SVTA2053}} does
+  not define. A publisher places such data in one member per defining
+  party on the object it describes, never in `features`; a receiver
+  ignores members it does not recognize, after verifying the signature
+  over the record as received. {{payload}} scopes its statement about
+  receivers to `features` accordingly, and {{privacy}} notes that
+  extension members reach every subscriber and relay.
+* {{open-issues}} gains item 9, the missing extension point in
+  {{SVTA2053}}, and what this binding needs from the SVTA Advertising
+  Working Group to retire the interim rule.
+* {{schema}}: a new valid vector, `extension-member`, carries extension
+  members at the envelope, Pod and Slot levels.
+* {{impl-status}} records that the deployment publishes no extension
+  member yet.
 
 # Changes since draft-riedl-moq-ad-creative-signaling-00 {#changes}
 {:numbered="false"}
