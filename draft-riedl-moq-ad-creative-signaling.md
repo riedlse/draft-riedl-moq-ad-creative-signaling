@@ -383,7 +383,7 @@ binding), but deduplication under redelivery is simplest at pod
 granularity, and a decomposed record loses the structural link to the
 slot it belongs to (see {{open-issues}}).
 
-### Extension Members {#extensions}
+### Extensions {#extensions}
 
 {{SVTA2053}} defines no member for data that one operator or vendor
 defines for itself, and no rule for what an interpreter does with a
@@ -392,48 +392,60 @@ Slot's `identifiers`, whose schemes may be proprietary, and the
 `parameters` string of a Verification. Deployments have such data all
 the same -- creative parameters handed to a measurement vendor, labels
 from the ad decision, content classifications -- and on a shared track
-a publisher cannot agree on a private format with each receiver. Until
-{{SVTA2053}} defines an extension point (item 9 of {{open-issues}}),
-the rules of this section apply to records on this track.
+a publisher cannot agree on a private format with each receiver. Both
+gaps have been raised with the SVTA Advertising Working Group (item 9
+of {{open-issues}}). Until an edition of {{SVTA2053}} closes them, the
+rules of this section apply to records on this track. They follow the
+form proposed there, so that a record written to them should need no
+change if that form is adopted.
 
 A publisher that adds data to a record beyond what {{SVTA2053}}, or a
-later edition of it, defines MUST place that data in an extension
-member: a member of the object the data describes -- the envelope, or
-an object within its payload such as a Pod or a Slot -- whose value is
-a JSON object and whose name identifies the party that defines the
-contents. An object MUST NOT carry more than one extension member for
-the same defining party. This document does not fix the form of the
-name; the test vectors ({{schema}}) use `x-example`, and
-{{impl-status}} gives the name the author's deployment intends to use.
+later edition of it, defines MUST place that data in an `extensions`
+member of the object the data describes: the envelope, or an object
+within its payload such as a Pod or a Slot. The value of `extensions`
+is a JSON object. Each of its members is named for the party that
+defines the value stored under it, by a URI or by the reverse domain
+name of a domain that party controls, and the value of each member is
+a JSON object whose content that party defines:
+
+~~~
+"extensions": { "com.example": { "creativeCategory": "automotive" } }
+~~~
+
+A defining party uses one name, so that its data on an object is in one
+place. {{impl-status}} gives the name the author's deployment intends
+to use.
 
 A publisher MUST NOT place such data anywhere else in the envelope. In
 particular it MUST NOT place it inside `features`, and MUST NOT set a
 `features` flag to announce it: a flag set to `true` requires every
 interpreter to support it or discard the payload, which is the opposite
-of what an extension needs. This document defines no extension member
-at the top level of a record, whose members are those of
+of what an extension needs. This document defines no `extensions`
+member at the top level of a record, whose members are those of
 {{record-structure}} and {{signing}}.
 
 A record MUST remain complete and correct for a receiver that ignores
-every extension member. Anything a receiver needs in order to present
-or measure an ad belongs in the members {{SVTA2053}} defines, and an
-identifier belongs in a Slot's `identifiers` under a scheme of the
-publisher's choosing.
+`extensions`. Anything a receiver needs in order to present or measure
+an ad belongs in the members {{SVTA2053}} defines, and an identifier
+belongs in a Slot's `identifiers` under a scheme of the publisher's
+choosing.
 
 A receiver MUST ignore a member of the envelope, or of an object within
 its payload, that it does not recognize, and MUST NOT treat the record
-as malformed because of it. This does not change the handling of
-`features` flags, which stays as {{SVTA2053}} defines it. Ignoring a
-member does not mean removing it: the signature of {{signing}} covers
-the record as published, extension members included, so a receiver
-verifies the signature over the record it received and only then
-disregards what it does not use.
+as malformed because of it. The same holds for a member of an
+`extensions` object. This does not change the handling of `features`
+flags, which stays as {{SVTA2053}} defines it. Ignoring a member does
+not mean removing it: the signature of {{signing}} covers the record as
+published, `extensions` included, so a receiver verifies the signature
+over the record it received and only then disregards what it does not
+use.
 
-In every other respect an extension member is part of the record. It is
+In every other respect `extensions` is part of the record. It is
 subscriber-invariant ({{invariance}}), it is untrusted input to a
-receiver that acts on it ({{validation}}), and it is repeated in every
-Object that repeats the record ({{Section 8.3 of MSF}}), so it is best
-kept small.
+receiver that acts on it ({{validation}}), it is not resolved through
+`$remote` ({{capability-urls}}), and it is repeated in every Object
+that repeats the record ({{Section 8.3 of MSF}}), so it is best kept
+small.
 
 ## Subscriber Invariance {#invariance}
 
@@ -488,7 +500,9 @@ them is verified against the provisioned key set as if they were
 absent.
 
 A distributor publishes its verification keys as a JWK Set
-{{RFC7517}}, each key carrying the `kid` its signatures name. How a
+{{RFC7517}}. Each key in the set has a `kid`, and the `kid` in the
+protected header of a signature identifies the key that verifies it.
+How a
 client obtains the key set is out of scope for this document; a
 deployment typically provisions it with the playback session, alongside
 the client identifier of {{client-identity}}. Keys are rotated by
@@ -499,14 +513,51 @@ a distinct `kid` per channel, so that a verifier can reject a validly
 signed record substituted from another channel.
 
 A verifier MUST check that the `sig` member is present and well formed,
-that `alg` is permitted, that `kid` names a key in the current set, and
-that the signature verifies over the canonical payload. A record that
+that `alg` is permitted, that `kid` names a key in the current set,
+that the signature verifies over the canonical payload, and, where a
+maximum age has been provisioned, that `iat` is present and within it
+(see below). A record that
 fails any of these checks MUST be treated as absent for the purposes of
 {{capability-urls}}: no tracking, `$remote`, verification or
 click-through resource it names is requested. Media playback is
 unaffected; the record is advisory. A verifier MAY report the failure
 to the distributor over a channel established out of band, which gives
 the distributor evidence of tampering on paths it does not operate.
+
+The protected header MAY carry `iat`, the time at which the record was
+signed, as a number of seconds since 1970-01-01T00:00:00Z. It is part
+of the protected header and is therefore covered by the signature.
+`iat` is not a registered JWS header parameter; it is used here as a
+name agreed between publisher and verifier, as {{Section 4.3 of
+RFC7515}} allows. A publisher MUST NOT list `iat` in `crit`, so that a
+verifier that does not use it can still verify the signature. A
+publisher that signs a record once, when it first publishes it, repeats
+the record unchanged in later Objects ({{Section 8.3 of MSF}}); `iat`
+is then the time of first publication and not the time of the Object
+that carries the record.
+
+A deployment MAY provision a verifier with a maximum age for the
+records of a track, together with the key set. A verifier that has
+been provisioned with a maximum age MUST treat a record as one that
+fails the checks above when its `iat` is absent, is not a number, is
+older than the maximum age, or lies further in the future than the
+clock difference the deployment allows. A verifier that has not been
+provisioned with a maximum age ignores `iat`. Where records are signed
+once, the maximum age has to cover the time a record stays on the
+track, from its publication ahead of the splice ({{publication-lead}})
+until it is no longer repeated ({{record-structure}}). The verifier
+compares `iat` with its own
+clock; where the clocks of devices are not reliable, a deployment
+gives the verifier a time reference when it provisions the key set.
+
+A signature on the envelope itself, which a later edition of
+{{SVTA2053}} may define (one with the construction of this section is
+proposed for the 3rd edition {{SVTA2053-2}}), is a member of the
+envelope and is covered by `sig` like any other. It does not take the
+place of `sig`: it does not cover the index reference, and so cannot
+show that the envelope is at the position on the timeline that the
+publisher gave it. A verifier on this track checks `sig`, and MAY also
+check an envelope signature that it understands.
 
 The signature is subscriber-invariant ({{invariance}}) and so remains
 relay-cacheable. It costs one 64-byte signature and a short protected
@@ -902,7 +953,7 @@ discussion; it is to be removed before publication.
 7. **Record integrity**: resolved in this revision in favor of
    per-record signing ({{signing}}: a detached JWS over the canonical
    record, EdDSA with Ed25519 mandatory to implement; {{integrity}}
-   gives the reasoning). Two questions remain. Key distribution: the
+   gives the reasoning). Three questions remain. Key distribution: the
    key set is provisioned out of band today; a key, or a key set
    location, pinned in the catalog or in a track property would let a
    client that found the track by name verify it without a separate
@@ -910,8 +961,10 @@ discussion; it is to be removed before publication.
    a binding-level addition to the record structure of {{Section 8.1 of
    MSF}}; a record signature defined by {{MSF}} itself would serve every
    Event Timeline event class, and the authors intend to raise it
-   there. A COSE encoding was considered and set aside because the
-   records are JSON.
+   there. And the signing time: `iat` ({{signing}}) is a header
+   parameter name agreed between publisher and verifier, not a
+   registered one, and whether to register it is open. A COSE encoding
+   was considered and set aside because the records are JSON.
 
 8. **No stable placement identifier**: {{SVTA2053}} gives neither the Pod
    nor the Slot object an identifier. A Pod carries `start`, `duration`,
@@ -949,6 +1002,15 @@ discussion; it is to be removed before publication.
    The first is what an implementation can do today; the second is what
    the ecosystem should have.
 
+   The second has been asked for. An optional `id` on Pod and on Slot,
+   the same each time the same Pod or Slot is signaled, was raised with
+   the SVTA Advertising Working Group in November 2026 and is proposed
+   for the 3rd edition {{SVTA2053-2}}. A record that carries such
+   members is acceptable on this track today, because a receiver
+   ignores members it does not recognize ({{extensions}}). If an
+   edition defines them, a receiver can key a Slot by its `id`, and
+   this item closes by reference.
+
    The deployed player ({{impl-status}}) takes the first way, with an
    occurrence count in place of the raw ordinal: a slot's key is its
    `identifiers` plus the number of earlier slots in the same pod that
@@ -966,15 +1028,17 @@ discussion; it is to be removed before publication.
    to go in this model. The `features` object cannot serve, because a
    flag set there has to be supported by every interpreter (item 6).
 
-   {{extensions}} is an interim rule for this track: one member per
-   defining party, ignored by a receiver that does not recognize it. As
-   with item 8, the lasting answer is not this document's to give,
-   because payload normativity belongs with {{SVTA2053}}. What this
-   binding needs from the SVTA Advertising Working Group is twofold: a
-   statement that an interpreter ignores members it does not recognize,
-   and an optional extension container on the envelope, Pod and Slot,
-   keyed by a name its definer controls. With both in {{SVTA2053}},
-   {{extensions}} reduces to a reference to them.
+   {{extensions}} is an interim rule for this track: an `extensions`
+   object on the envelope, Pod and Slot, keyed by a name its definer
+   controls, with members a receiver ignores when it does not recognize
+   them. As with item 8, the lasting answer is not this document's to
+   give, because payload normativity belongs with {{SVTA2053}}. What
+   this binding needs from the SVTA Advertising Working Group is
+   twofold: a statement that an interpreter ignores members it does not
+   recognize, and that optional container. Both were raised with the
+   Working Group in November 2026 and are proposed for the 3rd edition
+   {{SVTA2053-2}}, in the form {{extensions}} uses. With both in
+   {{SVTA2053}}, {{extensions}} reduces to a reference to them.
 
 # Implementation Status {#impl-status}
 
@@ -986,7 +1050,7 @@ deployment over MoQ: fixed-timeline linear channels, publisher to relay
 to browser, with ad creatives spliced server-side into one shared
 broadcast, so every subscriber receives the same media objects -- the
 condition that motivates this document ({{introduction}}). The relay
-is the open-source moq-relay, version 0.17.9 as of this revision; the
+is the open-source moq-relay, version 0.17.15 as of this revision; the
 publisher and player are not publicly available. Since 2026-10-22 the
 deployment publishes the event class this document defines. This
 section reports what it does, what was measured, and what is not yet
@@ -1077,12 +1141,25 @@ Unchanged from the previous revision:
   use and verified against an interop profile by a tool in the same
   codebase.
 
+Added on 2026-11-04 and 2026-11-05:
+
+* Record signatures ({{signing}}). Since 2026-11-04 every record on
+  every channel of the deployment carries a `sig` member: Ed25519, one
+  key per channel, the `kid` being the channel name and a date, and
+  the key set served to the player as a JWK Set. The player verifies
+  each record before it requests anything the record names; a record
+  that fails is treated as absent and the failure is reported once. A
+  monitor outside the publisher verifies the live records every 30
+  minutes.
+* Signing time ({{signing}}). Since 2026-11-05 the protected header
+  carries `iat`, and the player is provisioned with a maximum age of
+  600 seconds, allowing the same clock difference into the future. The
+  case that led to it is the one {{integrity}} describes: after a
+  publisher restart the media timeline starts again, and a valid record
+  from before the restart names a media time ahead of the new playhead.
+
 NOT yet implemented:
 
-* Record signatures ({{signing}}). Records are published without a
-  `sig` member as of this revision, and the validator does not check
-  one. The signing and verification code is the published script
-  ({{VECTORS}}), not yet the publisher.
 * Catalog listing. The `ad-creative` track is not yet listed in the MSF
   catalog, because the MoQ library in use does not yet emit
   `eventtimeline` entries; that needs an upstream change. Consumers find
@@ -1101,12 +1178,10 @@ NOT yet implemented:
 * `slot`, `trackingEvent` and `verification` envelopes, `$remote`, and
   the Slot members `media`, `verifications`, `skipOffset` and
   `clickThrough`.
-* Extension members ({{extensions}}). Records carry none as of this
-  revision. The validator and the player read only the members they
-  know, so both already ignore any other: the valid vector that carries
-  extension members ({{schema}}) passes the validator's checks, and the
-  player schedules the same events from it with and without them. The
-  name the deployment intends to use for its own data is `x-pluto`.
+* Extensions ({{extensions}}). Records carry no `extensions` member as
+  of this revision. The validator and the player read only the members
+  they know, so both ignore any other. The name the deployment intends
+  to use for its own data is `tv.pluto`.
 * A splice signaling track, and so the correlation rules of
   {{correlation}}.
 * The IANA registration in {{iana}}, which this document requests.
@@ -1146,13 +1221,19 @@ make this restriction natural.
 Verification has limits. A hostile client can skip the check, so the
 signature is detection and deterrence on the network path, not
 prevention at the device; enforcement against forged requests belongs
-at the distributor's tracking endpoint. A signature over content proves
-origin, not freshness. Replay is bounded by the index reference -- a
-record is acted on at the media time it names, and the accessible
-window of {{record-structure}} is short -- and substitution is bounded
-by per-channel keys ({{signing}}); a deployment that needs tighter
-binding can place further context in the protected header by agreement
-with its clients. In return, verifying clients give the distributor
+at the distributor's tracking endpoint. A signature alone proves origin
+and integrity, not freshness. The index reference bounds replay only
+while the media timeline keeps advancing: a record is acted on at the
+media time it names, and the accessible window of {{record-structure}}
+is short. It no longer bounds it once the timeline starts again, as it
+does after a publisher restart, because a valid record signed before
+the restart can then name a media time that lies ahead of the new
+playhead. The signing time of {{signing}}, held to a provisioned
+maximum age, closes that case and limits for how long any signed
+record can be delivered again. Substitution between channels is
+bounded by per-channel keys ({{signing}}); a deployment that needs
+tighter binding can place further context in the protected header by
+agreement with its clients. In return, verifying clients give the distributor
 something a publisher cannot otherwise observe on one-to-many
 delivery: evidence of tampering on paths it does not operate.
 
@@ -1184,9 +1265,9 @@ values out of relay caches. Distributor tracking endpoints handle real
 device context (addresses, user agents) and MUST apply applicable
 consent and data-protection policy before forwarding it to vendors.
 
-Extension members ({{extensions}}) reach every subscriber and every
-relay on the path as the rest of the record does, so commercially
-sensitive values, such as the terms of a deal, do not belong in them.
+Data in `extensions` ({{extensions}}) reaches every subscriber and
+every relay on the path as the rest of the record does, so commercially
+sensitive values, such as the terms of a deal, do not belong there.
 
 # IANA Considerations {#iana}
 
@@ -1234,23 +1315,26 @@ satisfies the envelope rules of Section 5.2.2.1 of {{SVTA2053}} --
 array, and no `features` flag set that {{SVTA2053}} does not define. It
 does not validate the payload objects themselves; those are governed by
 {{SVTA2053}}, not by this document. It permits members it does not
-list, which {{extensions}} requires a receiver to ignore. It checks the shape of the `sig`
+list, which {{extensions}} requires a receiver to ignore, and checks
+the shape of an `extensions` member on the envelope. It checks the shape of the `sig`
 member of {{signing}} when one is present but does not require it, so
 that it continues to validate the unsigned records the deployment
 publishes today ({{impl-status}}); verifying a signature is in any case
 not a schema check.
 
-The vectors come in two sets, and both matter: eleven files holding
-thirteen records that MUST validate, and eleven records that MUST NOT. A validator
+The vectors come in two sets, and both matter: twelve files holding
+fourteen records that MUST validate, and eleven records that MUST NOT. A validator
 that accepts everything passes the first set alone. The valid set covers
 each envelope type and each index type, back-to-back placement
 opportunities, the worked example of {{example}}, one Object captured
-from the running deployment, `extension-member`, a record with the
-extension members of {{extensions}} at the envelope, Pod and Slot
-levels, and `signed-pod`, a record carrying the
-`sig` member of {{signing}}; the Ed25519 test key that signed it is
-published beside it under `vectors/keys/`, with a script under
-`scripts/` that signs and verifies records. Each rejecting case is otherwise valid, so
+from the running deployment, `extensions`, a record with the
+`extensions` member of {{extensions}} at the envelope, Pod and Slot
+levels, and two signed records: `signed-pod`, carrying the
+`sig` member of {{signing}}, and `signed-pod-iat`, the same record
+signed with a signing time. The Ed25519 test key that signed them is
+published beside them under `vectors/keys/`, with a script under
+`scripts/` that signs and verifies records and can hold a record to a
+maximum age. Each rejecting case is otherwise valid, so
 it fails for the reason its name claims; together they pin the
 constraints most likely to be implemented loosely:
 
@@ -1368,19 +1452,33 @@ it re-serialized with its members reordered.
 (To be removed before publication.)
 
 * New {{extensions}}: an interim rule for data that {{SVTA2053}} does
-  not define. A publisher places such data in one member per defining
-  party on the object it describes, never in `features`; a receiver
-  ignores members it does not recognize, after verifying the signature
-  over the record as received. {{payload}} scopes its statement about
-  receivers to `features` accordingly, and {{privacy}} notes that
-  extension members reach every subscriber and relay.
-* {{open-issues}} gains item 9, the missing extension point in
-  {{SVTA2053}}, and what this binding needs from the SVTA Advertising
-  Working Group to retire the interim rule.
-* {{schema}}: a new valid vector, `extension-member`, carries extension
-  members at the envelope, Pod and Slot levels.
-* {{impl-status}} records that the deployment publishes no extension
-  member yet.
+  not define. A publisher places such data in an `extensions` object on
+  the object it describes, keyed by the party that defines it, never in
+  `features`; a receiver ignores members it does not recognize, after
+  verifying the signature over the record as received. The form is the
+  one proposed to the SVTA Advertising Working Group. {{payload}} scopes
+  its statement about receivers to `features` accordingly, and
+  {{privacy}} notes that the data reaches every subscriber and relay.
+* {{signing}}: an optional signing time, `iat`, in the protected
+  header, and a maximum age that a deployment provisions with the key
+  set; the list of checks gains it. A paragraph on a signature carried
+  on the envelope itself, which does not replace `sig`. The sentence on
+  verification keys is reworded.
+* {{integrity}}: the index reference bounds replay only while the media
+  timeline keeps advancing; the signing time covers a restart.
+* {{open-issues}}: item 7 notes that `iat` is not a registered header
+  parameter name. Item 8 records that an optional `id` on Pod and Slot
+  is proposed for the 3rd edition {{SVTA2053-2}}. New item 9, the
+  missing extension point in {{SVTA2053}}, what this binding needs from
+  the SVTA Advertising Working Group to retire the interim rule, and
+  that both parts are proposed there.
+* {{schema}}: a new valid vector, `extensions`, carries the member at
+  the envelope, Pod and Slot levels, and the schema checks its shape on
+  the envelope; a new valid vector, `signed-pod-iat`, is signed with a
+  signing time, and the script can sign with one and hold a record to a
+  maximum age.
+* {{impl-status}}: signatures and the signing time are deployed; the
+  deployment publishes no `extensions` member yet.
 
 # Changes since draft-riedl-moq-ad-creative-signaling-00 {#changes}
 {:numbered="false"}

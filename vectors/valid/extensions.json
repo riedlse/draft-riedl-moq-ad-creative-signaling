@@ -3,20 +3,23 @@
   "data": {
     "version": 2,
     "type": "pod",
-    "x-example": {"decisionLabel": "example-decision-1"},
+    "extensions": {"com.example": {"decisionLabel": "example-decision-1"}},
     "payload": [
       {
         "duration": 30.03,
-        "x-example": {"breakLabel": "example-break-a"},
+        "extensions": {"com.example": {"breakLabel": "example-break-a"}},
         "slots": [
           {
             "type": "linear",
             "start": 0.0,
             "duration": 30.03,
             "identifiers": [{"scheme": "urn:com:example:ads:id", "value": "example-30s-a"}],
-            "x-example": {
-              "creativeParameters": {"example-measurement": "{\"campaign\":\"example\"}"},
-              "categories": ["example-category"]
+            "extensions": {
+              "com.example": {
+                "creativeParameters": {"example-measurement": "{\"campaign\":\"example\"}"},
+                "categories": ["example-category"]
+              },
+              "https://vendor.example/ns/labels": {"label": "example-label"}
             },
             "tracking": [
               {"type": "impression", "urls": ["https://beacons.example.com/c/4c1d9a52/imp"]},
