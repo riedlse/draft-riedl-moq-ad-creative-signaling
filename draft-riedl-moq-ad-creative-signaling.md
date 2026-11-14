@@ -478,8 +478,8 @@ string:
 ~~~
 "extensions": { "com.example": { "interactive": [ {
   "framework": "example-overlay",
-  "resource": { "type": "application/json",
-                "uri": "https://interactive.example.com/c/4c1d9a52" },
+  "type": "application/json",
+  "resource": "https://interactive.example.com/c/4c1d9a52",
   "parameters": "{\"campaign\":\"example\"}" } ] } }
 ~~~
 
