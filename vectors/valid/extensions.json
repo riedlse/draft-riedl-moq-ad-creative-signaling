@@ -17,7 +17,14 @@
             "extensions": {
               "com.example": {
                 "creativeParameters": {"example-measurement": "{\"campaign\":\"example\"}"},
-                "categories": ["example-category"]
+                "categories": ["example-category"],
+                "interactive": [
+                  {
+                    "framework": "example-overlay",
+                    "resource": {"type": "application/json", "uri": "https://interactive.example.com/c/4c1d9a52"},
+                    "parameters": "{\"campaign\":\"example\"}"
+                  }
+                ]
               },
               "https://vendor.example/ns/labels": {"label": "example-label"}
             },

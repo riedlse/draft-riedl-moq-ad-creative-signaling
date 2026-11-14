@@ -447,6 +447,66 @@ receiver that acts on it ({{validation}}), it is not resolved through
 that repeats the record ({{Section 8.3 of MSF}}), so it is best kept
 small.
 
+### Interactive Components {#interactive}
+
+Some creatives come with a component that the device presents with the
+ad and that the viewer can act on: a button that opens the advertiser's
+page or adds a program to a watch list, or an overlay that a vendor's
+runtime renders from its own configuration. {{VAST}} delivers these as
+`VideoClicks`, as an `InteractiveCreativeFile`, as a `MediaFile` or
+`Companion` with an `apiFramework`, or as `AdParameters` and
+`Extensions` that are handed unparsed to a vendor's runtime. On a
+server-stitched stream the video of the ad is in the media track, and
+the component is the part that still has to reach the device.
+
+{{SVTA2053}} covers the first of these. A Slot's `clickThrough` carries
+the destination of a click, and `clickTracking` is among its tracking
+event types. It has no member that names a runtime, a resource for
+that runtime to load, or parameters to hand to it (item 10 of
+{{open-issues}}).
+
+Until it has one, a publisher that carries such a component on this
+track places it in the `extensions` member of the Slot it belongs to
+({{extensions}}). The condition of {{extensions}} is met because the
+component is optional by nature: a receiver that lacks the runtime, or
+does not recognize the member, presents the ad from the media track and
+measures it like any other, as a device without a vendor's runtime does
+with a server-stitched ad today. The content is the defining party's. A
+typical one names the runtime and gives it a resource or a parameter
+string:
+
+~~~
+"extensions": { "com.example": { "interactive": [ {
+  "framework": "example-overlay",
+  "resource": { "type": "application/json",
+                "uri": "https://interactive.example.com/c/4c1d9a52" },
+  "parameters": "{\"campaign\":\"example\"}" } ] } }
+~~~
+
+The rest of this document applies to an interactive component as it
+does to the rest of the record:
+
+* It is subscriber-invariant ({{invariance}}). A resource URI or a
+  parameter string that a vendor issues per impression, with a session
+  identifier, a device address or a cache-busting value in it, cannot
+  be carried as issued. It is carried as a template that the device
+  completes, or behind a capability URL ({{capability-urls}}).
+* It is covered by the signature, and a record that fails verification
+  is absent for it as well ({{signing}}). A resource that a runtime
+  loads and runs on the device is a more valuable target than a
+  tracking URL ({{validation}}).
+* It has to be on the device before its Slot starts, which is what the
+  publication lead provides ({{publication-lead}}). A runtime that
+  wants the components of a whole break, or of a whole program, before
+  playback starts cannot be served that way from a live shared track.
+* It is repeated in every Object that repeats the record ({{Section
+  8.3 of MSF}}), so a large configuration is better carried as a URI
+  than inline.
+* A request that the device makes when the viewer acts, such as a
+  click-through or its tracking, is a tracking request under
+  {{capability-urls}}. Requests that a vendor's runtime makes on its
+  own are outside this document.
+
 ## Subscriber Invariance {#invariance}
 
 Records on this track MUST be subscriber-invariant: no field value may
@@ -518,8 +578,8 @@ that the signature verifies over the canonical payload, and, where a
 maximum age has been provisioned, that `iat` is present and within it
 (see below). A record that
 fails any of these checks MUST be treated as absent for the purposes of
-{{capability-urls}}: no tracking, `$remote`, verification or
-click-through resource it names is requested. Media playback is
+{{capability-urls}}: no tracking, `$remote`, verification,
+click-through or interactive resource it names is requested. Media playback is
 unaffected; the record is advisory. A verifier MAY report the failure
 to the distributor over a channel established out of band, which gives
 the distributor evidence of tampering on paths it does not operate.
@@ -833,6 +893,8 @@ records keep their own size, cadence and failure behavior. The cost is
 the missing placement identifier (item 8 of {{open-issues}}): once
 records describing one placement opportunity are spread across tracks,
 a shared index identifies the opportunity but not the slot within it.
+Until such a track is defined, {{interactive}} says where an
+interactive component rides.
 
 Separately, {{MOQT}} today defines properties at Track and Object scope
 only. A proposal before the MoQ Working Group {{MOQT-SUBGROUP-PROPS}}
@@ -1040,6 +1102,29 @@ discussion; it is to be removed before publication.
    {{SVTA2053-2}}, in the form {{extensions}} uses. With both in
    {{SVTA2053}}, {{extensions}} reduces to a reference to them.
 
+10. **Interactive components**: {{SVTA2053}} carries a click-through
+    (`clickThrough`, `clickTracking`) and nothing for a component that
+    a runtime on the device renders: no member for the runtime's name,
+    the resource it loads or the parameters it is handed, which
+    {{VAST}} has in `InteractiveCreativeFile`, in `apiFramework` and in
+    `AdParameters`. The only object of that shape in the model is the
+    Verification, which is for measurement. The concurrent
+    presentations of the 3rd edition {{SVTA2053-2}} are layouts of
+    additional media beside the primary content, which is a different
+    thing from a component that a vendor's runtime renders over one
+    linear Slot.
+
+    {{interactive}} is an interim rule: the component rides in the
+    Slot's `extensions`. The lasting answer is again the data model's:
+    a Slot member that lists interactive components, each with a
+    runtime name, a resource and parameters, as the Verification has
+    for measurement, and tracking event types for interaction beyond
+    `clickTracking`. This has not yet been raised with the SVTA
+    Advertising Working Group. The alternative within this document's
+    reach is a sibling track of its own for interactivity
+    ({{future-carriage}}), which needs the placement identifier of
+    item 8 to tie a component to its Slot.
+
 # Implementation Status {#impl-status}
 
 (This section follows {{RFC7942}} and is to be removed before
@@ -1178,6 +1263,8 @@ NOT yet implemented:
 * `slot`, `trackingEvent` and `verification` envelopes, `$remote`, and
   the Slot members `media`, `verifications`, `skipOffset` and
   `clickThrough`.
+* Interactive components ({{interactive}}). None of the creatives the
+  deployment splices has one.
 * Extensions ({{extensions}}). Records carry no `extensions` member as
   of this revision. The validator and the player read only the members
   they know, so both ignore any other. The name the deployment intends
@@ -1253,6 +1340,10 @@ and nesting limits on the JSON envelope, and accept only `https` URLs
 in tracking, `$remote`, and verification fields. Verification resources
 are executable code; clients MUST apply their platform's script-loading
 policy and SHOULD load them only for slots that will actually render.
+The same holds for a resource that an interactive component names
+({{interactive}}): a receiver accepts only `https` there, treats it as
+code or as configuration of code, and SHOULD load it only from
+authorities the distributor has designated.
 
 ## Privacy {#privacy}
 
@@ -1459,6 +1550,11 @@ it re-serialized with its members reordered.
   one proposed to the SVTA Advertising Working Group. {{payload}} scopes
   its statement about receivers to `features` accordingly, and
   {{privacy}} notes that the data reaches every subscriber and relay.
+* New {{interactive}}: where a component that the viewer can act on
+  rides until {{SVTA2053}} has a member for it, and what subscriber
+  invariance, the signature and the publication lead mean for it.
+  {{open-issues}} gains item 10; {{validation}} and the list of
+  resources in {{signing}} name interactive resources.
 * {{signing}}: an optional signing time, `iat`, in the protected
   header, and a maximum age that a deployment provisions with the key
   set; the list of checks gains it. A paragraph on a signature carried
