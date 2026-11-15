@@ -641,7 +641,7 @@ relay-cacheable. It costs one 64-byte signature and a short protected
 header per record, and one Ed25519 verification per record received.
 {{VECTORS}} contains a signed record with the test key that signed it
 and a script that signs and verifies records; the example in
-{{example}} omits `sig` for brevity.
+{{example}} shows the `sig` member of its record.
 
 # Timing and Correlation {#timing}
 
@@ -789,6 +789,26 @@ The `remoteFields` flag is set because slot 2 uses `$remote`. This
 record is also published as the `worked-example` test vector. The
 appendix on test vectors ({{schema}}) shows a record captured from the
 running deployment.
+
+The listing leaves out the `sig` member of the record ({{signing}}) so
+that the payload stays readable. Signed with the test key of
+{{VECTORS}} at a signing time of 2026-11-05T00:00:00Z, the member is
+the following, and the test vector carries it. The value is one
+string, shown here on four lines:
+
+~~~
+"sig": "eyJhbGciOiJFZERTQSIsImtpZCI6InRlc3QtMjAyNi0xMSIsImI2NCI6ZmFsc
+  2UsImNyaXQiOlsiYjY0Il0sImlhdCI6MTc5MzgzNjgwMH0..RnCPa9EkLkeVcXuE8e
+  4ZvJRZ-4nYd8iq-KFG9clvOg8nq9gkc-kIE4x6MPhA7JYUFlx0nW8WyJ8LQFRa0FQV
+  Dw"
+~~~
+
+Its protected header, decoded, carries the signing time as `iat`:
+
+~~~ json
+{"alg":"EdDSA","kid":"test-2026-11","b64":false,
+ "crit":["b64"],"iat":1793836800}
+~~~
 
 # Tracking Indirection and Capability URLs {#capability-urls}
 
@@ -1048,6 +1068,13 @@ discussion; it is to be removed before publication.
    parameter name agreed between publisher and verifier, not a
    registered one, and whether to register it is open. A COSE encoding
    was considered and set aside because the records are JSON.
+
+   The construction of {{signing}} is also proposed for the 3rd edition
+   of {{SVTA2053}} {{SVTA2053-2}}, as an optional signature on the
+   envelope. If an edition defines it, {{signing}} is expected to cite
+   that definition for the construction and to keep only what belongs
+   to the record: that the signature is required, that it covers the
+   index reference, and that it is made per record.
 
 8. **No stable placement identifier**: {{SVTA2053}} gives neither the Pod
    nor the Slot object an identifier. A Pod carries `start`, `duration`,
@@ -1450,10 +1477,11 @@ The vectors come in two sets, and both matter: twelve files holding
 fourteen records that MUST validate, and eleven records that MUST NOT. A validator
 that accepts everything passes the first set alone. The valid set covers
 each envelope type and each index type, back-to-back placement
-opportunities, the worked example of {{example}}, one Object captured
+opportunities, the worked example of {{example}} with its signature,
+one Object captured
 from the running deployment, `extensions`, a record with the
 `extensions` member of {{extensions}} at the envelope, Pod and Slot
-levels, and two signed records: `signed-pod`, carrying the
+levels, and two further signed records: `signed-pod`, carrying the
 `sig` member of {{signing}}, and `signed-pod-iat`, the same record
 signed with a signing time. The Ed25519 test key that signed them is
 published beside them under `vectors/keys/`, with a script under
@@ -1558,8 +1586,7 @@ Object, about 100 s later on the same timeline, is a four-slot pod of
 15 s creatives.
 
 Apart from `captured-object`, the vectors are conformance examples
-authored against this specification. Every vector other than the two
-signature vectors was checked two ways:
+authored against this specification. Every vector was checked two ways:
 against the schema, with a JSON Schema draft 2020-12 validator; and
 against the record and payload checks of the implementation in
 {{impl-status}}, the same checks its read-only validator applies to live
@@ -1569,10 +1596,11 @@ required identifiers, non-empty `urls`, and defined event types). Both
 accept every valid vector and reject every invalid one, each for the
 reason its name gives. The implementation reads the index keys in the
 spelling {{MSF}} used before its -02 revision ({{impl-status}}), so for
-that check the keys were given to it in that spelling. The two signature vectors were checked against
-the schema, and `signed-pod` was verified with the published script,
-which also rejects it once any byte of the record changes and accepts
-it re-serialized with its members reordered.
+that check the keys were given to it in that spelling. The signatures
+of `signed-pod`, `signed-pod-iat` and `worked-example` were verified
+with the published script, which also rejects `signed-pod` once any
+byte of the record changes and accepts it re-serialized with its
+members reordered.
 
 # Changes since draft-riedl-moq-ad-creative-signaling-01 {#changes-01}
 {:numbered="false"}
@@ -1605,6 +1633,10 @@ it re-serialized with its members reordered.
   missing extension point in {{SVTA2053}}, what this binding needs from
   the SVTA Advertising Working Group to retire the interim rule, and
   that both parts are proposed there.
+* {{example}} shows the `sig` member of its record, signed with a
+  signing time, and the `worked-example` vector carries it. Item 7 of
+  {{open-issues}} says what {{signing}} would keep if an edition of
+  {{SVTA2053}} defines the construction.
 * {{schema}}: a new valid vector, `extensions`, carries the member at
   the envelope, Pod and Slot levels, and the schema checks its shape on
   the envelope; a new valid vector, `signed-pod-iat`, is signed with a

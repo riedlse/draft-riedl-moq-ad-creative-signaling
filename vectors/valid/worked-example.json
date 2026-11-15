@@ -40,5 +40,6 @@
       }
     ],
     "features": {"remoteFields": true}
-  }
+  },
+  "sig": "eyJhbGciOiJFZERTQSIsImtpZCI6InRlc3QtMjAyNi0xMSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il0sImlhdCI6MTc5MzgzNjgwMH0..RnCPa9EkLkeVcXuE8e4ZvJRZ-4nYd8iq-KFG9clvOg8nq9gkc-kIE4x6MPhA7JYUFlx0nW8WyJ8LQFRa0FQVDw"
 }
