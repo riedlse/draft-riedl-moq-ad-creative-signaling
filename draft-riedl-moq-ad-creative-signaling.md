@@ -413,8 +413,7 @@ a JSON object whose content that party defines:
 ~~~
 
 A defining party uses one name, so that its data on an object is in one
-place. {{impl-status}} gives the name the author's deployment intends
-to use.
+place.
 
 A publisher MUST NOT place such data anywhere else in the envelope. In
 particular it MUST NOT place it inside `features`, and MUST NOT set a
@@ -1267,8 +1266,7 @@ NOT yet implemented:
   deployment splices has one.
 * Extensions ({{extensions}}). Records carry no `extensions` member as
   of this revision. The validator and the player read only the members
-  they know, so both ignore any other. The name the deployment intends
-  to use for its own data is `tv.pluto`.
+  they know, so both ignore any other.
 * A splice signaling track, and so the correlation rules of
   {{correlation}}.
 * The IANA registration in {{iana}}, which this document requests.
