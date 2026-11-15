@@ -1,0 +1,45 @@
+{
+  "m": 120000,
+  "data": {
+    "version": 2,
+    "type": "pod",
+    "payload": [
+      {
+        "duration": 30.03,
+        "slots": [
+          {
+            "type": "linear",
+            "start": 0.0,
+            "duration": 30.03,
+            "identifiers": [{"scheme": "urn:com:example:ads:id", "value": "example-30s-a"}],
+            "interactive": [
+              {
+                "framework": "SIMID",
+                "type": "text/html",
+                "resource": "https://interactive.example.com/c/4c1d9a52/index.html",
+                "parameters": "{\"campaign\":\"example\"}",
+                "tracking": [
+                  {"type": "interactiveStart", "urls": ["https://beacons.example.com/c/4c1d9a52/istart"]},
+                  {"type": "acceptInvitation", "urls": ["https://beacons.example.com/c/4c1d9a52/accept"]}
+                ]
+              },
+              {
+                "framework": "example-overlay",
+                "parameters": "{\"placement\":\"lower-third\"}"
+              }
+            ],
+            "tracking": [
+              {"type": "impression", "urls": ["https://beacons.example.com/c/4c1d9a52/imp"]},
+              {"type": "start", "urls": ["https://beacons.example.com/c/4c1d9a52/start"]},
+              {"type": "complete", "urls": ["https://beacons.example.com/c/4c1d9a52/done"]}
+            ]
+          }
+        ],
+        "tracking": [
+          {"type": "podStart", "urls": ["https://beacons.example.com/c/a07e33b1/start"]},
+          {"type": "podEnd", "urls": ["https://beacons.example.com/c/a07e33b1/end"]}
+        ]
+      }
+    ]
+  }
+}
