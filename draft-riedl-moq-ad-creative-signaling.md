@@ -114,11 +114,6 @@ informative:
       - org: IAB Technology Laboratory
     date: 2019-06
     target: https://iabtechlab.com/standards/vast/
-  SIMID:
-    title: "Secure Interactive Media Interface Definition (SIMID)"
-    author:
-      - org: IAB Technology Laboratory
-    target: https://iabtechlab.com/standards/simid/
   OMSDK:
     title: "Open Measurement SDK"
     author:
@@ -441,9 +436,9 @@ member at the top level of a record, whose members are those of
 
 A record MUST remain complete and correct for a receiver that ignores
 `extensions`. Anything a receiver needs in order to present or measure
-an ad belongs in the members {{SVTA2053}} defines or in the
-`interactive` member of {{interactive}}, and an identifier belongs in a
-Slot's `identifiers` under a scheme of the publisher's choosing.
+an ad belongs in the members {{SVTA2053}} defines, and an identifier
+belongs in a Slot's `identifiers` under a scheme of the publisher's
+choosing.
 
 A receiver MUST ignore a member of the envelope, or of an object within
 its payload, that it does not recognize, and MUST NOT treat the record
@@ -477,64 +472,33 @@ the component is the part that still has to reach the device.
 {{SVTA2053}} covers the first of these. A Slot's `clickThrough` carries
 the destination of a click, and `clickTracking` is among its tracking
 event types. It has no member that names a runtime, a resource for
-that runtime to load, or parameters to hand to it. A member of that
-shape has been proposed for the 3rd edition (item 10 of
-{{open-issues}}).
+that runtime to load, or parameters to hand to it. Defining one is a
+matter for {{SVTA2053}}, whose object model this document carries
+unchanged ({{payload}}), and a member of that shape has been proposed
+for its 3rd edition (item 10 of {{open-issues}}). This document
+defines none.
 
-This section defines that member for records on this track, in the
-form proposed there, so that a record written to it should need no
-change if that form is adopted. When an edition of {{SVTA2053}} defines
-an `interactive` member of the Slot, that definition governs.
-
-A Slot MAY carry an `interactive` member. Its value is an array of
-Interactive objects, one for each component that is presented with the
-Slot. An Interactive object has these members:
-
-| Member | Type | Required | Description |
-|:-------|:-----|:---------|:------------|
-| `framework` | String | Yes | Identifies the runtime that presents the component, as the `apiFramework` attribute does in {{VAST}}. The value `SIMID` identifies {{SIMID}}. Other values are agreed between the publisher and the application on the device. |
-| `type` | String | No | The media type of what `resource` locates, for example `text/html` or `application/json`. |
-| `resource` | String | No | A URI of a resource that the runtime loads: the document of an interactive creative, or a configuration of the runtime. |
-| `parameters` | String | No | An opaque value that is handed to the runtime unchanged, as the content of an `AdParameters` element is. |
-| `tracking` | Array | No | Tracking events of the component, in the form {{SVTA2053}} gives a Slot's `tracking`. |
-{: #interactive-object title="Interactive Object"}
-
-An Interactive object MUST carry `resource`, `parameters`, or both.
-Which of them a runtime needs is a matter of its `framework`.
+Until {{SVTA2053}} has one, a publisher that carries such a component
+on this track places it in the `extensions` member of the Slot it
+belongs to
+({{extensions}}). The condition of {{extensions}} is met because the
+component is optional by nature: a receiver that lacks the runtime, or
+does not recognize the member, presents the ad from the media track and
+measures it like any other, as a device without a vendor's runtime does
+with a server-stitched ad today. The content is the defining party's. A
+typical one names the runtime and gives it a resource or a parameter
+string:
 
 ~~~
-"interactive": [ {
-  "framework": "SIMID",
-  "type": "text/html",
-  "resource": "https://interactive.example.com/c/4c1d9a52.html",
-  "parameters": "{\"campaign\":\"example\"}",
-  "tracking": [ { "type": "interactiveStart",
-    "urls": ["https://beacons.example.com/c/4c1d9a52/istart"] } ] } ]
+"extensions": { "com.example": { "interactive": [ {
+  "framework": "example-overlay",
+  "type": "application/json",
+  "resource": "https://interactive.example.com/c/4c1d9a52",
+  "parameters": "{\"campaign\":\"example\"}" } ] } }
 ~~~
 
-A receiver that does not implement the runtime that `framework`
-identifies MUST ignore the Interactive object. It presents the ad from
-the media track and requests the Slot's tracking as if the object were
-absent, as a device without a vendor's runtime does with a
-server-stitched ad today. For that reason a publisher MUST NOT announce
-`interactive` with a `features` flag: a flag set to `true` would make a
-receiver without the runtime discard the payload.
-
-A component belongs to its Slot. A receiver starts it no earlier than
-the start of the Slot and, unless the application and the runtime
-provide for more, ends it when the Slot ends. This document does not
-define the interface between the application and the runtime.
-
-A receiver requests a tracking event of an Interactive object when the
-runtime reports the event it describes. An `offset`, when present, is
-relative to the start of the Slot that carries the object. The proposal
-to the 3rd edition adds three event types for what only a component
-does: `interactiveStart`, `acceptInvitation` and `otherAdInteraction`.
-A publisher MAY use them here.
-
-Data for a runtime is carried in `interactive` and not in `extensions`
-({{extensions}}), because a receiver needs it in order to present the
-component.
+When an edition of {{SVTA2053}} defines a member for such a component,
+a publisher uses that member, and this interim use of `extensions` ends.
 
 The rest of this document applies to an interactive component as it
 does to the rest of the record:
@@ -555,9 +519,8 @@ does to the rest of the record:
 * It is repeated in every Object that repeats the record
   ({{record-structure}}), so a large configuration is better carried as
   a URI than inline.
-* A request that the device makes when the viewer acts or the runtime
-  reports an event, such as a click-through, its tracking or a tracking
-  event of the component, is a tracking request under
+* A request that the device makes when the viewer acts, such as a
+  click-through or its tracking, is a tracking request under
   {{capability-urls}}. Requests that a vendor's runtime makes on its
   own are outside this document.
 
@@ -947,8 +910,8 @@ records keep their own size, cadence and failure behavior. The cost is
 the missing placement identifier (item 8 of {{open-issues}}): once
 records describing one placement opportunity are spread across tracks,
 a shared index identifies the opportunity but not the slot within it.
-Until such a track is defined, an interactive component is a member of
-its Slot ({{interactive}}).
+Until such a track is defined, {{interactive}} says where an
+interactive component rides.
 
 Separately, {{MOQT}} today defines properties at Track and Object scope
 only. A proposal before the MoQ Working Group {{MOQT-SUBGROUP-PROPS}}
@@ -1172,18 +1135,18 @@ discussion; it is to be removed before publication.
     thing from a component that a vendor's runtime renders over one
     linear Slot.
 
-    {{interactive}} defines the member for records on this track: an
-    `interactive` member of the Slot that lists Interactive objects,
-    each with a runtime name, a resource, parameters and tracking, as
-    the Verification has for measurement. It is the form entered as a
-    proposed change to the working draft of the 3rd edition on
-    2026-11-14, together with three tracking event types for
-    interaction beyond `clickTracking`. The item stays open until an
-    edition of {{SVTA2053}} defines the member, whose definition then
-    governs. The alternative within this document's reach is a sibling
-    track of its own for interactivity ({{future-carriage}}), which
-    needs the placement identifier of item 8 to tie a component to its
-    Slot.
+    {{interactive}} is an interim rule: the component rides in the
+    Slot's `extensions`. The lasting answer is again the data model's,
+    and so for {{SVTA2053}} to define and not for this document:
+    a Slot member that lists interactive components, each with a
+    runtime name, a resource and parameters, as the Verification has
+    for measurement, and tracking event types for interaction beyond
+    `clickTracking`. A member of that shape was entered as a proposed
+    change to the working draft of the 3rd edition on 2026-11-14. The
+    alternative within this document's
+    reach is a sibling track of its own for interactivity
+    ({{future-carriage}}), which needs the placement identifier of
+    item 8 to tie a component to its Slot.
 
 # Implementation Status {#impl-status}
 
@@ -1483,15 +1446,14 @@ that it continues to validate the unsigned records the deployment
 publishes today ({{impl-status}}); verifying a signature is in any case
 not a schema check.
 
-The vectors come in two sets, and both matter: thirteen files holding
-fifteen records that MUST validate, and eleven records that MUST NOT. A validator
+The vectors come in two sets, and both matter: twelve files holding
+fourteen records that MUST validate, and eleven records that MUST NOT. A validator
 that accepts everything passes the first set alone. The valid set covers
 each envelope type and each index type, back-to-back placement
 opportunities, the worked example of {{example}}, one Object captured
 from the running deployment, `extensions`, a record with the
 `extensions` member of {{extensions}} at the envelope, Pod and Slot
-levels, `interactive`, a Slot with the `interactive` member of
-{{interactive}}, and two signed records: `signed-pod`, carrying the
+levels, and two signed records: `signed-pod`, carrying the
 `sig` member of {{signing}}, and `signed-pod-iat`, the same record
 signed with a signing time. The Ed25519 test key that signed them is
 published beside them under `vectors/keys/`, with a script under
@@ -1625,10 +1587,9 @@ it re-serialized with its members reordered.
   one proposed to the SVTA Advertising Working Group. {{payload}} scopes
   its statement about receivers to `features` accordingly, and
   {{privacy}} notes that the data reaches every subscriber and relay.
-* New {{interactive}}: an `interactive` member of the Slot for a
-  component that the viewer can act on, in the form proposed for the
-  3rd edition of {{SVTA2053}}, and what subscriber invariance, the
-  signature and the publication lead mean for it.
+* New {{interactive}}: where a component that the viewer can act on
+  rides until {{SVTA2053}} has a member for it, and what subscriber
+  invariance, the signature and the publication lead mean for it.
   {{open-issues}} gains item 10; {{validation}} and the list of
   resources in {{signing}} name interactive resources.
 * {{signing}}: an optional signing time, `iat`, in the protected
@@ -1663,7 +1624,6 @@ it re-serialized with its members reordered.
   rule is unchanged. {{iana}} uses the columns the registry now has and
   notes its guidance on URNs. Item 7 of {{open-issues}} names the new
   header data as a possible carrier for a key set location.
-* {{schema}}: a new valid vector, `interactive`.
 
 # Changes since draft-riedl-moq-ad-creative-signaling-00 {#changes}
 {:numbered="false"}
