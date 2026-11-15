@@ -636,6 +636,18 @@ show that the envelope is at the position on the timeline that the
 publisher gave it. A verifier on this track checks `sig`, and MAY also
 check an envelope signature that it understands.
 
+A publisher on this track is not required to sign the envelope as
+well, since `sig` covers it. An edition of {{SVTA2053}} may have a
+receiver that holds verification keys treat an envelope without a
+signature as one that fails verification, so that a signature cannot
+be defeated by removing it. On this track `sig` does that work: a
+receiver MUST NOT treat a record whose `sig` has verified as failing
+because its envelope carries no signature of its own. An envelope
+signature is useful here where another party made it, for example the
+producer of an envelope that a distributor carries onto this track
+unchanged; `sig` then shows who placed the envelope on the timeline,
+and the envelope signature who produced it.
+
 The signature is subscriber-invariant ({{invariance}}) and so remains
 relay-cacheable. It costs one 64-byte signature and a short protected
 header per record, and one Ed25519 verification per record received.
@@ -1633,6 +1645,9 @@ members reordered.
   missing extension point in {{SVTA2053}}, what this binding needs from
   the SVTA Advertising Working Group to retire the interim rule, and
   that both parts are proposed there.
+* {{signing}}: a publisher need not sign the envelope as well as the
+  record, and a record whose `sig` verified does not fail for lacking
+  an envelope signature.
 * {{example}} shows the `sig` member of its record, signed with a
   signing time, and the `worked-example` vector carries it. Item 7 of
   {{open-issues}} says what {{signing}} would keep if an edition of
