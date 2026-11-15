@@ -135,6 +135,7 @@ informative:
     seriesinfo:
       W3C: First Public Working Draft
   RFC7942:
+  RFC8141:
 
 --- abstract
 
@@ -167,7 +168,7 @@ SCTE-35 messages {{SCTE35}} carried on an MSF Event Timeline track
 {{SCTE35-MOQ}} give Media over QUIC deployments the function SCTE-35 was
 built for: signaling placement opportunities -- break windows and splice
 conditioning -- on a shared media timeline, using the Event Timeline
-mechanism of the MOQT Streaming Format ({{Section 8.1 of MSF}}). What
+mechanism of the MOQT Streaming Format ({{Section 8 of MSF}}). What
 that layer deliberately does not carry is a description of what plays
 inside those windows.
 
@@ -218,14 +219,14 @@ reports what was measured.
 {::boilerplate bcp14-tagged}
 
 This document uses the terms Track, Group, Object, Event Timeline, and
-the index reference fields `t`, `l`, and `m` as defined in {{MSF}}, and
+the index reference fields `T`, `L`, and `M` as defined in {{MSF}}, and
 the terms Pod, Slot, Tracking Event, Verification, and carriage envelope
 as defined in Sections 4 and 5 of {{SVTA2053}}.
 
-The index keys are spelled as in the published {{MSF}}. The MSF
-editor's copy has since renamed them `T`, `L` and `M`; this document
-will follow whichever spelling MSF settles on, and implementations may
-wish to accept both in the meantime.
+The index keys are spelled as {{MSF}} spells them. Revisions of {{MSF}}
+before -02 wrote them `t`, `l` and `m`, as did earlier revisions of this
+document, and a receiver may wish to accept both spellings while
+publishers move ({{impl-status}}).
 
 Additionally:
 
@@ -249,9 +250,8 @@ Capability URL:
 
 An MSF track carrying ad creative signaling:
 
-* MUST declare a packaging value of `"eventtimeline"` and a `mimeType`
-  of `"application/json"`, as {{Section 8.2 of MSF}} requires of every
-  Event Timeline track;
+* MUST declare a packaging value of `"eventtimeline"`, as {{Section 8.3
+  of MSF}} requires of every Event Timeline track;
 
 * MUST declare an `eventType` value of
   `"urn:svta:advertising-wg:ad-creative-signaling"`. This is the data
@@ -263,6 +263,11 @@ An MSF track carrying ad creative signaling:
   whose timeline its records index. When the track accompanies a splice
   signaling track, it SHOULD name the same media track(s) as that
   track.
+
+This event type defines no Event Timeline header data ({{Section 8.1 of
+MSF}}). A publisher MUST NOT send the MSF_EVENT_TIMELINE_HEADER Track
+property on an ad creative signaling track, and a subscriber that
+receives one MUST ignore its value.
 
 Because `eventType` is uniform for a track, and because implementations
 do not mix payload flavors within one Event Timeline track (see Section
@@ -285,14 +290,15 @@ those rules simply do not apply.
 ## Structure {#record-structure}
 
 Each record is a JSON object {{RFC8259}} following the Event Timeline
-data format of {{Section 8.1 of MSF}}. A record MUST contain:
+data format of {{Section 8.2 of MSF}}. A record MUST contain:
 
-* exactly one index reference field -- `t` (wallclock), `l` (MOQT
-  Location), or `m` (media time) -- selected per {{index-selection}}
-  and typed as {{Section 8.1 of MSF}} defines it: `t` and `m` are JSON
+* exactly one index reference field -- `T` (wallclock), `L` (MOQT
+  Location), or `M` (media time) -- selected per {{index-selection}}
+  and typed as {{Section 8.2 of MSF}} defines it: `T` and `M` are JSON
   Numbers of milliseconds (a wallclock index is milliseconds since the
-  Unix epoch, not a date string), and `l` is an Array of two Numbers,
-  the MOQT Group ID and Object ID;
+  Unix epoch, as {{Section 11.6 of MSF}} defines wallclock time, not a
+  date string), and `L` is an Array of two Numbers, the MOQT Group ID
+  and Object ID;
 
 * a `data` field whose value is exactly one Version 2 carriage
   envelope as defined in {{payload}}; and
@@ -300,20 +306,25 @@ data format of {{Section 8.1 of MSF}}. A record MUST contain:
 * a `sig` member holding the distributor's signature over the record,
   as {{signing}} defines.
 
-Records are carried in the Objects of the track as {{Section 8.3 of MSF}}
-specifies: the first Object of each Group is the independent array of
-every record accumulated and accessible so far. A subscriber that joins
-at a Group boundary during a placement opportunity therefore receives
-its record, provided the publisher keeps the record accessible until the
+{{Section 8.4 of MSF}} leaves the mapping of records to Groups and
+Objects to the event type. The records of this event type are consumed
+as a sequence, and the mapping is the one {{MSF}} recommends for that
+case, made a requirement: the first Object of each Group MUST be the
+independent array of every record accumulated and accessible so far. A
+publisher MAY publish incremental updates in the second and subsequent
+Objects of a Group, each holding only the records added since the
+previous Object of that Group. A subscriber that joins at a Group
+boundary during a placement opportunity therefore receives its record,
+provided the publisher keeps the record accessible until the
 opportunity has ended.
 
 ## Index Reference Selection {#index-selection}
 
 Records describing creatives spliced into the media timeline SHOULD use
-the `m` (media time) index, expressed in the coordinate space of the
+the `M` (media time) index, expressed in the coordinate space of the
 `depends` media track and sharing that track's timeline zero point. The
-`t` (wallclock) index MAY be used where a placement opportunity is
-defined in wallclock terms and no media time is available. The `l`
+`T` (wallclock) index MAY be used where a placement opportunity is
+defined in wallclock terms and no media time is available. The `L`
 (MOQT Location) index MAY be used for records bound to a delivery
 position rather than a media time.
 
@@ -448,7 +459,7 @@ In every other respect `extensions` is part of the record. It is
 subscriber-invariant ({{invariance}}), it is untrusted input to a
 receiver that acts on it ({{validation}}), it is not resolved through
 `$remote` ({{capability-urls}}), and it is repeated in every Object
-that repeats the record ({{Section 8.3 of MSF}}), so it is best kept
+that repeats the record ({{record-structure}}), so it is best kept
 small.
 
 ### Interactive Components {#interactive}
@@ -541,9 +552,9 @@ does to the rest of the record:
   publication lead provides ({{publication-lead}}). A runtime that
   wants the components of a whole break, or of a whole program, before
   playback starts cannot be served that way from a live shared track.
-* It is repeated in every Object that repeats the record ({{Section
-  8.3 of MSF}}), so a large configuration is better carried as a URI
-  than inline.
+* It is repeated in every Object that repeats the record
+  ({{record-structure}}), so a large configuration is better carried as
+  a URI than inline.
 * A request that the device makes when the viewer acts or the runtime
   reports an event, such as a click-through, its tracking or a tracking
   event of the component, is a tracking request under
@@ -585,10 +596,10 @@ form is the signing input only. The record is transmitted in whatever
 serialization the publisher produces, and a relay or library may
 re-serialize it -- member order, whitespace, number formatting within
 the rules of {{RFC8785}} -- without invalidating the signature. The
-signature is per record rather than per Object because {{Section 8.3
-of MSF}} re-forms the array of accumulated records at every Group; a
-per-record signature survives that and lets each record be verified on
-its own.
+signature is per record rather than per Object because the array of
+accumulated records is formed again at every Group
+({{record-structure}}); a per-record signature survives that and lets
+each record be verified on its own.
 
 The protected header MUST contain `alg` and `kid`. Publishers and
 verifiers MUST support `"alg": "EdDSA"` with Ed25519 keys {{RFC8032}}
@@ -635,7 +646,7 @@ name agreed between publisher and verifier, as {{Section 4.3 of
 RFC7515}} allows. A publisher MUST NOT list `iat` in `crit`, so that a
 verifier that does not use it can still verify the signature. A
 publisher that signs a record once, when it first publishes it, repeats
-the record unchanged in later Objects ({{Section 8.3 of MSF}}); `iat`
+the record unchanged in later Objects ({{record-structure}}); `iat`
 is then the time of first publication and not the time of the Object
 that carries the record.
 
@@ -682,7 +693,7 @@ signaling track that names the same media track.
 
 The record or records describing a placement opportunity SHOULD carry
 the same index value as the SCTE-35 record whose splice point opens
-that opportunity (the same `m`, or the same `l` Location when the
+that opportunity (the same `M`, or the same `L` Location when the
 splice is immediate). A pod whose start differs from the splice point
 MUST carry an index within the window the splice defines.
 
@@ -718,13 +729,13 @@ normally has `start` 0, as the per-slot events of the DASH binding do
 
 # Worked Example {#example}
 
-An SCTE-35 record on the splice signaling track (reproduced from
-Section 5.1 of {{SCTE35-MOQ}}) announces a splice at media time
-480500 ms:
+An SCTE-35 record on the splice signaling track (from Section 5.1 of
+{{SCTE35-MOQ}}, which predates the index-key change in {{MSF}} and
+writes `m`) announces a splice at media time 480500 ms:
 
 ~~~ json
 {
-  "m": 480500,
+  "M": 480500,
   "data": {
     "scte35_payload":
       "/DAhAAAAAAAAAP/wFAUAAArXf+/+AAAAAH4AARSyAAAAAA=="
@@ -742,7 +753,7 @@ via `$remote` ({{capability-urls}}):
 
 ~~~ json
 {
-  "m": 480500,
+  "M": 480500,
   "data": {
     "version": 2,
     "type": "pod",
@@ -980,7 +991,7 @@ discussion; it is to be removed before publication.
    SCTE-35 inherits cancellation from its payload semantics.
    Implementation experience favors the simple rule. When a splice
    fails, the deployed publisher publishes a complete new record with
-   the same `m`, dropping the failed slot and moving the later ones to
+   the same `M`, dropping the failed slot and moving the later ones to
    where they really air, and its player replaces only the events it has
    not yet fired. No patch rule has been needed so far.
 
@@ -989,9 +1000,9 @@ discussion; it is to be removed before publication.
    carry no id. Is (eventType, index, payload) a sufficient dedup key
    under relay redelivery and FETCH catch-up -- and which past records
    MUST a mid-break joiner fetch? Experience so far: with one `pod`
-   record per opportunity, `m` alone has served as the record key (a
-   changed payload at a known `m` is a supersede), and the player fires
-   each event at most once per (`m`, slot, event type). For late joiners
+   record per opportunity, `M` alone has served as the record key (a
+   changed payload at a known `M` is a supersede), and the player fires
+   each event at most once per (`M`, slot, event type). For late joiners
    the deployed publisher keeps each record in every independent Object
    until 60 s after its pod ends, and re-sends the retained array as a
    new Group about every 3 s when nothing has changed, so a subscriber
@@ -1002,7 +1013,7 @@ discussion; it is to be removed before publication.
 4. **Switching sets**: when ladder rungs are separate tracks, does one
    creative signaling track `depends` on all of them? Splice
    conditioning can land at slightly different media times per rung;
-   container-relative interior offsets survive that, but a single `m`
+   container-relative interior offsets survive that, but a single `M`
    may not. Sender-side track switching under discussion in the MOQ
    Working Group sharpens this: if relays select the delivered rung per
    subscriber and switch at Group boundaries, (a) these records must
@@ -1016,10 +1027,10 @@ discussion; it is to be removed before publication.
    `SWITCH_FROM` proposal distinguishes an *aligned* switch, where Group
    IDs from the two tracks are compared, from an *unaligned* switch,
    where they are not. The distinction decides this issue directly: a
-   single `m` on one signaling track can only address a switching set if
+   single `M` on one signaling track can only address a switching set if
    switches are aligned, since an unaligned switch leaves no common
    Group-ID frame in which one index means the same instant on every
-   rung. Under unaligned switching the interior offsets survive but `m`
+   rung. Under unaligned switching the interior offsets survive but `M`
    does not, which would push the binding toward either a per-rung
    signaling track or an index defined against something other than the
    media track's Group IDs. The proposal was not resolved at the
@@ -1062,8 +1073,12 @@ discussion; it is to be removed before publication.
    key set is provisioned out of band today; a key, or a key set
    location, pinned in the catalog or in a track property would let a
    client that found the track by name verify it without a separate
-   channel, and is a possible {{MSF}} follow-up. And the `sig` member is
-   a binding-level addition to the record structure of {{Section 8.1 of
+   channel, and is a possible {{MSF}} follow-up. The header data that
+   {{MSF}} now defines for an Event Timeline track, carried in a Track
+   property ({{Section 8.1 of MSF}}), is one place such a pointer could
+   go, though a pointer that arrives by the same path as the records is
+   only as trustworthy as that path. And the `sig` member is
+   a binding-level addition to the record structure of {{Section 8.2 of
    MSF}}; a record signature defined by {{MSF}} itself would serve every
    Event Timeline event class, and the authors intend to raise it
    there. And the signing time: `iat` ({{signing}}) is a header
@@ -1195,10 +1210,12 @@ Publisher, live on both of the deployment's ad-inserted channels since
 * Each placement opportunity is one record,
   `{"m": ..., "data": {"version": 2, "type": "pod", "payload": [...]}}`,
   where `m` is the media time, in milliseconds on the timeline of the
-  media track, of the pod's first video frame. Envelopes carry no
+  media track, of the pod's first video frame. The index key is the
+  lowercase `m` of {{MSF}} before its -02 revision; see the list of
+  what is not yet implemented. Envelopes carry no
   `features` member. Slot identifiers use a proprietary identifier
   scheme; tracking URLs are capability URLs ({{capability-urls}}).
-* Objects follow {{Section 8.3 of MSF}}: each change starts a new Group
+* Objects follow {{record-structure}}: each change starts a new Group
   whose single Object is the independent array of every retained
   record, with no incremental Objects. The first Group ID is taken from
   the wallclock in milliseconds, per the restart rule of
@@ -1290,6 +1307,9 @@ Added on 2026-11-04 and 2026-11-05:
 
 NOT yet implemented:
 
+* The index-key spelling of {{MSF}} -02. The deployment publishes `m`,
+  the spelling that {{MSF}} and this document used before, and its
+  player and validator read that spelling only.
 * Catalog listing. The `ad-creative` track is not yet listed in the MSF
   catalog, because the MoQ library in use does not yet emit
   `eventtimeline` entries; that needs an upstream change. Consumers find
@@ -1407,18 +1427,24 @@ sensitive values, such as the terms of a deal, do not belong there.
 # IANA Considerations {#iana}
 
 This document requests registration of the following entry in the "MSF
-Event Timeline Types" registry established by {{Section 14.2 of MSF}}.
-{{SCTE35-MOQ}} registers entries in that same registry; this document
-follows the same pattern.
+Event Timeline Types" registry established by {{Section 14.2 of MSF}},
+whose policy is Expert Review. {{SCTE35-MOQ}} registers entries in that
+same registry; this document follows the same pattern.
 
-| Event Type | Description | Reference |
-|---|---|---|
-| urn:svta:advertising-wg:ad-creative-signaling | SVTA 2053-1 ad creative signaling, Version 2 carriage envelope | This document; {{SVTA2053}} |
+| Event Type | Description | Change Controller | Specification |
+|---|---|---|---|
+| urn:svta:advertising-wg:ad-creative-signaling | SVTA 2053-1 ad creative signaling, Version 2 carriage envelope | IETF | This document; {{SVTA2053}} |
 {: title="Addition to the MSF Event Timeline Types registry"}
 
 Editor's note (to be resolved before publication): the URN is defined and
 owned by the SVTA Advertising Working Group; this registration is made in
-coordination with that group.
+coordination with that group, and the Change Controller is to be settled
+with it. The guidance that {{MSF}} gives the designated experts of the
+registry asks that an event type in the `urn:` scheme conform to a URN
+namespace {{RFC8141}}. At the time of writing `svta` is not a registered
+URN namespace identifier; whether that registration is needed, or
+another form for the event type, is to be settled with that group and
+the designated experts.
 
 --- back
 
@@ -1443,7 +1469,7 @@ in the `schema/` and `vectors/` directories of this document's source
 repository {{VECTORS}}.
 
 The schema encodes the record requirements of {{record-structure}} and
-{{payload}}: exactly one index reference field, typed as {{Section 8.1 of
+{{payload}}: exactly one index reference field, typed as {{Section 8.2 of
 MSF}} requires, and a `data` member holding one Version 2 envelope that
 satisfies the envelope rules of Section 5.2.2.1 of {{SVTA2053}} --
 `version` 2, one of the four envelope types, a non-empty `payload`
@@ -1457,14 +1483,15 @@ that it continues to validate the unsigned records the deployment
 publishes today ({{impl-status}}); verifying a signature is in any case
 not a schema check.
 
-The vectors come in two sets, and both matter: twelve files holding
-fourteen records that MUST validate, and eleven records that MUST NOT. A validator
+The vectors come in two sets, and both matter: thirteen files holding
+fifteen records that MUST validate, and eleven records that MUST NOT. A validator
 that accepts everything passes the first set alone. The valid set covers
 each envelope type and each index type, back-to-back placement
 opportunities, the worked example of {{example}}, one Object captured
 from the running deployment, `extensions`, a record with the
 `extensions` member of {{extensions}} at the envelope, Pod and Slot
-levels, and two signed records: `signed-pod`, carrying the
+levels, `interactive`, a Slot with the `interactive` member of
+{{interactive}}, and two signed records: `signed-pod`, carrying the
 `sig` member of {{signing}}, and `signed-pod-iat`, the same record
 signed with a signing time. The Ed25519 test key that signed them is
 published beside them under `vectors/keys/`, with a script under
@@ -1475,9 +1502,9 @@ constraints most likely to be implemented loosely:
 
 | Vector | Rejected because |
 |---|---|
-| `two-index-fields` | carries both `m` and `t`; exactly one is allowed |
+| `two-index-fields` | carries both `M` and `T`; exactly one is allowed |
 | `no-index-field` | carries none |
-| `string-wallclock-index` | `t` is a date string; {{MSF}} requires a Number |
+| `string-wallclock-index` | `T` is a date string; {{MSF}} requires a Number |
 | `missing-data` | index only, no envelope |
 | `v1-bare-payload` | a bare Version 1 payload object, which the DASH and HLS bindings accept and this one does not ({{payload}}) |
 | `unwrapped-pod` | a Version 2 Pod object with no envelope around it |
@@ -1491,15 +1518,17 @@ The following record is the first of the two in the `captured-object`
 vector: one Event Timeline Object, captured read-only from the running
 deployment ({{impl-status}}) on 2026-10-26 and then anonymized. The
 creative identifiers, the identifier scheme, and every tracking URL
-(scheme, host and path) were replaced with placeholders; everything else
-is as published -- the index, the MediaTime values, the slot structure,
-and the event types and their order. The slot durations are measured
+(scheme, host and path) were replaced with placeholders, and the index
+key is written `M` where the deployment published `m`
+({{impl-status}}); everything else is as published -- the index value,
+the MediaTime values, the slot structure, and the event types and their
+order. The slot durations are measured
 from the spliced media rather than declared, which is why they are not
 round numbers:
 
 ~~~ json
 {
-  "m": 82005596,
+  "M": 82005596,
   "data": {
     "version": 2,
     "type": "pod",
@@ -1576,7 +1605,9 @@ tracks, which beyond the record rules verify the {{SVTA2053}} shape of
 each payload (member names and types, MediaTime values in seconds,
 required identifiers, non-empty `urls`, and defined event types). Both
 accept every valid vector and reject every invalid one, each for the
-reason its name gives. The two signature vectors were checked against
+reason its name gives. The implementation reads the index keys in the
+spelling {{MSF}} used before its -02 revision ({{impl-status}}), so for
+that check the keys were given to it in that spelling. The two signature vectors were checked against
 the schema, and `signed-pod` was verified with the published script,
 which also rejects it once any byte of the record changes and accepts
 it re-serialized with its members reordered.
@@ -1620,6 +1651,19 @@ it re-serialized with its members reordered.
   maximum age.
 * {{impl-status}}: signatures and the signing time are deployed; the
   deployment publishes no `extensions` member yet.
+* Aligned with draft-ietf-moq-msf-02. The index keys are `T`, `L` and
+  `M` in the text, the schema and every vector, and the signed vectors
+  are signed again ({{conventions}}, {{record-structure}}, {{schema}});
+  {{impl-status}} records that the deployment still publishes the
+  earlier spelling. Section references follow the numbering of that
+  revision. {{track-properties}} no longer requires `mimeType`, which
+  {{MSF}} dropped, and states that this event type defines no header
+  data. {{record-structure}} states the mapping of records to Groups
+  and Objects itself, which {{MSF}} now leaves to the event type; the
+  rule is unchanged. {{iana}} uses the columns the registry now has and
+  notes its guidance on URNs. Item 7 of {{open-issues}} names the new
+  header data as a possible carrier for a key set location.
+* {{schema}}: a new valid vector, `interactive`.
 
 # Changes since draft-riedl-moq-ad-creative-signaling-00 {#changes}
 {:numbered="false"}
@@ -1640,8 +1684,9 @@ it re-serialized with its members reordered.
   inconsistencies in {{SVTA2053}} that affect parsers.
 * {{record-structure}}: index values are typed as {{MSF}} requires (`t`
   and `m` Numbers, `l` a two-Number Array; a -00 vector wrote `t` as a
-  date string); records map to Objects per {{Section 8.3 of MSF}}.
-  {{track-properties}} adds the `mimeType` that {{MSF}} requires.
+  date string); records map to Objects per the Event Timeline track
+  updating rules of {{MSF}} (Section 8.3 of its -01 revision).
+  {{track-properties}} adds the `mimeType` that {{MSF}} then required.
   {{interior-timing}} says what interior timing is relative to when an
   envelope carries Slot or TrackingEvent objects without their Pod.
 * The {{SVTA2053}} reference now cites the published SVTA 2053-1,

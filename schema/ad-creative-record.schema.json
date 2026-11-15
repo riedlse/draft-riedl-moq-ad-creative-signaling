@@ -2,21 +2,21 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://raw.githubusercontent.com/riedlse/draft-riedl-moq-ad-creative-signaling/main/schema/ad-creative-record.schema.json",
   "title": "Ad creative signaling Event Timeline record",
-  "description": "One record on an MSF Event Timeline track whose eventType is urn:svta:advertising-wg:ad-creative-signaling. Encodes the record requirements of draft-riedl-moq-ad-creative-signaling Section 4: exactly one index reference field, typed as MSF-01 Section 8.1 requires, and a data member holding exactly one SVTA 2053-1 Version 2 carriage envelope, with the envelope-level rules of SVTA 2053-1 Section 5.2.2.1 (Table 15). The payload objects (Pod, Slot, TrackingEvent, Verification) are governed by SVTA 2053-1 and are not checked here. Members beyond those listed are permitted on the envelope and on payload objects, and a receiver ignores those it does not recognize. Data defined outside SVTA 2053 is carried in an extensions member (draft Section 4.3.1, Extensions), whose shape is checked here on the envelope only. Note the DASH and HLS bindings also accept bare Version 1 payload objects; this binding does not.",
+  "description": "One record on an MSF Event Timeline track whose eventType is urn:svta:advertising-wg:ad-creative-signaling. Encodes the record requirements of draft-riedl-moq-ad-creative-signaling Section 4: exactly one index reference field, typed as MSF-02 Section 8.2 requires, and a data member holding exactly one SVTA 2053-1 Version 2 carriage envelope, with the envelope-level rules of SVTA 2053-1 Section 5.2.2.1 (Table 15). The payload objects (Pod, Slot, TrackingEvent, Verification) are governed by SVTA 2053-1 and are not checked here. Members beyond those listed are permitted on the envelope and on payload objects, and a receiver ignores those it does not recognize. Data defined outside SVTA 2053 is carried in an extensions member (draft Section 4.3.1, Extensions), whose shape is checked here on the envelope only. Note the DASH and HLS bindings also accept bare Version 1 payload objects; this binding does not.",
   "type": "object",
   "properties": {
-    "m": {
-      "description": "Media PTS index (MSF-01 Section 8.1): a JSON Number of milliseconds on the timeline of the depends media track. RECOMMENDED for records describing creatives spliced into the media timeline.",
+    "M": {
+      "description": "Media PTS index (MSF-02 Section 8.2): a JSON Number of milliseconds on the timeline of the depends media track. RECOMMENDED for records describing creatives spliced into the media timeline.",
       "type": "number",
       "minimum": 0
     },
-    "t": {
-      "description": "Wallclock index (MSF-01 Section 8.1): a JSON Number of milliseconds since the Unix epoch, not a date string. For placement opportunities defined in wallclock terms where no media time is available.",
+    "T": {
+      "description": "Wallclock index (MSF-02 Section 8.2): a JSON Number of milliseconds since the Unix epoch, not a date string. For placement opportunities defined in wallclock terms where no media time is available.",
       "type": "number",
       "minimum": 0
     },
-    "l": {
-      "description": "MOQT Location index (MSF-01 Section 8.1): [Group ID, Object ID]. For records bound to a delivery position rather than a media time.",
+    "L": {
+      "description": "MOQT Location index (MSF-02 Section 8.2): [Group ID, Object ID]. For records bound to a delivery position rather than a media time.",
       "type": "array",
       "prefixItems": [
         { "type": "integer", "minimum": 0 },
@@ -34,9 +34,9 @@
   },
   "required": ["data"],
   "oneOf": [
-    { "required": ["m"], "not": { "anyOf": [{ "required": ["t"] }, { "required": ["l"] }] } },
-    { "required": ["t"], "not": { "anyOf": [{ "required": ["m"] }, { "required": ["l"] }] } },
-    { "required": ["l"], "not": { "anyOf": [{ "required": ["m"] }, { "required": ["t"] }] } }
+    { "required": ["M"], "not": { "anyOf": [{ "required": ["T"] }, { "required": ["L"] }] } },
+    { "required": ["T"], "not": { "anyOf": [{ "required": ["M"] }, { "required": ["L"] }] } },
+    { "required": ["L"], "not": { "anyOf": [{ "required": ["M"] }, { "required": ["T"] }] } }
   ],
   "$defs": {
     "envelope": {
