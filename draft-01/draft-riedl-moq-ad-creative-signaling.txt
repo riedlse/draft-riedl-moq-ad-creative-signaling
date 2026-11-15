@@ -4,8 +4,8 @@
 
 Media Over QUIC                                                 S. Riedl
 Internet-Draft                                                 Paramount
-Intended status: Informational                           1 November 2026
-Expires: 5 May 2027
+Intended status: Informational                          15 November 2026
+Expires: 19 May 2027
 
 
            Ad Creative Signaling over the MSF Event Timeline
@@ -57,7 +57,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 5 May 2027.
+   This Internet-Draft will expire on 19 May 2027.
 
 Copyright Notice
 
@@ -82,6 +82,8 @@ Table of Contents
      4.1.  Structure
      4.2.  Index Reference Selection
      4.3.  Payload: Version 2 Carriage Envelope
+       4.3.1.  Extensions
+       4.3.2.  Interactive Components
      4.4.  Subscriber Invariance
      4.5.  Record Signature
    5.  Timing and Correlation
@@ -108,6 +110,7 @@ Table of Contents
      14.2.  Informative References
    Acknowledgments
    JSON Schema and Test Vectors
+   Changes since draft-riedl-moq-ad-creative-signaling-01
    Changes since draft-riedl-moq-ad-creative-signaling-00
    Author's Address
 
@@ -316,13 +319,13 @@ Table of Contents
    payload uses $remote (Section 7); a payload that does not use $remote
    can omit features entirely.
 
-   This document places no requirement of its own on receivers.  A
-   receiver applies Section 5.2.2.1 of [SVTA2053] unchanged: a flag set
-   to true that it does not support means it ignores that payload, while
-   a flag set to false, or an absent features member, asks nothing of
-   it.  The publisher-side rule is needed because on one-to-many
-   delivery the publisher never learns that a record was discarded (item
-   6 of Section 10).
+   This document places no requirement of its own on how a receiver
+   handles features.  A receiver applies Section 5.2.2.1 of [SVTA2053]
+   unchanged: a flag set to true that it does not support means it
+   ignores that payload, while a flag set to false, or an absent
+   features member, asks nothing of it.  The publisher-side rule is
+   needed because on one-to-many delivery the publisher never learns
+   that a record was discarded (item 6 of Section 10).
 
    Two inconsistencies in [SVTA2053] matter to parsers.  Its
    TrackingEvent payload table (Table 11) lists start and duration where
@@ -339,6 +342,195 @@ Table of Contents
    binding), but deduplication under redelivery is simplest at pod
    granularity, and a decomposed record loses the structural link to the
    slot it belongs to (see Section 10).
+
+4.3.1.  Extensions
+
+   [SVTA2053] defines no member for data that one operator or vendor
+   defines for itself, and no rule for what an interpreter does with a
+   member it does not recognize.  The places it offers today are narrow:
+   a Slot's identifiers, whose schemes may be proprietary, and the
+   parameters string of a Verification.  Deployments have such data all
+   the same -- creative parameters handed to a measurement vendor,
+   labels from the ad decision, content classifications -- and on a
+   shared track a publisher cannot agree on a private format with each
+   receiver.  Both gaps have been raised with the SVTA Advertising
+   Working Group (item 9 of Section 10).  Until an edition of [SVTA2053]
+   closes them, the rules of this section apply to records on this
+   track.  They follow the form proposed there, so that a record written
+   to them should need no change if that form is adopted.
+
+   A publisher that adds data to a record beyond what [SVTA2053], or a
+   later edition of it, defines MUST place that data in an extensions
+   member of the object the data describes: the envelope, or an object
+   within its payload such as a Pod or a Slot.  The value of extensions
+   is a JSON object.  Each of its members is named for the party that
+   defines the value stored under it, by a URI or by the reverse domain
+   name of a domain that party controls, and the value of each member is
+   a JSON object whose content that party defines:
+
+   "extensions": { "com.example": { "creativeCategory": "automotive" } }
+
+   A defining party uses one name, so that its data on an object is in
+   one place.
+
+   A publisher MUST NOT place such data anywhere else in the envelope.
+   In particular it MUST NOT place it inside features, and MUST NOT set
+   a features flag to announce it: a flag set to true requires every
+   interpreter to support it or discard the payload, which is the
+   opposite of what an extension needs.  This document defines no
+   extensions member at the top level of a record, whose members are
+   those of Section 4.1 and Section 4.5.
+
+   A record MUST remain complete and correct for a receiver that ignores
+   extensions.  Anything a receiver needs in order to present or measure
+   an ad belongs in the members [SVTA2053] defines or in the interactive
+   member of Section 4.3.2, and an identifier belongs in a Slot's
+   identifiers under a scheme of the publisher's choosing.
+
+   A receiver MUST ignore a member of the envelope, or of an object
+   within its payload, that it does not recognize, and MUST NOT treat
+   the record as malformed because of it.  The same holds for a member
+   of an extensions object.  This does not change the handling of
+   features flags, which stays as [SVTA2053] defines it.  Ignoring a
+   member does not mean removing it: the signature of Section 4.5 covers
+   the record as published, extensions included, so a receiver verifies
+   the signature over the record it received and only then disregards
+   what it does not use.
+
+   In every other respect extensions is part of the record.  It is
+   subscriber-invariant (Section 4.4), it is untrusted input to a
+   receiver that acts on it (Section 12.3), it is not resolved through
+   $remote (Section 7), and it is repeated in every Object that repeats
+   the record (Section 8.3 of [MSF]), so it is best kept small.
+
+4.3.2.  Interactive Components
+
+   Some creatives come with a component that the device presents with
+   the ad and that the viewer can act on: a button that opens the
+   advertiser's page or adds a program to a watch list, or an overlay
+   that a vendor's runtime renders from its own configuration.  [VAST]
+   delivers these as VideoClicks, as an InteractiveCreativeFile, as a
+   MediaFile or Companion with an apiFramework, or as AdParameters and
+   Extensions that are handed unparsed to a vendor's runtime.  On a
+   server-stitched stream the video of the ad is in the media track, and
+   the component is the part that still has to reach the device.
+
+   [SVTA2053] covers the first of these.  A Slot's clickThrough carries
+   the destination of a click, and clickTracking is among its tracking
+   event types.  It has no member that names a runtime, a resource for
+   that runtime to load, or parameters to hand to it.  A member of that
+   shape has been proposed for the 3rd edition (item 10 of Section 10).
+
+   This section defines that member for records on this track, in the
+   form proposed there, so that a record written to it should need no
+   change if that form is adopted.  When an edition of [SVTA2053]
+   defines an interactive member of the Slot, that definition governs.
+
+   A Slot MAY carry an interactive member.  Its value is an array of
+   Interactive objects, one for each component that is presented with
+   the Slot.  An Interactive object has these members:
+
+    +============+========+==========+===============================+
+    | Member     | Type   | Required | Description                   |
+    +============+========+==========+===============================+
+    | framework  | String | Yes      | Identifies the runtime that   |
+    |            |        |          | presents the component, as    |
+    |            |        |          | the apiFramework attribute    |
+    |            |        |          | does in [VAST].  The value    |
+    |            |        |          | SIMID identifies [SIMID].     |
+    |            |        |          | Other values are agreed       |
+    |            |        |          | between the publisher and the |
+    |            |        |          | application on the device.    |
+    +------------+--------+----------+-------------------------------+
+    | type       | String | No       | The media type of what        |
+    |            |        |          | resource locates, for example |
+    |            |        |          | text/html or application/     |
+    |            |        |          | json.                         |
+    +------------+--------+----------+-------------------------------+
+    | resource   | String | No       | A URI of a resource that the  |
+    |            |        |          | runtime loads: the document   |
+    |            |        |          | of an interactive creative,   |
+    |            |        |          | or a configuration of the     |
+    |            |        |          | runtime.                      |
+    +------------+--------+----------+-------------------------------+
+    | parameters | String | No       | An opaque value that is       |
+    |            |        |          | handed to the runtime         |
+    |            |        |          | unchanged, as the content of  |
+    |            |        |          | an AdParameters element is.   |
+    +------------+--------+----------+-------------------------------+
+    | tracking   | Array  | No       | Tracking events of the        |
+    |            |        |          | component, in the form        |
+    |            |        |          | [SVTA2053] gives a Slot's     |
+    |            |        |          | tracking.                     |
+    +------------+--------+----------+-------------------------------+
+
+                       Table 1: Interactive Object
+
+   An Interactive object MUST carry resource, parameters, or both.
+   Which of them a runtime needs is a matter of its framework.
+
+   "interactive": [ {
+     "framework": "SIMID",
+     "type": "text/html",
+     "resource": "https://interactive.example.com/c/4c1d9a52.html",
+     "parameters": "{\"campaign\":\"example\"}",
+     "tracking": [ { "type": "interactiveStart",
+       "urls": ["https://beacons.example.com/c/4c1d9a52/istart"] } ] } ]
+
+   A receiver that does not implement the runtime that framework
+   identifies MUST ignore the Interactive object.  It presents the ad
+   from the media track and requests the Slot's tracking as if the
+   object were absent, as a device without a vendor's runtime does with
+   a server-stitched ad today.  For that reason a publisher MUST NOT
+   announce interactive with a features flag: a flag set to true would
+   make a receiver without the runtime discard the payload.
+
+   A component belongs to its Slot.  A receiver starts it no earlier
+   than the start of the Slot and, unless the application and the
+   runtime provide for more, ends it when the Slot ends.  This document
+   does not define the interface between the application and the
+   runtime.
+
+   A receiver requests a tracking event of an Interactive object when
+   the runtime reports the event it describes.  An offset, when present,
+   is relative to the start of the Slot that carries the object.  The
+   proposal to the 3rd edition adds three event types for what only a
+   component does: interactiveStart, acceptInvitation and
+   otherAdInteraction.  A publisher MAY use them here.
+
+   Data for a runtime is carried in interactive and not in extensions
+   (Section 4.3.1), because a receiver needs it in order to present the
+   component.
+
+   The rest of this document applies to an interactive component as it
+   does to the rest of the record:
+
+   *  It is subscriber-invariant (Section 4.4).  A resource URI or a
+      parameter string that a vendor issues per impression, with a
+      session identifier, a device address or a cache-busting value in
+      it, cannot be carried as issued.  It is carried as a template that
+      the device completes, or behind a capability URL (Section 7).
+
+   *  It is covered by the signature, and a record that fails
+      verification is absent for it as well (Section 4.5).  A resource
+      that a runtime loads and runs on the device is a more valuable
+      target than a tracking URL (Section 12.3).
+
+   *  It has to be on the device before its Slot starts, which is what
+      the publication lead provides (Section 5.3).  A runtime that wants
+      the components of a whole break, or of a whole program, before
+      playback starts cannot be served that way from a live shared
+      track.
+
+   *  It is repeated in every Object that repeats the record
+      (Section 8.3 of [MSF]), so a large configuration is better carried
+      as a URI than inline.
+
+   *  A request that the device makes when the viewer acts or the
+      runtime reports an event, such as a click-through, its tracking or
+      a tracking event of the component, is a tracking request under
+      Section 7.  Requests that a vendor's runtime makes on its own are
+      outside this document.
 
 4.4.  Subscriber Invariance
 
@@ -393,27 +585,64 @@ Table of Contents
    carries them is verified against the provisioned key set as if they
    were absent.
 
-   A distributor publishes its verification keys as a JWK Set [RFC7517],
-   each key carrying the kid its signatures name.  How a client obtains
-   the key set is out of scope for this document; a deployment typically
-   provisions it with the playback session, alongside the client
-   identifier of Section 7.1.  Keys are rotated by publishing the new
-   key before any record is signed with it, and retiring the old key
+   A distributor publishes its verification keys as a JWK Set [RFC7517].
+   Each key in the set has a kid, and the kid in the protected header of
+   a signature identifies the key that verifies it.  How a client
+   obtains the key set is out of scope for this document; a deployment
+   typically provisions it with the playback session, alongside the
+   client identifier of Section 7.1.  Keys are rotated by publishing the
+   new key before any record is signed with it, and retiring the old key
    only after every record signed with it has left the accessible window
    (Section 4.1).  A distributor SHOULD use a distinct kid per channel,
    so that a verifier can reject a validly signed record substituted
    from another channel.
 
    A verifier MUST check that the sig member is present and well formed,
-   that alg is permitted, that kid names a key in the current set, and
-   that the signature verifies over the canonical payload.  A record
-   that fails any of these checks MUST be treated as absent for the
-   purposes of Section 7: no tracking, $remote, verification or click-
-   through resource it names is requested.  Media playback is
-   unaffected; the record is advisory.  A verifier MAY report the
-   failure to the distributor over a channel established out of band,
-   which gives the distributor evidence of tampering on paths it does
-   not operate.
+   that alg is permitted, that kid names a key in the current set, that
+   the signature verifies over the canonical payload, and, where a
+   maximum age has been provisioned, that iat is present and within it
+   (see below).  A record that fails any of these checks MUST be treated
+   as absent for the purposes of Section 7: no tracking, $remote,
+   verification, click-through or interactive resource it names is
+   requested.  Media playback is unaffected; the record is advisory.  A
+   verifier MAY report the failure to the distributor over a channel
+   established out of band, which gives the distributor evidence of
+   tampering on paths it does not operate.
+
+   The protected header MAY carry iat, the time at which the record was
+   signed, as a number of seconds since 1970-01-01T00:00:00Z.  It is
+   part of the protected header and is therefore covered by the
+   signature. iat is not a registered JWS header parameter; it is used
+   here as a name agreed between publisher and verifier, as Section 4.3
+   of [RFC7515] allows.  A publisher MUST NOT list iat in crit, so that
+   a verifier that does not use it can still verify the signature.  A
+   publisher that signs a record once, when it first publishes it,
+   repeats the record unchanged in later Objects (Section 8.3 of [MSF]);
+   iat is then the time of first publication and not the time of the
+   Object that carries the record.
+
+   A deployment MAY provision a verifier with a maximum age for the
+   records of a track, together with the key set.  A verifier that has
+   been provisioned with a maximum age MUST treat a record as one that
+   fails the checks above when its iat is absent, is not a number, is
+   older than the maximum age, or lies further in the future than the
+   clock difference the deployment allows.  A verifier that has not been
+   provisioned with a maximum age ignores iat.  Where records are signed
+   once, the maximum age has to cover the time a record stays on the
+   track, from its publication ahead of the splice (Section 5.3) until
+   it is no longer repeated (Section 4.1).  The verifier compares iat
+   with its own clock; where the clocks of devices are not reliable, a
+   deployment gives the verifier a time reference when it provisions the
+   key set.
+
+   A signature on the envelope itself, which a later edition of
+   [SVTA2053] may define (one with the construction of this section is
+   proposed for the 3rd edition [SVTA2053-2]), is a member of the
+   envelope and is covered by sig like any other.  It does not take the
+   place of sig: it does not cover the index reference, and so cannot
+   show that the envelope is at the position on the timeline that the
+   publisher gave it.  A verifier on this track checks sig, and MAY also
+   check an envelope signature that it understands.
 
    The signature is subscriber-invariant (Section 4.4) and so remains
    relay-cacheable.  It costs one 64-byte signature and a short
@@ -685,7 +914,8 @@ Table of Contents
    is the missing placement identifier (item 8 of Section 10): once
    records describing one placement opportunity are spread across
    tracks, a shared index identifies the opportunity but not the slot
-   within it.
+   within it.  Until such a track is defined, an interactive component
+   is a member of its Slot (Section 4.3.2).
 
    Separately, [MOQT] today defines properties at Track and Object scope
    only.  A proposal before the MoQ Working Group [MOQT-SUBGROUP-PROPS]
@@ -717,154 +947,215 @@ Table of Contents
    This section lists issues to be resolved through working group
    discussion; it is to be removed before publication.
 
-   1.  *Granularity*: one pod envelope per placement opportunity (the
-       RECOMMENDED default), or slot, trackingEvent and verification
-       envelopes per creative?  Redelivery deduplication is simpler at
-       pod granularity.  The deployment described in Section 11
-       publishes pod envelopes only and has not needed anything finer.
+   1.   *Granularity*: one pod envelope per placement opportunity (the
+        RECOMMENDED default), or slot, trackingEvent and verification
+        envelopes per creative?  Redelivery deduplication is simpler at
+        pod granularity.  The deployment described in Section 11
+        publishes pod envelopes only and has not needed anything finer.
 
-   2.  *Update semantics for live*: pods change close to air.  Is a
-       later record at the same index a full supersede (last-writer-
-       wins), or is a patch rule needed?  [SVTA2053] has no cancel/
-       supersede concept; SCTE-35 inherits cancellation from its payload
-       semantics.  Implementation experience favors the simple rule.
-       When a splice fails, the deployed publisher publishes a complete
-       new record with the same m, dropping the failed slot and moving
-       the later ones to where they really air, and its player replaces
-       only the events it has not yet fired.  No patch rule has been
-       needed so far.
+   2.   *Update semantics for live*: pods change close to air.  Is a
+        later record at the same index a full supersede (last-writer-
+        wins), or is a patch rule needed?  [SVTA2053] has no cancel/
+        supersede concept; SCTE-35 inherits cancellation from its
+        payload semantics.  Implementation experience favors the simple
+        rule.  When a splice fails, the deployed publisher publishes a
+        complete new record with the same m, dropping the failed slot
+        and moving the later ones to where they really air, and its
+        player replaces only the events it has not yet fired.  No patch
+        rule has been needed so far.
 
-   3.  *Deduplication and late joiners*: the DASH/HLS bindings give each
-       event a manifest-unique id for dedup on re-encounter; MSF records
-       carry no id.  Is (eventType, index, payload) a sufficient dedup
-       key under relay redelivery and FETCH catch-up -- and which past
-       records MUST a mid-break joiner fetch?  Experience so far: with
-       one pod record per opportunity, m alone has served as the record
-       key (a changed payload at a known m is a supersede), and the
-       player fires each event at most once per (m, slot, event type).
-       For late joiners the deployed publisher keeps each record in
-       every independent Object until 60 s after its pod ends, and re-
-       sends the retained array as a new Group about every 3 s when
-       nothing has changed, so a subscriber that starts at the next
-       Group rather than the latest one holds the timeline within
-       seconds.  Whether that re-send deserves a SHOULD is open.
+   3.   *Deduplication and late joiners*: the DASH/HLS bindings give
+        each event a manifest-unique id for dedup on re-encounter; MSF
+        records carry no id.  Is (eventType, index, payload) a
+        sufficient dedup key under relay redelivery and FETCH catch-up
+        -- and which past records MUST a mid-break joiner fetch?
+        Experience so far: with one pod record per opportunity, m alone
+        has served as the record key (a changed payload at a known m is
+        a supersede), and the player fires each event at most once per
+        (m, slot, event type).  For late joiners the deployed publisher
+        keeps each record in every independent Object until 60 s after
+        its pod ends, and re-sends the retained array as a new Group
+        about every 3 s when nothing has changed, so a subscriber that
+        starts at the next Group rather than the latest one holds the
+        timeline within seconds.  Whether that re-send deserves a SHOULD
+        is open.
 
-   4.  *Switching sets*: when ladder rungs are separate tracks, does one
-       creative signaling track depends on all of them?  Splice
-       conditioning can land at slightly different media times per rung;
-       container-relative interior offsets survive that, but a single m
-       may not.  Sender-side track switching under discussion in the MOQ
-       Working Group sharpens this: if relays select the delivered rung
-       per subscriber and switch at Group boundaries, (a) these records
-       must remain valid for every rung of a switching set, (b) splice
-       conditioning must keep switching sets coherent at placement
-       boundaries, and (c) the delivered rendition is known only at the
-       client, so rendition-level measurement is necessarily client-
-       observed.
+   4.   *Switching sets*: when ladder rungs are separate tracks, does
+        one creative signaling track depends on all of them?  Splice
+        conditioning can land at slightly different media times per
+        rung; container-relative interior offsets survive that, but a
+        single m may not.  Sender-side track switching under discussion
+        in the MOQ Working Group sharpens this: if relays select the
+        delivered rung per subscriber and switch at Group boundaries,
+        (a) these records must remain valid for every rung of a
+        switching set, (b) splice conditioning must keep switching sets
+        coherent at placement boundaries, and (c) the delivered
+        rendition is known only at the client, so rendition-level
+        measurement is necessarily client-observed.
 
-       That mechanism now has a concrete shape to test against.  The
-       SWITCH_FROM proposal distinguishes an _aligned_ switch, where
-       Group IDs from the two tracks are compared, from an _unaligned_
-       switch, where they are not.  The distinction decides this issue
-       directly: a single m on one signaling track can only address a
-       switching set if switches are aligned, since an unaligned switch
-       leaves no common Group-ID frame in which one index means the same
-       instant on every rung.  Under unaligned switching the interior
-       offsets survive but m does not, which would push the binding
-       toward either a per-rung signaling track or an index defined
-       against something other than the media track's Group IDs.  The
-       proposal was not resolved at the 2026-09-08 interim; at the
-       2026-10-14 interim the working group took the direction of
-       reducing it to the group-aligned mode, with other modes left to
-       extensions, and a consensus call is pending as of this revision.
-       At least one implementation (MOQtail) reports partial draft-18
-       support, so experience should be available before this document
-       has to choose.
+        That mechanism now has a concrete shape to test against.  The
+        SWITCH_FROM proposal distinguishes an _aligned_ switch, where
+        Group IDs from the two tracks are compared, from an _unaligned_
+        switch, where they are not.  The distinction decides this issue
+        directly: a single m on one signaling track can only address a
+        switching set if switches are aligned, since an unaligned switch
+        leaves no common Group-ID frame in which one index means the
+        same instant on every rung.  Under unaligned switching the
+        interior offsets survive but m does not, which would push the
+        binding toward either a per-rung signaling track or an index
+        defined against something other than the media track's Group
+        IDs.  The proposal was not resolved at the 2026-09-08 interim;
+        at the 2026-10-14 interim the working group took the direction
+        of reducing it to the group-aligned mode, with other modes left
+        to extensions, and a consensus call is pending as of this
+        revision.  At least one implementation (MOQtail) reports partial
+        draft-18 support, so experience should be available before this
+        document has to choose.
 
-   5.  *Common-format scope*: is the Event Timeline binding the whole
-       story, or is a container-level mapping (the envelope in CMAF
-       emsg) also wanted so one payload survives packager transit across
-       HLS/DASH/MOQT boundaries?
+   5.   *Common-format scope*: is the Event Timeline binding the whole
+        story, or is a container-level mapping (the envelope in CMAF
+        emsg) also wanted so one payload survives packager transit
+        across HLS/DASH/MOQT boundaries?
 
-   6.  *Feature negotiation on one-to-many*: [SVTA2053] interpreters
-       SHOULD error on unsupported flagged features -- sensible unicast
-       behavior, but a broadcast publisher cannot negotiate per
-       subscriber.  Should the catalog advertise which features a track
-       uses so clients subscribe eyes-open?  The features member this
-       rests on is confirmed: the Version 2 base carriage envelope
-       defines it as an object of boolean flags, with
-       features.remoteFields as the only flag so far, and requires that
-       an interpreter encountering a flag it does not support SHOULD
-       raise an error and ignore the payload.  This revision settles the
-       easy half by forbidding flags that [SVTA2053] does not define
-       (Section 4.3); the hard half -- a defined flag that some
-       subscribers do not support -- remains.  That rule is written for
-       unicast, where the publisher learns of the failure; on one-to-
-       many the publisher never hears, so the burden has to move to
-       subscribe time.  Note also that if the per-function tracks of a
-       split (Section 9) are published as separate broadcasts rather
-       than sibling tracks, a subscriber selects the functions it
-       supports by subscribing to them, which answers much of this for
-       the split case but not for flagged features within a single
-       track.
+   6.   *Feature negotiation on one-to-many*: [SVTA2053] interpreters
+        SHOULD error on unsupported flagged features -- sensible unicast
+        behavior, but a broadcast publisher cannot negotiate per
+        subscriber.  Should the catalog advertise which features a track
+        uses so clients subscribe eyes-open?  The features member this
+        rests on is confirmed: the Version 2 base carriage envelope
+        defines it as an object of boolean flags, with
+        features.remoteFields as the only flag so far, and requires that
+        an interpreter encountering a flag it does not support SHOULD
+        raise an error and ignore the payload.  This revision settles
+        the easy half by forbidding flags that [SVTA2053] does not
+        define (Section 4.3); the hard half -- a defined flag that some
+        subscribers do not support -- remains.  That rule is written for
+        unicast, where the publisher learns of the failure; on one-to-
+        many the publisher never hears, so the burden has to move to
+        subscribe time.  Note also that if the per-function tracks of a
+        split (Section 9) are published as separate broadcasts rather
+        than sibling tracks, a subscriber selects the functions it
+        supports by subscribing to them, which answers much of this for
+        the split case but not for flagged features within a single
+        track.
 
-   7.  *Record integrity*: resolved in this revision in favor of per-
-       record signing (Section 4.5: a detached JWS over the canonical
-       record, EdDSA with Ed25519 mandatory to implement; Section 12.1
-       gives the reasoning).  Two questions remain.  Key distribution:
-       the key set is provisioned out of band today; a key, or a key set
-       location, pinned in the catalog or in a track property would let
-       a client that found the track by name verify it without a
-       separate channel, and is a possible [MSF] follow-up.  And the sig
-       member is a binding-level addition to the record structure of
-       Section 8.1 of [MSF]; a record signature defined by [MSF] itself
-       would serve every Event Timeline event class, and the authors
-       intend to raise it there.  A COSE encoding was considered and set
-       aside because the records are JSON.
+   7.   *Record integrity*: resolved in this revision in favor of per-
+        record signing (Section 4.5: a detached JWS over the canonical
+        record, EdDSA with Ed25519 mandatory to implement; Section 12.1
+        gives the reasoning).  Three questions remain.  Key
+        distribution: the key set is provisioned out of band today; a
+        key, or a key set location, pinned in the catalog or in a track
+        property would let a client that found the track by name verify
+        it without a separate channel, and is a possible [MSF] follow-
+        up.  And the sig member is a binding-level addition to the
+        record structure of Section 8.1 of [MSF]; a record signature
+        defined by [MSF] itself would serve every Event Timeline event
+        class, and the authors intend to raise it there.  And the
+        signing time: iat (Section 4.5) is a header parameter name
+        agreed between publisher and verifier, not a registered one, and
+        whether to register it is open.  A COSE encoding was considered
+        and set aside because the records are JSON.
 
-   8.  *No stable placement identifier*: [SVTA2053] gives neither the
-       Pod nor the Slot object an identifier.  A Pod carries start,
-       duration, slots and tracking; a Slot carries type, start,
-       duration, media, identifiers, tracking, verifications, skipOffset
-       and clickThrough.  MediaReference does have an id, but the
-       specification states that uniqueness of that value "is desired,
-       but not required", so it cannot be relied on as a key.  The Slot
-       identifiers array identifies the *creative*, not the *placement*:
-       the same creative may legitimately appear twice in one pod, and
-       each appearance is measured separately.
+   8.   *No stable placement identifier*: [SVTA2053] gives neither the
+        Pod nor the Slot object an identifier.  A Pod carries start,
+        duration, slots and tracking; a Slot carries type, start,
+        duration, media, identifiers, tracking, verifications,
+        skipOffset and clickThrough.  MediaReference does have an id,
+        but the specification states that uniqueness of that value "is
+        desired, but not required", so it cannot be relied on as a key.
+        The Slot identifiers array identifies the *creative*, not the
+        *placement*: the same creative may legitimately appear twice in
+        one pod, and each appearance is measured separately.
 
-       While an envelope carries a whole pod, correlation is structural
-       and the absence costs nothing.  It only bites once records are
-       decomposed -- which [SVTA2053] itself already does in two places,
-       the $remote fields that resolve slots, tracking and verifications
-       separately, and the HLS Interstitial ASSET-LIST mapping, whose
-       own note observes that it "separates the Slot objects from the
-       Pod objects without explicit reference".  This document
-       decomposes further still if the event class is split by function
-       across sibling tracks (Section 9), because then a tracking or
-       verification record and the creative record it belongs to arrive
-       on different tracks: a shared index identifies the placement
-       opportunity, not which slot within it.
+        While an envelope carries a whole pod, correlation is structural
+        and the absence costs nothing.  It only bites once records are
+        decomposed -- which [SVTA2053] itself already does in two
+        places, the $remote fields that resolve slots, tracking and
+        verifications separately, and the HLS Interstitial ASSET-LIST
+        mapping, whose own note observes that it "separates the Slot
+        objects from the Pod objects without explicit reference".  This
+        document decomposes further still if the event class is split by
+        function across sibling tracks (Section 9), because then a
+        tracking or verification record and the creative record it
+        belongs to arrive on different tracks: a shared index identifies
+        the placement opportunity, not which slot within it.
 
-       Three ways out.  Derive a composite key from what already exists
-       -- creative identifiers plus the slot's ordinal position within
-       the pod, anchored by the shared index -- which needs no change to
-       [SVTA2053] but is positional and therefore fragile under pod
-       rewriting.  Or request stable id fields on Pod and Slot from the
-       SVTA Advertising Working Group, which is the clean fix and the
-       one their ASSET-LIST note already argues for.  Or define
-       identifiers in this document, which is the wrong layer: payload
-       normativity belongs with [SVTA2053] and this binding should not
-       fork the data model.  The first is what an implementation can do
-       today; the second is what the ecosystem should have.
+        Three ways out.  Derive a composite key from what already exists
+        -- creative identifiers plus the slot's ordinal position within
+        the pod, anchored by the shared index -- which needs no change
+        to [SVTA2053] but is positional and therefore fragile under pod
+        rewriting.  Or request stable id fields on Pod and Slot from the
+        SVTA Advertising Working Group, which is the clean fix and the
+        one their ASSET-LIST note already argues for.  Or define
+        identifiers in this document, which is the wrong layer: payload
+        normativity belongs with [SVTA2053] and this binding should not
+        fork the data model.  The first is what an implementation can do
+        today; the second is what the ecosystem should have.
 
-       The deployed player (Section 11) takes the first way, with an
-       occurrence count in place of the raw ordinal: a slot's key is its
-       identifiers plus the number of earlier slots in the same pod that
-       carry the same identifiers.  That keeps a superseding record that
-       drops a slot from shifting the other slots' firing history.  It
-       would still mis-key two appearances of one creative if a rewrite
-       reordered them.
+        The second has been asked for.  An optional id on Pod and on
+        Slot, the same each time the same Pod or Slot is signaled, was
+        raised with the SVTA Advertising Working Group in November 2026
+        and is proposed for the 3rd edition [SVTA2053-2].  A record that
+        carries such members is acceptable on this track today, because
+        a receiver ignores members it does not recognize
+        (Section 4.3.1).  If an edition defines them, a receiver can key
+        a Slot by its id, and this item closes by reference.
+
+        The deployed player (Section 11) takes the first way, with an
+        occurrence count in place of the raw ordinal: a slot's key is
+        its identifiers plus the number of earlier slots in the same pod
+        that carry the same identifiers.  That keeps a superseding
+        record that drops a slot from shifting the other slots' firing
+        history.  It would still mis-key two appearances of one creative
+        if a rewrite reordered them.
+
+   9.   *No extension point*: [SVTA2053] has no member for data that one
+        operator or vendor defines for itself, and no statement of what
+        an interpreter does with a member it does not recognize.  [VAST]
+        has the first: its Extensions and CreativeExtensions elements
+        hold custom content, each entry carrying a type attribute.  A
+        deployment whose ad decisions arrive as VAST therefore has
+        fields with nowhere to go in this model.  The features object
+        cannot serve, because a flag set there has to be supported by
+        every interpreter (item 6).
+
+        Section 4.3.1 is an interim rule for this track: an extensions
+        object on the envelope, Pod and Slot, keyed by a name its
+        definer controls, with members a receiver ignores when it does
+        not recognize them.  As with item 8, the lasting answer is not
+        this document's to give, because payload normativity belongs
+        with [SVTA2053].  What this binding needs from the SVTA
+        Advertising Working Group is twofold: a statement that an
+        interpreter ignores members it does not recognize, and that
+        optional container.  Both were raised with the Working Group in
+        November 2026 and are proposed for the 3rd edition [SVTA2053-2],
+        in the form Section 4.3.1 uses.  With both in [SVTA2053],
+        Section 4.3.1 reduces to a reference to them.
+
+   10.  *Interactive components*: [SVTA2053] carries a click-through
+        (clickThrough, clickTracking) and nothing for a component that a
+        runtime on the device renders: no member for the runtime's name,
+        the resource it loads or the parameters it is handed, which
+        [VAST] has in InteractiveCreativeFile, in apiFramework and in
+        AdParameters.  The only object of that shape in the model is the
+        Verification, which is for measurement.  The concurrent
+        presentations of the 3rd edition [SVTA2053-2] are layouts of
+        additional media beside the primary content, which is a
+        different thing from a component that a vendor's runtime renders
+        over one linear Slot.
+
+        Section 4.3.2 defines the member for records on this track: an
+        interactive member of the Slot that lists Interactive objects,
+        each with a runtime name, a resource, parameters and tracking,
+        as the Verification has for measurement.  It is the form entered
+        as a proposed change to the working draft of the 3rd edition on
+        2026-11-14, together with three tracking event types for
+        interaction beyond clickTracking.  The item stays open until an
+        edition of [SVTA2053] defines the member, whose definition then
+        governs.  The alternative within this document's reach is a
+        sibling track of its own for interactivity (Section 9), which
+        needs the placement identifier of item 8 to tie a component to
+        its Slot.
 
 11.  Implementation Status
 
@@ -876,11 +1167,11 @@ Table of Contents
    relay to browser, with ad creatives spliced server-side into one
    shared broadcast, so every subscriber receives the same media objects
    -- the condition that motivates this document (Section 1).  The relay
-   is the open-source moq-relay, version 0.17.9 as of this revision; the
-   publisher and player are not publicly available.  Since 2026-10-22
-   the deployment publishes the event class this document defines.  This
-   section reports what it does, what was measured, and what is not yet
-   implemented.  Contact: the author.
+   is the open-source moq-relay, version 0.17.15 as of this revision;
+   the publisher and player are not publicly available.  Since
+   2026-10-22 the deployment publishes the event class this document
+   defines.  This section reports what it does, what was measured, and
+   what is not yet implemented.  Contact: the author.
 
    Publisher, live on both of the deployment's ad-inserted channels
    since 2026-10-22:
@@ -978,12 +1269,26 @@ Table of Contents
       in use and verified against an interop profile by a tool in the
       same codebase.
 
-   NOT yet implemented:
+   Added on 2026-11-04 and 2026-11-05:
 
-   *  Record signatures (Section 4.5).  Records are published without a
-      sig member as of this revision, and the validator does not check
-      one.  The signing and verification code is the published script
-      ([VECTORS]), not yet the publisher.
+   *  Record signatures (Section 4.5).  Since 2026-11-04 every record on
+      every channel of the deployment carries a sig member: Ed25519, one
+      key per channel, the kid being the channel name and a date, and
+      the key set served to the player as a JWK Set. The player verifies
+      each record before it requests anything the record names; a record
+      that fails is treated as absent and the failure is reported once.
+      A monitor outside the publisher verifies the live records every 30
+      minutes.
+
+   *  Signing time (Section 4.5).  Since 2026-11-05 the protected header
+      carries iat, and the player is provisioned with a maximum age of
+      600 seconds, allowing the same clock difference into the future.
+      The case that led to it is the one Section 12.1 describes: after a
+      publisher restart the media timeline starts again, and a valid
+      record from before the restart names a media time ahead of the new
+      playhead.
+
+   NOT yet implemented:
 
    *  Catalog listing.  The ad-creative track is not yet listed in the
       MSF catalog, because the MoQ library in use does not yet emit
@@ -1005,6 +1310,13 @@ Table of Contents
 
    *  slot, trackingEvent and verification envelopes, $remote, and the
       Slot members media, verifications, skipOffset and clickThrough.
+
+   *  Interactive components (Section 4.3.2).  None of the creatives the
+      deployment splices has one.
+
+   *  Extensions (Section 4.3.1).  Records carry no extensions member as
+      of this revision.  The validator and the player read only the
+      members they know, so both ignore any other.
 
    *  A splice signaling track, and so the correlation rules of
       Section 5.2.
@@ -1048,15 +1360,22 @@ Table of Contents
    Verification has limits.  A hostile client can skip the check, so the
    signature is detection and deterrence on the network path, not
    prevention at the device; enforcement against forged requests belongs
-   at the distributor's tracking endpoint.  A signature over content
-   proves origin, not freshness.  Replay is bounded by the index
-   reference -- a record is acted on at the media time it names, and the
-   accessible window of Section 4.1 is short -- and substitution is
-   bounded by per-channel keys (Section 4.5); a deployment that needs
-   tighter binding can place further context in the protected header by
-   agreement with its clients.  In return, verifying clients give the
-   distributor something a publisher cannot otherwise observe on one-to-
-   many delivery: evidence of tampering on paths it does not operate.
+   at the distributor's tracking endpoint.  A signature alone proves
+   origin and integrity, not freshness.  The index reference bounds
+   replay only while the media timeline keeps advancing: a record is
+   acted on at the media time it names, and the accessible window of
+   Section 4.1 is short.  It no longer bounds it once the timeline
+   starts again, as it does after a publisher restart, because a valid
+   record signed before the restart can then name a media time that lies
+   ahead of the new playhead.  The signing time of Section 4.5, held to
+   a provisioned maximum age, closes that case and limits for how long
+   any signed record can be delivered again.  Substitution between
+   channels is bounded by per-channel keys (Section 4.5); a deployment
+   that needs tighter binding can place further context in the protected
+   header by agreement with its clients.  In return, verifying clients
+   give the distributor something a publisher cannot otherwise observe
+   on one-to-many delivery: evidence of tampering on paths it does not
+   operate.
 
 12.2.  Amplification and Load
 
@@ -1074,7 +1393,10 @@ Table of Contents
    in tracking, $remote, and verification fields.  Verification
    resources are executable code; clients MUST apply their platform's
    script-loading policy and SHOULD load them only for slots that will
-   actually render.
+   actually render.  The same holds for a resource that an interactive
+   component names (Section 4.3.2): a receiver accepts only https there,
+   treats it as code or as configuration of code, and SHOULD load it
+   only from authorities the distributor has designated.
 
 12.4.  Privacy
 
@@ -1087,6 +1409,10 @@ Table of Contents
    handle real device context (addresses, user agents) and MUST apply
    applicable consent and data-protection policy before forwarding it to
    vendors.
+
+   Data in extensions (Section 4.3.1) reaches every subscriber and every
+   relay on the path as the rest of the record does, so commercially
+   sensitive values, such as the terms of a deal, do not belong there.
 
 13.  IANA Considerations
 
@@ -1103,7 +1429,7 @@ Table of Contents
     |                          | carriage envelope       | [SVTA2053] |
     +--------------------------+-------------------------+------------+
 
-         Table 1: Addition to the MSF Event Timeline Types registry
+         Table 2: Addition to the MSF Event Timeline Types registry
 
    Editor's note (to be resolved before publication): the URN is defined
    and owned by the SVTA Advertising Working Group; this registration is
@@ -1174,9 +1500,9 @@ Table of Contents
 
    [MOQT]     Nandakumar, S., Vasiliev, V., Swett, I., and A. Frindell,
               "Media over QUIC Transport", Work in Progress, Internet-
-              Draft, draft-ietf-moq-transport-22, 1 October 2026,
+              Draft, draft-ietf-moq-transport-23, 2 November 2026,
               <https://datatracker.ietf.org/doc/html/draft-ietf-moq-
-              transport-22>.
+              transport-23>.
 
    [MOQT-SUBGROUP-PROPS]
               Hošna, M., "Add Subgroup Properties", moq-transport Pull
@@ -1201,6 +1527,10 @@ Table of Contents
               wilaw-moq-scte35-event-timeline-00, 6 July 2026,
               <https://datatracker.ietf.org/doc/html/draft-wilaw-moq-
               scte35-event-timeline-00>.
+
+   [SIMID]    IAB Technology Laboratory, "Secure Interactive Media
+              Interface Definition (SIMID)", n.d.,
+              <https://iabtechlab.com/standards/simid/>.
 
    [SVTA2053-2]
               Streaming Video Technology Alliance (SVTA), "Non-Linear
@@ -1245,24 +1575,29 @@ JSON Schema and Test Vectors
    version 2, one of the four envelope types, a non-empty payload array,
    and no features flag set that [SVTA2053] does not define.  It does
    not validate the payload objects themselves; those are governed by
-   [SVTA2053], not by this document.  It checks the shape of the sig
-   member of Section 4.5 when one is present but does not require it, so
-   that it continues to validate the unsigned records the deployment
-   publishes today (Section 11); verifying a signature is in any case
-   not a schema check.
+   [SVTA2053], not by this document.  It permits members it does not
+   list, which Section 4.3.1 requires a receiver to ignore, and checks
+   the shape of an extensions member on the envelope.  It checks the
+   shape of the sig member of Section 4.5 when one is present but does
+   not require it, so that it continues to validate the unsigned records
+   the deployment publishes today (Section 11); verifying a signature is
+   in any case not a schema check.
 
-   The vectors come in two sets, and both matter: ten files holding
-   twelve records that MUST validate, and eleven records that MUST NOT.
-   A validator that accepts everything passes the first set alone.  The
-   valid set covers each envelope type and each index type, back-to-back
-   placement opportunities, the worked example of Section 6, one Object
-   captured from the running deployment, and signed-pod, a record
-   carrying the sig member of Section 4.5; the Ed25519 test key that
-   signed it is published beside it under vectors/keys/, with a script
-   under scripts/ that signs and verifies records.  Each rejecting case
-   is otherwise valid, so it fails for the reason its name claims;
-   together they pin the constraints most likely to be implemented
-   loosely:
+   The vectors come in two sets, and both matter: twelve files holding
+   fourteen records that MUST validate, and eleven records that MUST
+   NOT.  A validator that accepts everything passes the first set alone.
+   The valid set covers each envelope type and each index type, back-to-
+   back placement opportunities, the worked example of Section 6, one
+   Object captured from the running deployment, extensions, a record
+   with the extensions member of Section 4.3.1 at the envelope, Pod and
+   Slot levels, and two signed records: signed-pod, carrying the sig
+   member of Section 4.5, and signed-pod-iat, the same record signed
+   with a signing time.  The Ed25519 test key that signed them is
+   published beside them under vectors/keys/, with a script under
+   scripts/ that signs and verifies records and can hold a record to a
+   maximum age.  Each rejecting case is otherwise valid, so it fails for
+   the reason its name claims; together they pin the constraints most
+   likely to be implemented loosely:
 
     +========================+========================================+
     | Vector                 | Rejected because                       |
@@ -1301,7 +1636,7 @@ JSON Schema and Test Vectors
     |                        | compact JWS (Section 4.5)              |
     +------------------------+----------------------------------------+
 
-                                  Table 2
+                                  Table 3
 
    The following record is the first of the two in the captured-object
    vector: one Event Timeline Object, captured read-only from the
@@ -1393,6 +1728,52 @@ JSON Schema and Test Vectors
    and signed-pod was verified with the published script, which also
    rejects it once any byte of the record changes and accepts it re-
    serialized with its members reordered.
+
+Changes since draft-riedl-moq-ad-creative-signaling-01
+
+   (To be removed before publication.)
+
+   *  New Section 4.3.1: an interim rule for data that [SVTA2053] does
+      not define.  A publisher places such data in an extensions object
+      on the object it describes, keyed by the party that defines it,
+      never in features; a receiver ignores members it does not
+      recognize, after verifying the signature over the record as
+      received.  The form is the one proposed to the SVTA Advertising
+      Working Group.  Section 4.3 scopes its statement about receivers
+      to features accordingly, and Section 12.4 notes that the data
+      reaches every subscriber and relay.
+
+   *  New Section 4.3.2: an interactive member of the Slot for a
+      component that the viewer can act on, in the form proposed for the
+      3rd edition of [SVTA2053], and what subscriber invariance, the
+      signature and the publication lead mean for it.  Section 10 gains
+      item 10; Section 12.3 and the list of resources in Section 4.5
+      name interactive resources.
+
+   *  Section 4.5: an optional signing time, iat, in the protected
+      header, and a maximum age that a deployment provisions with the
+      key set; the list of checks gains it.  A paragraph on a signature
+      carried on the envelope itself, which does not replace sig.  The
+      sentence on verification keys is reworded.
+
+   *  Section 12.1: the index reference bounds replay only while the
+      media timeline keeps advancing; the signing time covers a restart.
+
+   *  Section 10: item 7 notes that iat is not a registered header
+      parameter name.  Item 8 records that an optional id on Pod and
+      Slot is proposed for the 3rd edition [SVTA2053-2].  New item 9,
+      the missing extension point in [SVTA2053], what this binding needs
+      from the SVTA Advertising Working Group to retire the interim
+      rule, and that both parts are proposed there.
+
+   *  Appendix "JSON Schema and Test Vectors": a new valid vector,
+      extensions, carries the member at the envelope, Pod and Slot
+      levels, and the schema checks its shape on the envelope; a new
+      valid vector, signed-pod-iat, is signed with a signing time, and
+      the script can sign with one and hold a record to a maximum age.
+
+   *  Section 11: signatures and the signing time are deployed; the
+      deployment publishes no extensions member yet.
 
 Changes since draft-riedl-moq-ad-creative-signaling-00
 
