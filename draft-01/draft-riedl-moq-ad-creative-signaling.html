@@ -1819,7 +1819,7 @@ relay-cacheable. It costs one 64-byte signature and a short protected
 header per record, and one Ed25519 verification per record received.
 <span>[<a href="#VECTORS" class="cite xref">VECTORS</a>]</span> contains a signed record with the test key that signed it
 and a script that signs and verifies records; the example in
-<a href="#example" class="auto internal xref">Section 6</a> omits <code>sig</code> for brevity.<a href="#section-4.5-9" class="pilcrow">¶</a></p>
+<a href="#example" class="auto internal xref">Section 6</a> shows the <code>sig</code> member of its record.<a href="#section-4.5-9" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -1990,6 +1990,26 @@ via <code>$remote</code> (<a href="#capability-urls" class="auto internal xref">
 record is also published as the <code>worked-example</code> test vector. The
 appendix on test vectors (<a href="#schema" class="auto internal xref">Appendix "JSON Schema and Test Vectors"</a>) shows a record captured from the
 running deployment.<a href="#section-6-5" class="pilcrow">¶</a></p>
+<p id="section-6-6">The listing leaves out the <code>sig</code> member of the record (<a href="#signing" class="auto internal xref">Section 4.5</a>) so
+that the payload stays readable. Signed with the test key of
+<span>[<a href="#VECTORS" class="cite xref">VECTORS</a>]</span> at a signing time of 2026-11-05T00:00:00Z, the member is
+the following, and the test vector carries it. The value is one
+string, shown here on four lines:<a href="#section-6-6" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-6-7">
+<pre>
+"sig": "eyJhbGciOiJFZERTQSIsImtpZCI6InRlc3QtMjAyNi0xMSIsImI2NCI6ZmFsc
+  2UsImNyaXQiOlsiYjY0Il0sImlhdCI6MTc5MzgzNjgwMH0..RnCPa9EkLkeVcXuE8e
+  4ZvJRZ-4nYd8iq-KFG9clvOg8nq9gkc-kIE4x6MPhA7JYUFlx0nW8WyJ8LQFRa0FQV
+  Dw"
+</pre><a href="#section-6-7" class="pilcrow">¶</a>
+</div>
+<p id="section-6-8">Its protected header, decoded, carries the signing time as <code>iat</code>:<a href="#section-6-8" class="pilcrow">¶</a></p>
+<div class="lang-json sourcecode" id="section-6-9">
+<pre>
+{"alg":"EdDSA","kid":"test-2026-11","b64":false,
+ "crit":["b64"],"iat":1793836800}
+</pre><a href="#section-6-9" class="pilcrow">¶</a>
+</div>
 </section>
 </div>
 <div id="capability-urls">
@@ -2275,6 +2295,13 @@ there. And the signing time: <code>iat</code> (<a href="#signing" class="auto in
 parameter name agreed between publisher and verifier, not a
 registered one, and whether to register it is open. A COSE encoding
 was considered and set aside because the records are JSON.<a href="#section-10-2.7.1" class="pilcrow">¶</a></p>
+<p id="section-10-2.7.2">
+The construction of <a href="#signing" class="auto internal xref">Section 4.5</a> is also proposed for the 3rd edition
+of <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> <span>[<a href="#SVTA2053-2" class="cite xref">SVTA2053-2</a>]</span>, as an optional signature on the
+envelope. If an edition defines it, <a href="#signing" class="auto internal xref">Section 4.5</a> is expected to cite
+that definition for the construction and to keep only what belongs
+to the record: that the signature is required, that it covers the
+index reference, and that it is made per record.<a href="#section-10-2.7.2" class="pilcrow">¶</a></p>
 </li>
         <li id="section-10-2.8">
           <p id="section-10-2.8.1"><strong>No stable placement identifier</strong>: <span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> gives neither the Pod
@@ -2886,10 +2913,11 @@ not a schema check.<a href="#appendix-B-2" class="pilcrow">¶</a></p>
 fourteen records that <span class="bcp14">MUST</span> validate, and eleven records that <span class="bcp14">MUST NOT</span>. A validator
 that accepts everything passes the first set alone. The valid set covers
 each envelope type and each index type, back-to-back placement
-opportunities, the worked example of <a href="#example" class="auto internal xref">Section 6</a>, one Object captured
+opportunities, the worked example of <a href="#example" class="auto internal xref">Section 6</a> with its signature,
+one Object captured
 from the running deployment, <code>extensions</code>, a record with the
 <code>extensions</code> member of <a href="#extensions" class="auto internal xref">Section 4.3.1</a> at the envelope, Pod and Slot
-levels, and two signed records: <code>signed-pod</code>, carrying the
+levels, and two further signed records: <code>signed-pod</code>, carrying the
 <code>sig</code> member of <a href="#signing" class="auto internal xref">Section 4.5</a>, and <code>signed-pod-iat</code>, the same record
 signed with a signing time. The Ed25519 test key that signed them is
 published beside them under <code>vectors/keys/</code>, with a script under
@@ -3058,8 +3086,7 @@ carries an <code>offset</code>, so each event's timing follows from its type
 Object, about 100 s later on the same timeline, is a four-slot pod of
 15 s creatives.<a href="#appendix-B-7" class="pilcrow">¶</a></p>
 <p id="appendix-B-8">Apart from <code>captured-object</code>, the vectors are conformance examples
-authored against this specification. Every vector other than the two
-signature vectors was checked two ways:
+authored against this specification. Every vector was checked two ways:
 against the schema, with a JSON Schema draft 2020-12 validator; and
 against the record and payload checks of the implementation in
 <a href="#impl-status" class="auto internal xref">Section 11</a>, the same checks its read-only validator applies to live
@@ -3069,10 +3096,11 @@ required identifiers, non-empty <code>urls</code>, and defined event types). Bot
 accept every valid vector and reject every invalid one, each for the
 reason its name gives. The implementation reads the index keys in the
 spelling <span>[<a href="#MSF" class="cite xref">MSF</a>]</span> used before its -02 revision (<a href="#impl-status" class="auto internal xref">Section 11</a>), so for
-that check the keys were given to it in that spelling. The two signature vectors were checked against
-the schema, and <code>signed-pod</code> was verified with the published script,
-which also rejects it once any byte of the record changes and accepts
-it re-serialized with its members reordered.<a href="#appendix-B-8" class="pilcrow">¶</a></p>
+that check the keys were given to it in that spelling. The signatures
+of <code>signed-pod</code>, <code>signed-pod-iat</code> and <code>worked-example</code> were verified
+with the published script, which also rejects <code>signed-pod</code> once any
+byte of the record changes and accepts it re-serialized with its
+members reordered.<a href="#appendix-B-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="changes-01">
@@ -3119,18 +3147,24 @@ the SVTA Advertising Working Group to retire the interim rule, and
 that both parts are proposed there.<a href="#appendix-C-2.5.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="appendix-C-2.6">
-          <p id="appendix-C-2.6.1"><a href="#schema" class="auto internal xref">Appendix "JSON Schema and Test Vectors"</a>: a new valid vector, <code>extensions</code>, carries the member at
+          <p id="appendix-C-2.6.1"><a href="#example" class="auto internal xref">Section 6</a> shows the <code>sig</code> member of its record, signed with a
+signing time, and the <code>worked-example</code> vector carries it. Item 7 of
+<a href="#open-issues" class="auto internal xref">Section 10</a> says what <a href="#signing" class="auto internal xref">Section 4.5</a> would keep if an edition of
+<span>[<a href="#SVTA2053" class="cite xref">SVTA2053</a>]</span> defines the construction.<a href="#appendix-C-2.6.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-2.7">
+          <p id="appendix-C-2.7.1"><a href="#schema" class="auto internal xref">Appendix "JSON Schema and Test Vectors"</a>: a new valid vector, <code>extensions</code>, carries the member at
 the envelope, Pod and Slot levels, and the schema checks its shape on
 the envelope; a new valid vector, <code>signed-pod-iat</code>, is signed with a
 signing time, and the script can sign with one and hold a record to a
-maximum age.<a href="#appendix-C-2.6.1" class="pilcrow">¶</a></p>
-</li>
-        <li class="normal" id="appendix-C-2.7">
-          <p id="appendix-C-2.7.1"><a href="#impl-status" class="auto internal xref">Section 11</a>: signatures and the signing time are deployed; the
-deployment publishes no <code>extensions</code> member yet.<a href="#appendix-C-2.7.1" class="pilcrow">¶</a></p>
+maximum age.<a href="#appendix-C-2.7.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="appendix-C-2.8">
-          <p id="appendix-C-2.8.1">Aligned with draft-ietf-moq-msf-02. The index keys are <code>T</code>, <code>L</code> and
+          <p id="appendix-C-2.8.1"><a href="#impl-status" class="auto internal xref">Section 11</a>: signatures and the signing time are deployed; the
+deployment publishes no <code>extensions</code> member yet.<a href="#appendix-C-2.8.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-2.9">
+          <p id="appendix-C-2.9.1">Aligned with draft-ietf-moq-msf-02. The index keys are <code>T</code>, <code>L</code> and
 <code>M</code> in the text, the schema and every vector, and the signed vectors
 are signed again (<a href="#conventions" class="auto internal xref">Section 2</a>, <a href="#record-structure" class="auto internal xref">Section 4.1</a>, <a href="#schema" class="auto internal xref">Appendix "JSON Schema and Test Vectors"</a>);
 <a href="#impl-status" class="auto internal xref">Section 11</a> records that the deployment still publishes the
@@ -3141,7 +3175,7 @@ data. <a href="#record-structure" class="auto internal xref">Section 4.1</a> sta
 and Objects itself, which <span>[<a href="#MSF" class="cite xref">MSF</a>]</span> now leaves to the event type; the
 rule is unchanged. <a href="#iana" class="auto internal xref">Section 13</a> uses the columns the registry now has and
 notes its guidance on URNs. Item 7 of <a href="#open-issues" class="auto internal xref">Section 10</a> names the new
-header data as a possible carrier for a key set location.<a href="#appendix-C-2.8.1" class="pilcrow">¶</a></p>
+header data as a possible carrier for a key set location.<a href="#appendix-C-2.9.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>
