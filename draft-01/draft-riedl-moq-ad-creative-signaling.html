@@ -31,13 +31,13 @@ counterpart of the DASH and HLS carriage bindings defined by SVTA
 <!-- Generator version information:
   xml2rfc 3.35.0
     Python 3.14.10
-    ConfigArgParse 1.9.0
+    ConfigArgParse 1.10.1
     google-i18n-address 3.1.1
     intervaltree 3.2.1
     Jinja2 3.1.6
     lxml 6.1.1
     natsort 8.4.0
-    platformdirs 4.14.3
+    platformdirs 4.14.7
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.33.1
@@ -1061,7 +1061,7 @@ svg {
 </tr></thead>
 <tfoot><tr>
 <td class="left">Riedl</td>
-<td class="center">Expires 19 May 2027</td>
+<td class="center">Expires 24 May 2027</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1074,12 +1074,12 @@ svg {
 <dd class="internet-draft">draft-riedl-moq-ad-creative-signaling-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-11-15" class="published">15 November 2026</time>
+<time datetime="2026-11-20" class="published">20 November 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2027-05-19">19 May 2027</time></dd>
+<dd class="expires"><time datetime="2027-05-24">24 May 2027</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1138,7 +1138,7 @@ counterpart of the DASH and HLS carriage bindings defined by SVTA
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 19 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 24 May 2027.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -2179,7 +2179,9 @@ the creatives ahead of the splice.<a href="#section-9-3" class="pilcrow">¶</a><
 presentations such as overlays, squeezebacks and L-shapes. It is
 specified as an additive extension of the Version 2 carriage envelope
 (a Viewport data type, a PresentationType enumeration and layout
-control) and defines carriage for DASH and HLS. This document carries
+control). Its project scope defines HLS carriage for concurrent
+presentations and leaves normative DASH carriage for them to a later
+edition. This document carries
 the Version 2 envelope without interpreting the payload objects
 (<a href="#schema" class="auto internal xref">Appendix "JSON Schema and Test Vectors"</a>), so payloads using those extensions would ride unchanged on
 an ad creative signaling track. Carriage over the MSF Event Timeline, as
@@ -2255,8 +2257,10 @@ signaling track or an index defined against something other than the
 media track's Group IDs. The proposal was not resolved at the
 2026-09-08 interim; at the 2026-10-14 interim the working group took
 the direction of reducing it to the group-aligned mode, with other
-modes left to extensions, and a consensus call is pending as of this
-revision. At least one implementation (MOQtail) reports partial
+modes left to extensions. As of this revision the proposal is still
+open, beside a narrower alternative: a best-effort hand-off between
+aligned tracks in which the publisher or relay chooses the Group at
+which the switch happens. At least one implementation (MOQtail) reports partial
 draft-18 support, so experience should be available before this
 document has to choose.<a href="#section-10-2.4.2" class="pilcrow">¶</a></p>
 </li>
@@ -2527,7 +2531,10 @@ delay, with at most 8 ms of spread within each ad.<a href="#section-11-8.3.1" cl
           <p id="section-11-10.1.1">Placement opportunities on the live channel detected from
 <strong>inbound</strong> in-band SCTE-35, parsed to a break window and duration.
 The deployment consumes SCTE-35; it does not publish a splice
-signaling track.<a href="#section-11-10.1.1" class="pilcrow">¶</a></p>
+signaling track. The live channel has been out of the running
+deployment since 2026-11-06 while its source feed is replaced, so
+this part is implemented but not running as of this revision; the
+channels that run are assembled from a schedule.<a href="#section-11-10.1.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-11-10.2">
           <p id="section-11-10.2.1">Tracking indirection as described in <a href="#capability-urls" class="auto internal xref">Section 7</a>: a proxy
@@ -2917,18 +2924,19 @@ does not validate the payload objects themselves; those are governed by
 list, which <a href="#extensions" class="auto internal xref">Section 4.3.1</a> requires a receiver to ignore, and checks
 the shape of an <code>extensions</code> member on the envelope. It checks the shape of the <code>sig</code>
 member of <a href="#signing" class="auto internal xref">Section 4.5</a> when one is present but does not require it, so
-that it continues to validate the unsigned records the deployment
-publishes today (<a href="#impl-status" class="auto internal xref">Section 11</a>); verifying a signature is in any case
-not a schema check.<a href="#appendix-B-2" class="pilcrow">¶</a></p>
+that it continues to validate records published before the deployment
+signed them, such as the one in the <code>captured-object</code> vector
+(<a href="#impl-status" class="auto internal xref">Section 11</a>); verifying a signature is in any case not a schema
+check.<a href="#appendix-B-2" class="pilcrow">¶</a></p>
 <p id="appendix-B-3">The vectors come in two sets, and both matter: twelve files holding
 fourteen records that <span class="bcp14">MUST</span> validate, and eleven records that <span class="bcp14">MUST NOT</span>. A validator
 that accepts everything passes the first set alone. The valid set covers
 each envelope type and each index type, back-to-back placement
 opportunities, the worked example of <a href="#example" class="auto internal xref">Section 6</a> with its signature,
 one Object captured
-from the running deployment, <code>extensions</code>, a record with the
-<code>extensions</code> member of <a href="#extensions" class="auto internal xref">Section 4.3.1</a> at the envelope, Pod and Slot
-levels, and two further signed records: <code>signed-pod</code>, carrying the
+from the running deployment, a record with the <code>extensions</code> member of
+<a href="#extensions" class="auto internal xref">Section 4.3.1</a> at the envelope, Pod and Slot levels, and two further
+signed records: <code>signed-pod</code>, carrying the
 <code>sig</code> member of <a href="#signing" class="auto internal xref">Section 4.5</a>, and <code>signed-pod-iat</code>, the same record
 signed with a signing time. The Ed25519 test key that signed them is
 published beside them under <code>vectors/keys/</code>, with a script under
@@ -3192,6 +3200,14 @@ and Objects itself, which <span>[<a href="#MSF" class="cite xref">MSF</a>]</span
 rule is unchanged. <a href="#iana" class="auto internal xref">Section 13</a> uses the columns the registry now has and
 notes its guidance on URNs. Item 7 of <a href="#open-issues" class="auto internal xref">Section 10</a> names the new
 header data as a possible carrier for a key set location.<a href="#appendix-C-2.10.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="appendix-C-2.11">
+          <p id="appendix-C-2.11.1">Brought up to date as of this revision: <a href="#future-carriage" class="auto internal xref">Section 9</a> says
+which carriage the 3rd edition <span>[<a href="#SVTA2053-2" class="cite xref">SVTA2053-2</a>]</span> defines for concurrent
+presentations; item 4 of <a href="#open-issues" class="auto internal xref">Section 10</a> gives the state of track
+switching in the working group; <a href="#impl-status" class="auto internal xref">Section 11</a> notes that the live
+channel is not running at present; and <a href="#schema" class="auto internal xref">Appendix "JSON Schema and Test Vectors"</a> no longer calls the
+deployment's records unsigned.<a href="#appendix-C-2.11.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 </section>
