@@ -963,7 +963,9 @@ The data model itself is also growing. SVTA is preparing a 3rd edition,
 presentations such as overlays, squeezebacks and L-shapes. It is
 specified as an additive extension of the Version 2 carriage envelope
 (a Viewport data type, a PresentationType enumeration and layout
-control) and defines carriage for DASH and HLS. This document carries
+control). Its project scope defines HLS carriage for concurrent
+presentations and leaves normative DASH carriage for them to a later
+edition. This document carries
 the Version 2 envelope without interpreting the payload objects
 ({{schema}}), so payloads using those extensions would ride unchanged on
 an ad creative signaling track. Carriage over the MSF Event Timeline, as
@@ -1031,8 +1033,10 @@ discussion; it is to be removed before publication.
    media track's Group IDs. The proposal was not resolved at the
    2026-09-08 interim; at the 2026-10-14 interim the working group took
    the direction of reducing it to the group-aligned mode, with other
-   modes left to extensions, and a consensus call is pending as of this
-   revision. At least one implementation (MOQtail) reports partial
+   modes left to extensions. As of this revision the proposal is still
+   open, beside a narrower alternative: a best-effort hand-off between
+   aligned tracks in which the publisher or relay chooses the Group at
+   which the switch happens. At least one implementation (MOQtail) reports partial
    draft-18 support, so experience should be available before this
    document has to choose.
 
@@ -1273,7 +1277,10 @@ Unchanged from the previous revision:
 * Placement opportunities on the live channel detected from
   **inbound** in-band SCTE-35, parsed to a break window and duration.
   The deployment consumes SCTE-35; it does not publish a splice
-  signaling track.
+  signaling track. The live channel has been out of the running
+  deployment since 2026-11-06 while its source feed is replaced, so
+  this part is implemented but not running as of this revision; the
+  channels that run are assembled from a schedule.
 * Tracking indirection as described in {{capability-urls}}: a proxy
   holds vendor beacon URLs and returns compact per-event capability
   URLs, which devices request with their own client identifier, with
@@ -1481,9 +1488,10 @@ does not validate the payload objects themselves; those are governed by
 list, which {{extensions}} requires a receiver to ignore, and checks
 the shape of an `extensions` member on the envelope. It checks the shape of the `sig`
 member of {{signing}} when one is present but does not require it, so
-that it continues to validate the unsigned records the deployment
-publishes today ({{impl-status}}); verifying a signature is in any case
-not a schema check.
+that it continues to validate records published before the deployment
+signed them, such as the one in the `captured-object` vector
+({{impl-status}}); verifying a signature is in any case not a schema
+check.
 
 The vectors come in two sets, and both matter: twelve files holding
 fourteen records that MUST validate, and eleven records that MUST NOT. A validator
@@ -1491,9 +1499,9 @@ that accepts everything passes the first set alone. The valid set covers
 each envelope type and each index type, back-to-back placement
 opportunities, the worked example of {{example}} with its signature,
 one Object captured
-from the running deployment, `extensions`, a record with the
-`extensions` member of {{extensions}} at the envelope, Pod and Slot
-levels, and two further signed records: `signed-pod`, carrying the
+from the running deployment, a record with the `extensions` member of
+{{extensions}} at the envelope, Pod and Slot levels, and two further
+signed records: `signed-pod`, carrying the
 `sig` member of {{signing}}, and `signed-pod-iat`, the same record
 signed with a signing time. The Ed25519 test key that signed them is
 published beside them under `vectors/keys/`, with a script under
@@ -1671,6 +1679,12 @@ members reordered.
   rule is unchanged. {{iana}} uses the columns the registry now has and
   notes its guidance on URNs. Item 7 of {{open-issues}} names the new
   header data as a possible carrier for a key set location.
+* Brought up to date as of this revision: {{future-carriage}} says
+  which carriage the 3rd edition {{SVTA2053-2}} defines for concurrent
+  presentations; item 4 of {{open-issues}} gives the state of track
+  switching in the working group; {{impl-status}} notes that the live
+  channel is not running at present; and {{schema}} no longer calls the
+  deployment's records unsigned.
 
 # Changes since draft-riedl-moq-ad-creative-signaling-00 {#changes}
 {:numbered="false"}
